@@ -97,14 +97,14 @@ const NewsNotice = (props) => {
             noticeParams.language = 'ZH';
             pageTotal = '共';
             pageItems = '条';
-            if (keyType && keyType == 2) {
+            if ((keyType && keyType == 2) || keyType == 0) {
                 setOneInfoTitle('新闻公告&研究报告');
             }
         } else {
             noticeParams.language = 'EN';
             pageTotal = 'Total';
             pageItems = 'items';
-            if (keyType && keyType == 2) {
+            if ((keyType && keyType == 2) || keyType == 0) {
                 setOneInfoTitle('Press Announcements & Research Reports');
             }
         }

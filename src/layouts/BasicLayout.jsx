@@ -37,7 +37,7 @@ const menuDataRender = (menuList) =>
 
 const defaultFooterDom = (
   <DefaultFooter
-    copyright={`2021GMT`}
+    copyright={`Copyright © 2021 GMT DATA TERMINAL All Rights Reserved.`}
   />
 );
 

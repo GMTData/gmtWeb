@@ -2,42 +2,51 @@
 export const menuList = [
     {
         id: 0,
-        name: '概览'
+        name: '概览',
+        nameEn: 'Overview',
     },
     {
         id: 1,
         name: '公司资料&证券资料',
+        nameEn: 'Company Information & Securities Information',
         subMenu: [
             {
                 id: 101,
-                name: '公司介绍'
+                name: '公司介绍',
+                nameEn: 'Company introduction'
             },
             {
                 id: 102,
-                name: '董事会高管'
+                name: '董事会高管',
+                nameEn: 'Board of directors'
             },
             {
                 id: 103,
-                name: '股票详情'
+                name: '股票详情',
+                nameEn: 'Stock details'
             }
         ]
     },
     {
         id: 2,
         name: '新闻公告&研究报告',
+        nameEn: 'Press Announcements & Research Reports'
     },
     {
         id: 3,
         name: '股本股东',
+        nameEn: 'Equity shareholders',
         subMenu: [
             {
                 id: 301,
                 name: '股东报告',
-                type: 'Consolidated'
+                nameEn: 'Shareholder report',
+                type: 'Consolidated',
             },
             {
                 id: 302,
                 name: '基金持仓',
+                nameEn: 'Fund positions',
                 type: 'Fund'
             },
         ]
@@ -45,66 +54,81 @@ export const menuList = [
     {
         id: 4,
         name: '盈利预测&研究报告',
+        nameEn: 'Earnings Forecasts & Research Reports',
         subMenu: [
             {
                 id: 401,
                 name: '现金流量表预测',
+                nameEn: 'Cash flow statement forecast',
             },
             {
                 id: 402,
                 name: '资产负债表预测',
+                nameEn: 'Balance sheet forecast',
             },
             {
                 id: 403,
                 name: '损益表预测',
+                nameEn: 'Profit and loss statement forecast',
             },
             {
                 id: 404,
                 name: '推荐&目标价',
+                nameEn: 'Recommendation & Target Price',
             },
         ]
     },
     {
         id: 5,
         name: '交易&估值',
+        nameEn: 'Trading & Valuation',
         subMenu: [
             {
                 id: 501,
                 name: '每日行情',
+                nameEn: 'The daily market',
             },
             {
                 id: 502,
                 name: '估值分析',
+                nameEn: 'Valuation analysis',
             },
         ]
     },
     {
         id: 6,
         name: '财务数据',
+        nameEn: 'Financial data',
         subMenu: [
             {
                 id: 601,
                 name: '成长能力',
+                nameEn: 'Growth ability',
             },
             {
                 id: 602,
                 name: '现金流量',
+                nameEn: 'The cash flow',
             },
             {
                 id: 603,
-                name: '损益表'
+                name: '损益表',
+                nameEn: 'The income statement',
             },
             {
                 id: 604,
-                name: '资产负债表'
+                name: '资产负债表',
+                nameEn: 'Balance sheet',
             },
             {
                 id: 605,
                 name: '盈利能力与收益质量',
+                nameEn: 'Profitability and earnings quality',
             },
             {
                 id: 606,
                 name: '营运能力',
+                nameEn: 'Operation ability',
             },
             // {
             //     id: 607,
@@ -113,47 +137,56 @@ export const menuList = [
             {
                 id: 608,
                 name: '资本结构与偿债能力',
+                nameEn: 'Capital structure and solvency',
             },
         ]
     },
     {
         id: 7,
         name: '重大事件',
+        nameEn: 'Significant events',
         subMenu: [
             {
                 id: 701,
                 name: '重大事件',
+                nameEn: 'Significant events',
             },
             {
                 id: 702,
                 name: '股利数据',
+                nameEn: 'Dividend data',
             },
         ]
     },
     {
         id: 8,
         name: '同行比较',
+        nameEn: 'Peer comparison',
         subMenu: [
             {
                 id: 801,
                 name: '财务比率比较',
+                nameEn: 'Financial ratio comparison',
             },
             {
                 id: 802,
                 name: '财务数据比较',
+                nameEn: 'Comparison of financial data',
             },
             {
                 id: 803,
-                name: '估值分析比较'
+                name: '估值分析比较',
+                nameEn: 'Valuation analysis and comparison',
             },
             {
                 id: 804,
-                name: '市场表现比较'
+                name: '市场表现比较',
+                nameEn: 'Market performance comparison',
             },
-            {
-                id: 805,
-                name: '盈利预测比较',
-            }
+            // {
+            //     id: 805,
+            //     name: '盈利预测比较',
+            // }
         ]
     },
 ]

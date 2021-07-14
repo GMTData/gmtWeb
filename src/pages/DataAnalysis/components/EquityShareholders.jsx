@@ -241,7 +241,7 @@ const EquityShareholders = (props) => {
         if (intl.locale === "zh-CN") {
             pageTotal = '共';
             pageItems = '条';
-            if (keyType && keyType == 301) {
+            if ((keyType && keyType == 301) || keyType == 0) {
                 setOneInfoTitle('主要股东');
                 setTwoInfoTitle('股东报告');
             } else if (keyType && keyType == 302) {
@@ -251,7 +251,7 @@ const EquityShareholders = (props) => {
         } else {
             pageTotal = 'Total';
             pageItems = 'items';
-            if (keyType && keyType == 301) {
+            if ((keyType && keyType == 301) || keyType == 0) {
                 setOneInfoTitle('Major shareholders');
                 setTwoInfoTitle('Shareholder report');
             } else if (keyType && keyType == 302) {
@@ -276,8 +276,8 @@ const EquityShareholders = (props) => {
     const [barData, setBarData] = useState([]);//条形图数据
     //模糊查询rici集合
     const getShareholderInfo = (ric) => {
-        if (keyType) {
-            if (keyType == 301) {//股东报告
+        if (keyType || keyType == 0) {
+            if (keyType == 301 || keyType == 0) {//股东报告
                 shareParams.type = 'Consolidated';
             } else if (keyType == 302) {//基金持仓
                 shareParams.type = 'Fund';
@@ -376,8 +376,8 @@ const EquityShareholders = (props) => {
                             autoFit
                         >
                             <Coord transpose />
-                            <Axis name="investorName"  visible={false}/>
-                            <Axis name="pctOfSharesOutstanding" tickLine={null} line={null}/>
+                            <Axis name="investorName" visible={false} />
+                            <Axis name="pctOfSharesOutstanding" tickLine={null} line={null} />
                             <Tooltip shared={true} />
                             <Geom
                                 type="interval"
@@ -398,43 +398,44 @@ const EquityShareholders = (props) => {
 
                 </div>
             </div>
-
-            <div className={styles.companyInfo}>
-                <div className={styles.infoTitle}>
-                    <span className={styles.titleTxt}>{twoInfoTitle}</span>
-                </div>
-                <div>
+            {keyType != 0 ?
+                <div className={styles.companyInfo}>
+                    <div className={styles.infoTitle}>
+                        <span className={styles.titleTxt}>{twoInfoTitle}</span>
+                    </div>
                     <div>
-                        {keyType == 301 ?
-                            <Table loading={loadingPageState}
-                                scroll={{ x: 2500 }}
-                                rowKey={(record) => record.InvestorPermId}
-                                columns={columnsConsolidated}
-                                dataSource={pageList}
-                                pagination={false} />
-                            :
-                            keyType == 302 ?
+                        <div>
+                            {keyType == 301 ?
                                 <Table loading={loadingPageState}
                                     scroll={{ x: 2500 }}
                                     rowKey={(record) => record.InvestorPermId}
-                                    columns={columnsFund}
+                                    columns={columnsConsolidated}
                                     dataSource={pageList}
-                                    pagination={false} /> : ''
-                        }
+                                    pagination={false} />
+                                :
+                                keyType == 302 ?
+                                    <Table loading={loadingPageState}
+                                        scroll={{ x: 2500 }}
+                                        rowKey={(record) => record.InvestorPermId}
+                                        columns={columnsFund}
+                                        dataSource={pageList}
+                                        pagination={false} /> : ''
+                            }
 
-                    </div>
-                    <div className={styles.pageBox}>
-                        <Pagination
-                            total={share.TotalShareholderCount}
-                            showTotal={(total) => `${pageTotal} ${share.TotalShareholderCount ? share.TotalShareholderCount : 0} ${pageItems} `}
-                            defaultPageSize={20}
-                            current={cutPage ? cutPage : 1}
-                            onChange={onChange}
-                            onShowSizeChange={onShowSizeChange}
-                        />
+                        </div>
+                        <div className={styles.pageBox}>
+                            <Pagination
+                                total={share.TotalShareholderCount}
+                                showTotal={(total) => `${pageTotal} ${share.TotalShareholderCount ? share.TotalShareholderCount : 0} ${pageItems} `}
+                                defaultPageSize={20}
+                                current={cutPage ? cutPage : 1}
+                                onChange={onChange}
+                                onShowSizeChange={onShowSizeChange}
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
+                : ''}
         </div>
 
     )

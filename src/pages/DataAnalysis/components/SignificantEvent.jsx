@@ -140,7 +140,7 @@ const SignificantEvent = (props) => {
 
     useEffect(() => {
         if (intl.locale === "zh-CN") {
-            if (keyType && keyType == 701) {
+            if ((keyType && keyType == 701) || keyType == 0) {
                 setOneInfoTitle('重大事件');
                 queryByOfTypeList();
             } else if (keyType && keyType == 702) {
@@ -148,7 +148,7 @@ const SignificantEvent = (props) => {
                 queryExDividendsHeadlineLists(ric)
             }
         } else {
-            if (keyType && keyType == 701) {
+            if ((keyType && keyType == 701) || keyType == 0) {
                 setOneInfoTitle('Significant events');
                 queryByOfTypeList();
             } else if (keyType && keyType == 702) {
@@ -299,7 +299,7 @@ const SignificantEvent = (props) => {
                                 className={styles.timeContentLeft}
                                 defaultValue={[moment(timeSpan(7).startDate, dateFormat), moment(timeSpan(7).endDate, dateFormat)]}
                                 onChange={(e) => setTimeData(e)} />
-                            {keyType == 701 ?
+                            {(keyType == 701 || keyType == 0) ?
                                 <span style={{ marginLeft: '32px' }}>
                                     <FormattedMessage id="pages.significantEvent.classification" defaultMessage="分类:" />
                                     <Select
@@ -318,7 +318,7 @@ const SignificantEvent = (props) => {
                                     </Select>
                                 </span> : ''}
                         </div>
-                        {keyType == 701 ?
+                        {(keyType == 701 || keyType == 0) ?
                             <div>
                                 <Table loading={loadingState}
                                     scroll={{ x: '100%' }}

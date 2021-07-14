@@ -42,7 +42,7 @@ export default defineConfig({
     basePath: '/gmtweb/',
   },
   define: {
-    PATH: 'http://13.250.119.166:8088/gmt',
+    PATH: 'http://52.77.209.254:8088/gmt',
     // PATH: '/gmt'
   },
   esbuild: {},

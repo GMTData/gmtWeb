@@ -5,8 +5,6 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { querySecuritiesInfo, queryRicLists } from './service';
 import styles from './index.less';
 import { getAuthority } from '@/utils/authority';
-import moment from 'moment';
-import { isEmpty, mimeType } from '@/utils/utils';
 import CompanyInfo from './components/CompanyInfo';
 import Executives from './components/Executives';
 import EquityShareholders from './components/EquityShareholders';
@@ -101,7 +99,7 @@ const DataAnalysis = () => {
   const menu = (
     <Menu onClick={getTwoMenu}>
       {twoMenu ? twoMenu.map((item) => (
-        <Menu.Item key={item.id}>{item.name}</Menu.Item>
+        <Menu.Item key={item.id}>{intl.locale === "zh-CN" ? item.name : item.nameEn}</Menu.Item>
       )) : ''}
     </Menu>
   );
@@ -141,13 +139,11 @@ const DataAnalysis = () => {
     <PageContainer loading={loadingState} className={styles.securitiesInfo}>
       <div className={styles.inputDiv}>
         <span className={styles.pageTitle}>
-          {stateData.GetShareholdersReport_Response_1 ?
-            stateData.GetShareholdersReport_Response_1.SymbolReport ?
-              stateData.GetShareholdersReport_Response_1.SymbolReport.Identifiers ?
-                stateData.GetShareholdersReport_Response_1.SymbolReport.Identifiers.Identifier.length > 0 ?
-                  stateData.GetShareholdersReport_Response_1.SymbolReport.Identifiers.Identifier.map((idt) => (
-                    idt.Symbol === 'TickerSymbol' ? idt.Value : ''
-                  )) : '' : '' : '' : ''
+          {stateData?.GetShareholdersReport_Response_1?.SymbolReport?.Identifiers ?
+            stateData.GetShareholdersReport_Response_1.SymbolReport.Identifiers.Identifier.length > 0 ?
+              stateData.GetShareholdersReport_Response_1.SymbolReport.Identifiers.Identifier.map((idt) => (
+                idt.Symbol === 'TickerSymbol' ? idt.Value : ''
+              )) : '' : ''
           }
         </span>
         <AutoComplete className={styles.searchInput}
@@ -172,20 +168,52 @@ const DataAnalysis = () => {
             <Dropdown overlay={menu} key={item.id}>
               <span onMouseOver={() => checkInfo(item)}
                 className={[styles.oneSpan, item.id === one ? styles.oneActive : ''].join(' ')}>
-                {item.name}
+                {intl.locale === "zh-CN" ? item.name : item.nameEn}
               </span>
             </Dropdown>
             :
             <span onClick={() => checkInfo(item)}
               key={item.id}
               className={[styles.oneSpan, item.id === one ? styles.oneActive : ''].join(' ')}>
-              {item.name}
+              {intl.locale === "zh-CN" ? item.name : item.nameEn}
             </span>
         )) : ''}
       </div>
       {!loadingListState ?
         <div>
-          {
+          {infoKey == 0 ?
+            <div>
+              <div className={styles.infoBoxContent}>
+                <div className={styles.companyInfo}>
+                  <div className={styles.infoTitle}>
+                    <span className={styles.titleTxt}>公司简介</span>
+                  </div>
+                  <p className={styles.companyInfoDetail}>
+                    {stateData.GetGeneralInformation_Response_1 ? stateData.GetGeneralInformation_Response_1.GeneralInformation.TextInfo ? stateData.GetGeneralInformation_Response_1.GeneralInformation.TextInfo.Text.length > 0 ? stateData.GetGeneralInformation_Response_1.GeneralInformation.TextInfo.Text.map((item) => (
+                      <span>{item.Type == "Business Summary" ? item.Value : ''}</span>
+                    )) : '' : '' : ''}
+                  </p>
+                </div>
+              </div>
+              <div className={styles.infoBoxContent}>
+                <EquityShareholders keyType={infoKey} ric={ricState} />
+              </div>
+              <div className={styles.infoBoxContent}>
+                <NewsNotice keyType={infoKey} ric={ricState} />
+              </div>
+              <div className={styles.infoBoxContent}>
+                <TradingValuation keyType={infoKey} ric={ricState} />
+              </div>
+              <div className={styles.infoBoxContent}>
+                <SignificantEvent keyType={infoKey} ric={ricState} />
+              </div>
+              <div className={styles.infoBoxContent}>
+                {
+                  stateData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol?.Value ?
+                    <PeerComparison keyType={infoKey} ric={ricState} allData={stateData} /> : ''
+                }
+              </div>
+            </div> :
             (infoKey == 101 || infoKey == 103) ?
               stateData.GetGeneralInformation_Response_1 ?
                 <CompanyInfo allData={stateData} keyType={infoKey} /> :
@@ -194,7 +222,7 @@ const DataAnalysis = () => {
                 stateData.GetGeneralInformation_Response_1 ?
                   <Executives allData={stateData} keyType={infoKey} /> :
                   <Spin className={styles.spinLoading} /> :
-                infoKey == 2 ?
+                (infoKey == 2) ?
                   <NewsNotice keyType={infoKey} ric={ricState} /> :
                   (infoKey == 301 || infoKey == 302) ?
                     <div>
@@ -211,8 +239,8 @@ const DataAnalysis = () => {
                           <ProfitForecastReport keyType={infoKey} ric={ricState} /> :
                           (infoKey == 501 || infoKey == 502) ?
                             <TradingValuation keyType={infoKey} ric={ricState} /> :
-                            (infoKey == 801) ?
-                              <PeerComparison keyType={infoKey} ric={ricState} /> :
+                            (infoKey == 801 || infoKey == 802 || infoKey == 803 || infoKey == 804) ?
+                              <PeerComparison keyType={infoKey} ric={ricState} allData={stateData} /> :
                               (infoKey == 701 || infoKey == 702) ?
                                 <SignificantEvent keyType={infoKey} ric={ricState} /> :
                                 ''

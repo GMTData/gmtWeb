@@ -13,7 +13,7 @@ const NewsDetails = (props) => {
   const [loadingState, setLoadingState] = useState(true);//loading
   /** 国际化配置 */
   const intl = useIntl();
-  
+
   let params = {
     newsId: newsId,
     accessToken: userInfo.accessToken
@@ -39,19 +39,20 @@ const NewsDetails = (props) => {
     );
   }, []);
 
-
   return (
     <PageContainer loading={loadingState}>
       <div >
         <div className={styles.infoTime}>{moment(newsInfo.CT).format("yyyy-MM-DD HH:mm:ss")}</div>
         <div className={styles.infoTitle}>{newsInfo.HT}</div>
-        <div className={styles.infoTxt} dangerouslySetInnerHTML={{__html: newsInfo.TE}}></div>
-
+        <div className={styles.infoTxtTitle}></div>
+        <div className={styles.infoTxt}>
+          <div dangerouslySetInnerHTML={{ __html: newsInfo.TE }}></div>
+        </div>
       </div>
     </PageContainer>
   )
 };
 
 export default connect(({ loading }) => ({
-  loading:loading
+  loading: loading
 }))(NewsDetails);

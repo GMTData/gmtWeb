@@ -73,7 +73,7 @@ export async function downloadkNotice(params) {
 }
 //f10-6获取股价接口
 export async function querySharePrice(params) {
-  return request(`${PATH}/f106/getInterday?ric=${params.ric}&startTime=${params.startTime}&endTime=${params.endTime}`, {
+  return request(`${PATH}/f106/getInterday?ric=${params.ric}&startTime=${params.startTime}&endTime=${params.endTime}&period=${params.period}`, {
     method: 'get',
     headers: { 'accessToken': params.accessToken, },
   });
@@ -134,3 +134,11 @@ export async function getIndustryType(params) {
     headers: { 'accessToken': params.accessToken, },
   });
 }
+//f10-9获取财务比率和财务数据比较
+export async function queryFinancialReport(params) {
+  return request(`${PATH}/f109/queryFinancialReprot?industryType=${params.industryType}&timeType=${params.timeType}`, {
+    method: 'get',
+    headers: { 'accessToken': params.accessToken, },
+  });
+}
+

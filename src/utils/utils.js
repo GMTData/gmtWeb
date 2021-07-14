@@ -312,4 +312,17 @@ export const toDecimal = (x) => {
   }
   f = Math.round(x * 100) / 100;
   return f;
-} 
+}
+
+/**
+ * 根据日期进行数组排序
+ */
+export const sortArray = (property) => {
+  return function (a, b) {
+    var value1 = a[property];
+    var value2 = b[property];
+    const startTime = new Date(value1)
+    const endTime = new Date(value2)
+    return startTime.getTime() - endTime.getTime();
+  }
+}

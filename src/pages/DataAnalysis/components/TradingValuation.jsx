@@ -55,6 +55,7 @@ const TradingValuation = (props) => {
         ric: '',
         startTime: moment(timeSpan(7).startDate).format(dateFormat),
         endTime: moment(timeSpan(7).endDate).format(dateFormat),
+        period: 'DAILY',
         accessToken: userInfo.accessToken
     }
     /** 国际化配置 */
@@ -70,7 +71,7 @@ const TradingValuation = (props) => {
         if (intl.locale === "zh-CN") {
             pageTotal = '共';
             pageItems = '条';
-            if (keyType && keyType == 501) {
+            if ((keyType && keyType == 501) || keyType == 0) {
                 setOneInfoTitle('每日行情');
             } else if (keyType && keyType == 502) {
                 setOneInfoTitle('估值分析');
@@ -78,7 +79,7 @@ const TradingValuation = (props) => {
         } else {
             pageTotal = 'Total';
             pageItems = 'items';
-            if (keyType && keyType == 501) {
+            if ((keyType && keyType == 501) || keyType == 0) {
                 setOneInfoTitle('The daily market');
             } else if (keyType && keyType == 502) {
                 setOneInfoTitle('Valuation analysis');
@@ -88,7 +89,7 @@ const TradingValuation = (props) => {
 
     }, [ric]);
 
-    //查询公告列表
+    //查询股价列表
     const querySharePriceLists = (ric) => {
         params.ric = ric;
         querySharePrice(params).then(
