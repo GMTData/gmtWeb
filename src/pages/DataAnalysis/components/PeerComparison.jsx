@@ -82,9 +82,8 @@ const PeerComparison = (props) => {
                 }
             }
         )
-        console.log(2)
 
-    }, [ric, keyType]);
+    }, [keyType, allData]);
 
     const [industryState, setIndustryState] = useState([]);
     //行业分类数据
@@ -554,76 +553,77 @@ const PeerComparison = (props) => {
                                         </div>
                                     </div>
                                     {JSON.stringify(marketState) !== '{}' && allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol?.Value ?
-                                        marketState ? marketState[allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value].length > 0 ?
-                                            marketState[allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value].map((value) => (
-                                                <div className={styles.dataPeer}>
-                                                    <div>
-                                                        <span></span>
-                                                        <span>{value.ric}</span>
-                                                        <span></span>
-                                                    </div>
-                                                    <div>
-                                                        <span>
-                                                            <div className={styles.dataPeerRow}>
-                                                                <div>
-                                                                    {value.lineItemObject ?
-                                                                        value.lineItemObject.Group ?
-                                                                            value.lineItemObject.Group.map((g) => (
-                                                                                g.Ratio ? g.Ratio.map((r) => (
-                                                                                    r.FieldName == 'PR1DAYPRC' ? r.Value : ''
-                                                                                )) : ''
-                                                                            )) : '' : ''
-                                                                    }
-                                                                </div>
-                                                                <div>
-                                                                    {value.lineItemObject ?
-                                                                        value.lineItemObject.Group ?
-                                                                            value.lineItemObject.Group.map((g) => (
-                                                                                g.Ratio ? g.Ratio.map((r) => (
-                                                                                    r.FieldName == 'PR5DAYPRC' ? r.Value : ''
-                                                                                )) : ''
-                                                                            )) : '' : ''
-                                                                    }
-                                                                </div>
-                                                                <div>
-                                                                    {value.lineItemObject ?
-                                                                        value.lineItemObject.Group ?
-                                                                            value.lineItemObject.Group.map((g) => (
-                                                                                g.Ratio ? g.Ratio.map((r) => (
-                                                                                    r.FieldName == 'ChPctPriceMTD' ? r.Value : ''
-                                                                                )) : ''
-                                                                            )) : '' : ''
-                                                                    }
-                                                                </div>
-                                                                <div>
-                                                                    {value.lineItemObject ?
-                                                                        value.lineItemObject.Group ?
-                                                                            value.lineItemObject.Group.map((g) => (
-                                                                                g.Ratio ? g.Ratio.map((r) => (
-                                                                                    r.FieldName == 'PRYTDPCT' ? r.Value : ''
-                                                                                )) : ''
-                                                                            )) : '' : ''
-                                                                    }
-                                                                </div>
-                                                                <div>
+                                        marketState ? marketState[allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value] ?
+                                            marketState[allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value].length > 0 ?
+                                                marketState[allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value].map((value) => (
+                                                    <div className={styles.dataPeer}>
+                                                        <div>
+                                                            <span></span>
+                                                            <span>{value.ric}</span>
+                                                            <span></span>
+                                                        </div>
+                                                        <div>
+                                                            <span>
+                                                                <div className={styles.dataPeerRow}>
+                                                                    <div>
+                                                                        {value.lineItemObject ?
+                                                                            value.lineItemObject.Group ?
+                                                                                value.lineItemObject.Group.map((g) => (
+                                                                                    g.Ratio ? g.Ratio.map((r) => (
+                                                                                        r.FieldName == 'PR1DAYPRC' ? r.Value : ''
+                                                                                    )) : ''
+                                                                                )) : '' : ''
+                                                                        }
+                                                                    </div>
+                                                                    <div>
+                                                                        {value.lineItemObject ?
+                                                                            value.lineItemObject.Group ?
+                                                                                value.lineItemObject.Group.map((g) => (
+                                                                                    g.Ratio ? g.Ratio.map((r) => (
+                                                                                        r.FieldName == 'PR5DAYPRC' ? r.Value : ''
+                                                                                    )) : ''
+                                                                                )) : '' : ''
+                                                                        }
+                                                                    </div>
+                                                                    <div>
+                                                                        {value.lineItemObject ?
+                                                                            value.lineItemObject.Group ?
+                                                                                value.lineItemObject.Group.map((g) => (
+                                                                                    g.Ratio ? g.Ratio.map((r) => (
+                                                                                        r.FieldName == 'ChPctPriceMTD' ? r.Value : ''
+                                                                                    )) : ''
+                                                                                )) : '' : ''
+                                                                        }
+                                                                    </div>
+                                                                    <div>
+                                                                        {value.lineItemObject ?
+                                                                            value.lineItemObject.Group ?
+                                                                                value.lineItemObject.Group.map((g) => (
+                                                                                    g.Ratio ? g.Ratio.map((r) => (
+                                                                                        r.FieldName == 'PRYTDPCT' ? r.Value : ''
+                                                                                    )) : ''
+                                                                                )) : '' : ''
+                                                                        }
+                                                                    </div>
+                                                                    <div>
 
+                                                                    </div>
+                                                                    <div>
+                                                                        {value.lineItemObject ?
+                                                                            value.lineItemObject.Group ?
+                                                                                value.lineItemObject.Group.map((g) => (
+                                                                                    g.Ratio ? g.Ratio.map((r) => (
+                                                                                        r.FieldName == 'PR13WKPCT' ? r.Value : ''
+                                                                                    )) : ''
+                                                                                )) : '' : ''
+                                                                        }
+                                                                    </div>
                                                                 </div>
-                                                                <div>
-                                                                    {value.lineItemObject ?
-                                                                        value.lineItemObject.Group ?
-                                                                            value.lineItemObject.Group.map((g) => (
-                                                                                g.Ratio ? g.Ratio.map((r) => (
-                                                                                    r.FieldName == 'PR13WKPCT' ? r.Value : ''
-                                                                                )) : ''
-                                                                            )) : '' : ''
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        </span>
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                            )) : <Spin className={styles.spinLoading} /> : '' : ''}
+                                                )) : <Spin className={styles.spinLoading} /> : '' : '' : ''}
                                     <div className={styles.dataPeer}>
                                         <div>
                                             <span>美股20</span>

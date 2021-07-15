@@ -300,7 +300,8 @@ const EquityShareholders = (props) => {
                             if (res.data.GetShareholdersReport_Response_1.SymbolReport.Shareholders.Investor) {
                                 let datas = [];
                                 let investor = res.data.GetShareholdersReport_Response_1.SymbolReport.Shareholders.Investor;
-                                for (let i = 0; i < 10; i++) {
+                                let len = investor.length > 10 ? 10 : investor.length;
+                                for (let i = 0; i < len; i++) {
                                     datas.push({
                                         index: i,
                                         investorName: investor[i].Name,
