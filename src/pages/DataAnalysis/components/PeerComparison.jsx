@@ -101,6 +101,7 @@ const PeerComparison = (props) => {
     }
 
     const [marketState, setMarketState] = useState({});
+    const [companyName, setCompanyName] = useState({});//公司名称集合
     //市场表现
     const getRatiosReport = (industryType) => {
         marketParams.industryType = industryType;
@@ -108,7 +109,8 @@ const PeerComparison = (props) => {
             res => {
                 if (res.state) {
                     if (res.data) {
-                        setMarketState(res.data ? res.data : {})
+                        setCompanyName(res.data.names ? res.data.names : {})
+                        setMarketState(res.data.ratiosReport ? res.data.ratiosReport : {})
                     }
                 } else {
                     message.error(res.message);
@@ -118,6 +120,7 @@ const PeerComparison = (props) => {
     }
 
     const [financialState, setFinancialState] = useState({});
+    const [financialName, setFinancialName] = useState({});
     //财务比率和财务数据比较
     const getFinancialReport = (industryType) => {
         reportParams.industryType = industryType;
@@ -125,30 +128,33 @@ const PeerComparison = (props) => {
             res => {
                 if (res.state) {
                     if (res.data) {
-                        Object.keys(res.data).map((fs) => {
-                            let financialArray = [];
-                            Object.keys(res.data[fs]).map((v) => {
-                                let RTLR = 0;
-                                let SCOR = 0;
-                                res.data[fs][v].map((y) => {
-                                    y.lineItemObject.map((l) => {
-                                        if (l.coaCode == 'SCOR') {
-                                            SCOR = l.Value;
-                                        }
-                                        if (l.coaCode == 'RTLR') {
-                                            RTLR = l.Value;
+                        setFinancialName(res.data.names ? res.data.names : {})
+                        if (res.data.financialStatements) {
+                            Object.keys(res.data.financialStatements).map((fs) => {
+                                let financialArray = [];
+                                Object.keys(res.data.financialStatements[fs]).map((v) => {
+                                    let RTLR = 0;
+                                    let SCOR = 0;
+                                    res.data.financialStatements[fs][v].map((y) => {
+                                        y.lineItemObject.map((l) => {
+                                            if (l.coaCode == 'SCOR') {
+                                                SCOR = l.Value;
+                                            }
+                                            if (l.coaCode == 'RTLR') {
+                                                RTLR = l.Value;
+                                            }
+                                        })
+                                        let saleMargin = (SCOR - RTLR) / RTLR * 100;
+                                        if (saleMargin) {
+                                            y.saleMargin = saleMargin.toFixed(2);
                                         }
                                     })
-                                    let saleMargin = (SCOR - RTLR) / RTLR * 100;
-                                    if (saleMargin) {
-                                        y.saleMargin = saleMargin.toFixed(2);
-                                    }
+                                    financialArray.push({ year: v, financial: res.data.financialStatements[fs][v] })
                                 })
-                                financialArray.push({ year: v, financial: res.data[fs][v] })
+                                res.data.financialStatements[fs] = financialArray.sort(sortArray('year')).reverse();
                             })
-                            res.data[fs] = financialArray.sort(sortArray('year')).reverse();
-                        })
-                        setFinancialState(res.data ? res.data : {})
+                            setFinancialState(res.data.financialStatements ? res.data.financialStatements : {})
+                        }
                     }
                 } else {
                     message.error(res.message);
@@ -158,6 +164,7 @@ const PeerComparison = (props) => {
     }
 
     const [valuation, setValuation] = useState([]);//估值分析数据
+    const [valuationName, setValuationName] = useState({});
     //估值分析
     const getValueData = (industryType) => {
         params.industryType = industryType;
@@ -165,7 +172,8 @@ const PeerComparison = (props) => {
             res => {
                 if (res.state) {
                     if (res.data) {
-                        setValuation(res.data ? res.data : [])
+                        setValuationName(res.data.names ? res.data.names : [])
+                        setValuation(res.data.valueData ? res.data.valueData : [])
                     }
                 } else {
                     message.error(res.message);
@@ -224,7 +232,6 @@ const PeerComparison = (props) => {
                     <div>
                         <div className={styles.titilePeer}>
                             <div>
-                                <span>排名</span>
                                 <span>代码</span>
                                 <span>证券简称</span>
                             </div>
@@ -247,7 +254,6 @@ const PeerComparison = (props) => {
                                 allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value == fs ?
                                     <div className={styles.dataPeer}>
                                         <div>
-                                            <span></span>
                                             <span>
                                                 {financialState[fs].map((value, index) => (
                                                     index == 0 ?
@@ -255,7 +261,13 @@ const PeerComparison = (props) => {
                                                 ))
                                                 }
                                             </span>
-                                            <span></span>
+                                            <span>
+                                                {financialState[fs].map((value, index) => (
+                                                    index == 0 ?
+                                                        JSON.stringify(financialName) !== '{}' ? financialName[value.financial[0].ric] : '' : ''
+                                                ))
+                                                }
+                                            </span>
                                         </div>
                                         <div>
                                             <span>
@@ -273,32 +285,12 @@ const PeerComparison = (props) => {
                                         </div>
                                     </div> : ''
                                 : '')) : <Spin className={styles.spinLoading} />}
-                        <div className={styles.dataPeer}>
-                            <div>
-                                <span>美股20</span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                            <div>
-                                <span>
-                                    <div className={styles.dataPeerRow}>
-                                        <div></div>
-                                        <div></div>
-                                        <div></div>
-                                        <div></div>
-                                        <div></div>
-                                        <div></div>
-                                    </div>
-                                </span>
-                            </div>
-                        </div>
 
                         {JSON.stringify(financialState) !== '{}' ? Object.keys(financialState).map((fs) => (
                             allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol ?
                                 allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value != fs ?
                                     <div className={styles.dataPeer}>
                                         <div>
-                                            <span></span>
                                             <span>
                                                 {financialState[fs].map((value, index) => (
                                                     index == 0 ?
@@ -306,7 +298,13 @@ const PeerComparison = (props) => {
                                                 ))
                                                 }
                                             </span>
-                                            <span></span>
+                                            <span>
+                                                {financialState[fs].map((value, index) => (
+                                                    index == 0 ?
+                                                        JSON.stringify(financialName) !== '{}' ? financialName[value.financial[0].ric] : '' : ''
+                                                ))
+                                                }
+                                            </span>
                                         </div>
                                         <div>
                                             <span>
@@ -329,7 +327,6 @@ const PeerComparison = (props) => {
                         <div>
                             <div className={styles.titilePeer}>
                                 <div>
-                                    <span>排名</span>
                                     <span>代码</span>
                                     <span>证券简称</span>
                                 </div>
@@ -352,7 +349,6 @@ const PeerComparison = (props) => {
                                     allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value == fs ?
                                         <div className={styles.dataPeer}>
                                             <div>
-                                                <span></span>
                                                 <span>
                                                     {financialState[fs].map((value, index) => (
                                                         index == 0 ?
@@ -360,7 +356,13 @@ const PeerComparison = (props) => {
                                                     ))
                                                     }
                                                 </span>
-                                                <span></span>
+                                                <span>
+                                                    {financialState[fs].map((value, index) => (
+                                                        index == 0 ?
+                                                            JSON.stringify(financialName) !== '{}' ? financialName[value.financial[0].ric] : '' : ''
+                                                    ))
+                                                    }
+                                                </span>
                                             </div>
                                             <div>
                                                 <span>
@@ -381,32 +383,12 @@ const PeerComparison = (props) => {
                                             </div>
                                         </div> : ''
                                     : '')) : <Spin className={styles.spinLoading} />}
-                            <div className={styles.dataPeer}>
-                                <div>
-                                    <span>美股20</span>
-                                    <span></span>
-                                    <span></span>
-                                </div>
-                                <div>
-                                    <span>
-                                        <div className={styles.dataPeerRow}>
-                                            <div></div>
-                                            <div></div>
-                                            <div></div>
-                                            <div></div>
-                                            <div></div>
-                                            <div></div>
-                                        </div>
-                                    </span>
-                                </div>
-                            </div>
 
                             {JSON.stringify(financialState) !== '{}' ? Object.keys(financialState).map((fs) => (
                                 allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol ?
                                     allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value != fs ?
                                         <div className={styles.dataPeer}>
                                             <div>
-                                                <span></span>
                                                 <span>
                                                     {financialState[fs].map((value, index) => (
                                                         index == 0 ?
@@ -414,7 +396,13 @@ const PeerComparison = (props) => {
                                                     ))
                                                     }
                                                 </span>
-                                                <span></span>
+                                                <span>
+                                                    {financialState[fs].map((value, index) => (
+                                                        index == 0 ?
+                                                            JSON.stringify(financialName) !== '{}' ? financialName[value.financial[0].ric] : '' : ''
+                                                    ))
+                                                    }
+                                                </span>
                                             </div>
                                             <div>
                                                 <span>
@@ -440,7 +428,6 @@ const PeerComparison = (props) => {
                             <div>
                                 <div className={styles.titilePeer}>
                                     <div>
-                                        <span>排名</span>
                                         <span>代码</span>
                                         <span>证券简称</span>
                                     </div>
@@ -459,14 +446,13 @@ const PeerComparison = (props) => {
                                         </span>
                                     </div>
                                 </div>
-                                {valuation ? valuation.map((value) => (
+                                {valuation.length > 0 ? valuation.map((value) => (
                                     allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol ?
                                         allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value == value.ric ?
                                             <div className={styles.dataPeer}>
                                                 <div>
-                                                    <span></span>
                                                     <span>{value.ric}</span>
-                                                    <span></span>
+                                                    <span>{JSON.stringify(valuationName) !== '{}' ? valuationName[value.ric] : ''}</span>
                                                 </div>
                                                 <div>
                                                     <span>{value.close}</span>
@@ -475,43 +461,22 @@ const PeerComparison = (props) => {
                                                 <div>
                                                     <span>
                                                         <div className={styles.dataPeerRow}>
-                                                            <div>{value.pe}</div>
-                                                            <div>{value.ps}</div>
-                                                            <div>{value.pb}</div>
+                                                            <div>{value.pe && value.close ? eval(value.pe * value.close).toFixed(2) : ''}</div>
+                                                            <div>{value.ps && value.close ? eval(value.ps * value.close).toFixed(2) : ''}</div>
+                                                            <div>{value.pb && value.close ? eval(value.pb * value.close).toFixed(2) : ''}</div>
                                                         </div>
                                                     </span>
                                                 </div>
                                             </div>
                                             : '' : ''
                                 )) : <Spin className={styles.spinLoading} />}
-                                <div className={styles.dataPeer}>
-                                    <div>
-                                        <span>美股20</span>
-                                        <span></span>
-                                        <span></span>
-                                    </div>
-                                    <div>
-                                        <span></span>
-                                        <span></span>
-                                    </div>
-                                    <div>
-                                        <span>
-                                            <div className={styles.dataPeerRow}>
-                                                <div></div>
-                                                <div></div>
-                                                <div></div>
-                                            </div>
-                                        </span>
-                                    </div>
-                                </div>
                                 {valuation ? valuation.map((value) => (
                                     allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol ?
                                         allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value != value.ric ?
                                             <div className={styles.dataPeer}>
                                                 <div>
-                                                    <span></span>
                                                     <span>{value.ric}</span>
-                                                    <span></span>
+                                                    <span>{JSON.stringify(valuationName) !== '{}' ? valuationName[value.ric] : ''}</span>
                                                 </div>
                                                 <div>
                                                     <span>{value.close}</span>
@@ -520,27 +485,28 @@ const PeerComparison = (props) => {
                                                 <div>
                                                     <span>
                                                         <div className={styles.dataPeerRow}>
-                                                            <div>{value.pe}</div>
-                                                            <div>{value.ps}</div>
-                                                            <div>{value.pb}</div>
+                                                            <div>{value.pe && value.close ? eval(value.pe * value.close).toFixed(2) : ''}</div>
+                                                            <div>{value.ps && value.close ? eval(value.ps * value.close).toFixed(2) : ''}</div>
+                                                            <div>{value.pb && value.close ? eval(value.pb * value.close).toFixed(2) : ''}</div>
                                                         </div>
                                                     </span>
                                                 </div>
                                             </div>
                                             : '' : ''
-                                )) : ''}
+                                )) : <Spin className={styles.spinLoading} />}
                             </div> :
                             (keyType == 804 || keyType == 0) && marketState ?
                                 <div>
                                     <div className={styles.titilePeer}>
                                         <div>
-                                            <span>排名</span>
                                             <span>代码</span>
                                             <span>证券简称</span>
+                                            <span>52周最高(前复权)</span>
+                                            <span>52周最低(前复权)</span>
                                         </div>
                                         <div>
                                             <span className={styles.spanPeer}>
-                                                <div style={{ height: 36 }}></div>
+                                                <div>涨跌幅(%)</div>
                                                 <div className={styles.titilePeerRow}>
                                                     <div>最新</div>
                                                     <div>本周</div>
@@ -558,9 +524,28 @@ const PeerComparison = (props) => {
                                                 marketState[allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value].map((value) => (
                                                     <div className={styles.dataPeer}>
                                                         <div>
-                                                            <span></span>
                                                             <span>{value.ric}</span>
-                                                            <span></span>
+                                                            <span>{JSON.stringify(companyName) !== '{}' ? companyName[value.ric] : ''}</span>
+                                                            <span>
+                                                                {value.lineItemObject ?
+                                                                    value.lineItemObject.Group ?
+                                                                        value.lineItemObject.Group.map((g) => (
+                                                                            g.Ratio ? g.Ratio.map((r) => (
+                                                                                r.FieldName == 'NHIG' ? r.Value : ''
+                                                                            )) : ''
+                                                                        )) : '' : ''
+                                                                }
+                                                            </span>
+                                                            <span>
+                                                                {value.lineItemObject ?
+                                                                    value.lineItemObject.Group ?
+                                                                        value.lineItemObject.Group.map((g) => (
+                                                                            g.Ratio ? g.Ratio.map((r) => (
+                                                                                r.FieldName == 'NLOW' ? r.Value : ''
+                                                                            )) : ''
+                                                                        )) : '' : ''
+                                                                }
+                                                            </span>
                                                         </div>
                                                         <div>
                                                             <span>
@@ -624,25 +609,6 @@ const PeerComparison = (props) => {
                                                     </div>
 
                                                 )) : <Spin className={styles.spinLoading} /> : '' : '' : ''}
-                                    <div className={styles.dataPeer}>
-                                        <div>
-                                            <span>美股20</span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                        <div>
-                                            <span>
-                                                <div className={styles.dataPeerRow}>
-                                                    <div></div>
-                                                    <div></div>
-                                                    <div></div>
-                                                    <div></div>
-                                                    <div></div>
-                                                    <div></div>
-                                                </div>
-                                            </span>
-                                        </div>
-                                    </div>
 
                                     {JSON.stringify(marketState) !== '{}' ? Object.keys(marketState).map((ms) => (
                                         allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol ?
@@ -650,9 +616,28 @@ const PeerComparison = (props) => {
                                                 marketState[ms].map((value) => (
                                                     <div className={styles.dataPeer}>
                                                         <div>
-                                                            <span></span>
                                                             <span>{value.ric}</span>
-                                                            <span></span>
+                                                            <span>{JSON.stringify(companyName) !== '{}' ? companyName[value.ric] : ''}</span>
+                                                            <span>
+                                                                {value.lineItemObject ?
+                                                                    value.lineItemObject.Group ?
+                                                                        value.lineItemObject.Group.map((g) => (
+                                                                            g.Ratio ? g.Ratio.map((r) => (
+                                                                                r.FieldName == 'NHIG' ? r.Value : ''
+                                                                            )) : ''
+                                                                        )) : '' : ''
+                                                                }
+                                                            </span>
+                                                            <span>
+                                                                {value.lineItemObject ?
+                                                                    value.lineItemObject.Group ?
+                                                                        value.lineItemObject.Group.map((g) => (
+                                                                            g.Ratio ? g.Ratio.map((r) => (
+                                                                                r.FieldName == 'NLOW' ? r.Value : ''
+                                                                            )) : ''
+                                                                        )) : '' : ''
+                                                                }
+                                                            </span>
                                                         </div>
                                                         <div>
                                                             <span>

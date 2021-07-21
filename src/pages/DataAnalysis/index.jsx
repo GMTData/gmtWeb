@@ -183,7 +183,7 @@ const DataAnalysis = () => {
         <div>
           {infoKey == 0 ?
             <div>
-              <div className={styles.infoBoxContent}>
+              <div>
                 <div className={styles.companyInfo}>
                   <div className={styles.infoTitle}>
                     <span className={styles.titleTxt}>公司简介</span>
@@ -195,19 +195,19 @@ const DataAnalysis = () => {
                   </p>
                 </div>
               </div>
-              <div className={styles.infoBoxContent}>
+              <div>
                 <EquityShareholders keyType={infoKey} ric={ricState} />
               </div>
-              <div className={styles.infoBoxContent}>
+              <div>
                 <NewsNotice keyType={infoKey} ric={ricState} />
               </div>
-              <div className={styles.infoBoxContent}>
+              <div>
                 <TradingValuation keyType={infoKey} ric={ricState} />
               </div>
-              <div className={styles.infoBoxContent}>
+              <div>
                 <SignificantEvent keyType={infoKey} ric={ricState} />
               </div>
-              <div className={styles.infoBoxContent}>
+              <div>
                 {
                   stateData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol?.Value ?
                     <PeerComparison keyType={infoKey} ric={ricState} allData={stateData} /> : ''

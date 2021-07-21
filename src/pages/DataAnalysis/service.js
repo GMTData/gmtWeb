@@ -78,6 +78,13 @@ export async function querySharePrice(params) {
     headers: { 'accessToken': params.accessToken, },
   });
 }
+//f10-6估值分析接口
+export async function queryValuationAnalysis(params) {
+  return request(`${PATH}/f106/getValuationAnalysis?ric=${params.ric}&startTime=${params.startTime}&endTime=${params.endTime}`, {
+    method: 'get',
+    headers: { 'accessToken': params.accessToken, },
+  });
+}
 //f10-8获取事件正文接口
 export async function queryEventContent(params) {
   return request(`${PATH}/f108/getEventContent?eventId=${params.eventId}`, {

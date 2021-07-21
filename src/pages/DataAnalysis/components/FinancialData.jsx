@@ -4,7 +4,6 @@ import { useIntl, FormattedMessage } from 'umi';
 import { queryReportInfo, queryFinancialAnalysis } from '../service';
 import styles from './index.less';
 import { getAuthority } from '@/utils/authority';
-import { dataCas, dataIncome, dataBalance } from './DataUtil';
 
 const titleYearCn = '(年报)';
 const titleYearEn = '(annual report)';

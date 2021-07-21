@@ -1,11 +1,13 @@
 import { message, Table, Pagination, DatePicker } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useIntl, FormattedMessage } from 'umi';
-import { querySharePrice } from '../service';
+import { querySharePrice, queryValuationAnalysis } from '../service';
 import styles from './index.less';
 import { getAuthority } from '@/utils/authority';
 import { subGroupArray, timeSpan } from '@/utils/utils';
+import { dataValuation } from './DataUtil';
 import moment from 'moment';
+import { join } from 'lodash';
 
 const { RangePicker } = DatePicker;
 let dateFormat = 'YYYY-MM-DDTHH:mm:ss';
@@ -50,7 +52,7 @@ const TradingValuation = (props) => {
         },
     ];
 
-    //默认ric
+    //每日行情
     let params = {
         ric: '',
         startTime: moment(timeSpan(7).startDate).format(dateFormat),
@@ -58,6 +60,14 @@ const TradingValuation = (props) => {
         period: 'DAILY',
         accessToken: userInfo.accessToken
     }
+    //估值分析
+    let paramsValuation = {
+        ric: '',
+        startTime: timeSpan(170).startDate.getTime(),
+        endTime: timeSpan(170).endDate.getTime(),
+        accessToken: userInfo.accessToken
+    }
+
     /** 国际化配置 */
     const intl = useIntl();
 
@@ -73,21 +83,24 @@ const TradingValuation = (props) => {
             pageItems = '条';
             if ((keyType && keyType == 501) || keyType == 0) {
                 setOneInfoTitle('每日行情');
+                querySharePriceLists(ric);
             } else if (keyType && keyType == 502) {
                 setOneInfoTitle('估值分析');
+                queryValuationAnalysisData(ric);
             }
         } else {
             pageTotal = 'Total';
             pageItems = 'items';
             if ((keyType && keyType == 501) || keyType == 0) {
                 setOneInfoTitle('The daily market');
+                querySharePriceLists(ric);
             } else if (keyType && keyType == 502) {
                 setOneInfoTitle('Valuation analysis');
+                queryValuationAnalysisData(ric);
             }
         }
-        querySharePriceLists(ric);
 
-    }, [ric]);
+    }, [ric, keyType]);
 
     //查询股价列表
     const querySharePriceLists = (ric) => {
@@ -102,6 +115,25 @@ const TradingValuation = (props) => {
                     }
                 } else {
                     setLoadingState(false);
+                    message.error(res.message);
+                }
+            }
+        )
+    }
+
+    const [valuation, setValuation] = useState([]);
+    //查询行情分析
+    const queryValuationAnalysisData = (ric) => {
+        paramsValuation.ric = ric;
+        queryValuationAnalysis(paramsValuation).then(
+            res => {
+                if (res.state) {
+                    if (res.data) {
+                        setValuation(res.data ? res.data : [])
+                    } else {
+                        setValuation([])
+                    }
+                } else {
                     message.error(res.message);
                 }
             }
@@ -124,7 +156,13 @@ const TradingValuation = (props) => {
     const setTimeData = (e) => {
         params.startTime = moment(e[0]._d).format(dateFormat);
         params.endTime = moment(e[1]._d).format(dateFormat);
-        querySharePriceLists(ric);
+        paramsValuation.startTime = e[0]._d.getTime();
+        paramsValuation.endTime = e[1]._d.getTime();
+        if (keyType == 501) {
+            querySharePriceLists(ric);
+        } else if (keyType == 502) {
+            queryValuationAnalysisData(ric);
+        }
     }
 
     return (
@@ -140,23 +178,61 @@ const TradingValuation = (props) => {
                         defaultValue={[moment(timeSpan(7).startDate, dateFormat), moment(timeSpan(7).endDate, dateFormat)]}
                         onChange={(e) => setTimeData(e)} />
                 </div>
-                <Table loading={loadingState}
-                    scroll={{ x: '100%' }}
-                    rowKey={(index, record) => index}
-                    columns={columns}
-                    rowClassName={getRowClassName}
-                    dataSource={sharePricePage}
-                    pagination={false} />
-                <div className={styles.pageBox}>
-                    <Pagination
-                        total={sharePriceData.Row ? sharePriceData.Row.length : 0}
-                        showTotal={(total) => `${pageTotal} ${sharePriceData.Row ? sharePriceData.Row.length : 0} ${pageItems} `}
-                        defaultPageSize={20}
-                        current={cutPage ? cutPage : 1}
-                        onChange={onChange}
-                        onShowSizeChange={onShowSizeChange}
-                    />
-                </div>
+                {keyType == 501 ?
+                    <div>
+                        <Table loading={loadingState}
+                            scroll={{ x: '100%' }}
+                            rowKey={(index, record) => index}
+                            columns={columns}
+                            rowClassName={getRowClassName}
+                            dataSource={sharePricePage}
+                            pagination={false} />
+                        <div className={styles.pageBox}>
+                            <Pagination
+                                total={sharePriceData.Row ? sharePriceData.Row.length : 0}
+                                showTotal={(total) => `${pageTotal} ${sharePriceData.Row ? sharePriceData.Row.length : 0} ${pageItems} `}
+                                defaultPageSize={20}
+                                current={cutPage ? cutPage : 1}
+                                onChange={onChange}
+                                onShowSizeChange={onShowSizeChange}
+                            />
+                        </div>
+                    </div> :
+                    keyType == 502 ?
+                        <div>
+                            <div className={[styles.dataTitle, styles.oddBack].join(' ')}>
+                                <span></span>
+                                {
+                                    valuation.length > 0 ? valuation.map((item) => (
+                                        <span>{item.quarterTime ? item.quarterTime : ''}</span>
+                                    )) : ''
+                                }
+                            </div>
+                            {
+                                valuation.length > 0 ? valuation.map((value) => (
+                                    dataValuation.length > 0 ? dataValuation.map((code, index) => (
+                                        <div className={styles.dataContent}
+                                            className={[styles.dataContent, index % 2 != 0 ? styles.oddBack : ''].join(' ')}>
+                                            <span>{intl.locale === "zh-CN" ? code.nameCN : code.nameEN}</span>
+                                            { code.type == 'pe' ?
+                                                <span>
+                                                    {value.pe && value.close ? eval(value.pe * value.close).toFixed(2) : ''}
+                                                </span>
+                                                : code.type == 'pb' ?
+                                                    <span>
+                                                        {value.pb && value.close ? eval(value.pb * value.close).toFixed(2) : ''}
+                                                    </span> : code.type == 'ps' ?
+                                                        <span>
+                                                            {value.ps && value.close ? eval(value.ps * value.close).toFixed(2) : ''}
+                                                        </span> : code.type == 'pcf' ?
+                                                            <span>
+                                                                {value.pcf && value.close ? eval(value.pcf * value.close).toFixed(2) : ''}
+                                                            </span> : ''}
+                                        </div>
+                                    )) : ''
+                                )) : ''
+                            }
+                        </div> : ''}
             </div>
         </div>
     )

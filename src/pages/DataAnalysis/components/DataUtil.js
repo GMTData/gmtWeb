@@ -1132,3 +1132,27 @@ export const dataForecast = [
         section: 'Income Statement'
     },
 ]
+//估值分析
+export const dataValuation = [
+    {
+        nameCN: '市盈率（PE）',
+        nameEN: 'PE',
+        type: 'pe',
+    },
+    {
+        nameCN: '市净率（PB）',
+        nameEN: 'PB',
+        type: 'pb',
+    },
+    {
+        nameCN: '市销率（PS）',
+        nameEN: 'PS',
+        type: 'ps',
+    },
+    {
+        nameCN: '市现率（PCF）',
+        nameEN: 'PCF',
+        type: 'pcf',
+    },
+
+]
