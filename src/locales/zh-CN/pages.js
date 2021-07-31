@@ -205,6 +205,8 @@ export default {
   'pages.tradingValuation.timeRange':'时间范围:',
   'pages.peerComparison.industry':'行业:',
   'pages.peerComparison.industry.placeholder':'请选择行业',
+  'pages.peerComparison.indicators':'指标:',
+  'pages.peerComparison.indicators.placeholder':'请选择指标',
   'pages.significantEvent.releaseDate':'发布日期',
   'pages.significantEvent.documentTitle':'标题',
   'pages.significantEvent.theme':'主题',

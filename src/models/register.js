@@ -14,7 +14,7 @@ const Model = {
         payload: response,
       }); // Register successfully
 
-      if (!response.state) {
+      if (response.state) {
         if (callback && typeof callback === 'function') {
           callback(response); // 返回结果
         }

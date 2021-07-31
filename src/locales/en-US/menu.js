@@ -36,6 +36,7 @@ export default {
   'menu.news.information.companyNotice':'Company Notice',
   'menu.news.information.economicCalenda':'Economic Calenda',
   'menu.dataAnalysis': 'Data Analysis',
+  'menu.chartingLibrary':'chartingLibrary',
   'menu.profile': 'Profile',
   'menu.profile.basic': 'Basic Profile',
   'menu.profile.advanced': 'Advanced Profile',

@@ -96,6 +96,11 @@ export default [
                 component: './DataAnalysis'
               },
               {
+                name: 'chartingLibrary',
+                path: '/chartingLibrary',
+                component: './ChartingLibrary'
+              },
+              {
                 component: './404',
               },
             ],

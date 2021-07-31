@@ -20,15 +20,26 @@ const Model = {
       if (response.state) {
         //记住密码
         if (payload.autoLoginParam.autoLogin) {
-          setCookie('username', payload.params.info, 1)
-          setCookie('password', payload.params.password, 1)
+          if (payload.typeParams.typeTab == 'mobile') {
+            setCookie('username', payload.params.info, 90)
+            setCookie('password', payload.params.password, 90)
+          } else {
+            setCookie('usernameAccount', payload.params.info, 90)
+            setCookie('passwordAccount', payload.params.password, 90)
+          }
         } else {
           removeCookie('username')
           removeCookie('password')
+          removeCookie('usernameAccount')
+          removeCookie('passwordAccount')
         }
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
-        message.success('登录成功！');
+        if (localStorage.umi_locale === "zh-CN") {
+          message.success('登录成功！')
+        } else {
+          message.success('Login successful!')
+        }
         let { redirect } = params;
 
         if (redirect) {

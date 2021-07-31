@@ -167,6 +167,7 @@ const DataAnalysis = () => {
           item.subMenu ?
             <Dropdown overlay={menu} key={item.id}>
               <span onMouseOver={() => checkInfo(item)}
+                title={intl.locale === "zh-CN" ? item.name : item.nameEn}
                 className={[styles.oneSpan, item.id === one ? styles.oneActive : ''].join(' ')}>
                 {intl.locale === "zh-CN" ? item.name : item.nameEn}
               </span>
@@ -174,6 +175,7 @@ const DataAnalysis = () => {
             :
             <span onClick={() => checkInfo(item)}
               key={item.id}
+              title={intl.locale === "zh-CN" ? item.name : item.nameEn}
               className={[styles.oneSpan, item.id === one ? styles.oneActive : ''].join(' ')}>
               {intl.locale === "zh-CN" ? item.name : item.nameEn}
             </span>
@@ -186,7 +188,7 @@ const DataAnalysis = () => {
               <div>
                 <div className={styles.companyInfo}>
                   <div className={styles.infoTitle}>
-                    <span className={styles.titleTxt}>公司简介</span>
+                    <span className={styles.titleTxt}>{intl.locale === "zh-CN" ? '公司简介' : 'Company profile'}</span>
                   </div>
                   <p className={styles.companyInfoDetail}>
                     {stateData.GetGeneralInformation_Response_1 ? stateData.GetGeneralInformation_Response_1.GeneralInformation.TextInfo ? stateData.GetGeneralInformation_Response_1.GeneralInformation.TextInfo.Text.length > 0 ? stateData.GetGeneralInformation_Response_1.GeneralInformation.TextInfo.Text.map((item) => (
@@ -235,8 +237,8 @@ const DataAnalysis = () => {
                       :
                       (infoKey == 401 || infoKey == 402 || infoKey == 403) ?
                         <ProfitForecast keyType={infoKey} ric={ricState} /> :
-                        infoKey == 404 ?
-                          <ProfitForecastReport keyType={infoKey} ric={ricState} /> :
+                        // infoKey == 404 ?
+                        //   <ProfitForecastReport keyType={infoKey} ric={ricState} /> :
                           (infoKey == 501 || infoKey == 502) ?
                             <TradingValuation keyType={infoKey} ric={ricState} /> :
                             (infoKey == 801 || infoKey == 802 || infoKey == 803 || infoKey == 804) ?

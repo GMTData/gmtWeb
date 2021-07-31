@@ -69,6 +69,9 @@ const FinancialData = (props) => {
             }
         }
 
+    }, [keyType])
+
+    useEffect(() => {
         params.ric = ric;
         //查询财务数据
         queryFinancialAnalysis(params).then(
@@ -145,8 +148,6 @@ const FinancialData = (props) => {
         );
     }, [ric])
 
-
-
     return (
         <div className={styles.companyInfo}>
             <div className={styles.infoTitle}>
@@ -172,8 +173,7 @@ const FinancialData = (props) => {
                             casState.year.length > 0 ? casState.year[0].lineitem.map((cas, index) => (
                                 codeMap ? codeMap.map((code) => (
                                     code.coaItem == cas.coaCode ?
-                                        <div className={styles.dataContent}
-                                            className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
+                                        <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                             <span>
                                                 {code.coaValueEn}
                                             </span>
@@ -207,8 +207,7 @@ const FinancialData = (props) => {
                                 incState.year.length > 0 ? incState.year[0].lineitem.map((cas, index) => (
                                     codeMap ? codeMap.map((code) => (
                                         code.coaItem == cas.coaCode ?
-                                            <div className={styles.dataContent}
-                                                className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
+                                            <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                                 <span>
                                                     {code.coaValueEn}
                                                 </span>
@@ -242,8 +241,7 @@ const FinancialData = (props) => {
                                     balState.year.length > 0 ? balState.year[0].lineitem.map((cas, index) => (
                                         codeMap ? codeMap.map((code) => (
                                             code.coaItem == cas.coaCode ?
-                                                <div className={styles.dataContent}
-                                                    className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
+                                                <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                                     <span>
                                                         {code.coaValueEn}
                                                     </span>
@@ -281,8 +279,7 @@ const FinancialData = (props) => {
                                                         financial[item].Annual[0].dataContentObject ?
                                                             financial[item].Annual[0].dataContentObject.growthAbility ?
                                                                 Object.keys(financial[item].Annual[0].dataContentObject.growthAbility).map((grow, index) => (
-                                                                    <div className={styles.dataContent}
-                                                                        className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
+                                                                    <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                                                         <span>
                                                                             {grow}
                                                                         </span>
@@ -316,8 +313,7 @@ const FinancialData = (props) => {
                                                             financial[item].Annual[0].dataContentObject ?
                                                                 financial[item].Annual[0].dataContentObject.profitabilityAndIncomeQuality ?
                                                                     Object.keys(financial[item].Annual[0].dataContentObject.profitabilityAndIncomeQuality).map((profit, index) => (
-                                                                        <div className={styles.dataContent}
-                                                                            className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
+                                                                        <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                                                             <span>
                                                                                 {profit}
                                                                             </span>
@@ -351,8 +347,7 @@ const FinancialData = (props) => {
                                                                 financial[item].Annual[0].dataContentObject ?
                                                                     financial[item].Annual[0].dataContentObject.operatingCapacity ?
                                                                         Object.keys(financial[item].Annual[0].dataContentObject.operatingCapacity).map((oper, index) => (
-                                                                            <div className={styles.dataContent}
-                                                                                className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
+                                                                            <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                                                                 <span>
                                                                                     {oper}
                                                                                 </span>
@@ -386,8 +381,7 @@ const FinancialData = (props) => {
                                                                     financial[item].Annual[0].dataContentObject ?
                                                                         financial[item].Annual[0].dataContentObject.capitalStructureAndSolvency ?
                                                                             Object.keys(financial[item].Annual[0].dataContentObject.capitalStructureAndSolvency).map((capital, index) => (
-                                                                                <div className={styles.dataContent}
-                                                                                    className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
+                                                                                <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                                                                     <span>
                                                                                         {capital}
                                                                                     </span>

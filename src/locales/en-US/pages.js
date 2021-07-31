@@ -207,6 +207,8 @@ export default {
   'pages.tradingValuation.timeRange':'Time range:',
   'pages.peerComparison.industry':'industry',
   'pages.peerComparison.industry.placeholder':'Please select a industry',
+  'pages.peerComparison.indicators':'indicators',
+  'pages.peerComparison.indicators.placeholder':'Please select a indicators',
   'pages.significantEvent.releaseDate':'release date',
   'pages.significantEvent.documentTitle':'The title',
   'pages.significantEvent.theme':'theme',

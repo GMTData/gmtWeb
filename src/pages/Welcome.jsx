@@ -14,7 +14,6 @@ const CodePreview = ({ children }) => (
 
 export default () => {
   const intl = useIntl();
-  console.log(localStorage);
   return (
     <PageContainer>
       

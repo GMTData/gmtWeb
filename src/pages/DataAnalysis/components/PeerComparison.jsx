@@ -1,4 +1,4 @@
-import { Spin, Table, message, Select } from 'antd';
+import { Spin, Table, message, Select, Row, Col } from 'antd';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useIntl, FormattedMessage } from 'umi';
 import { queryRatiosReport, queryValueData, getIndustryType, queryFinancialReport } from '../service';
@@ -9,6 +9,10 @@ import { sortArray } from '@/utils/utils';
 const { Option } = Select;
 const titleYearCn = '(年报)';
 const titleYearEn = '(annual report)';
+const oneYear = new Date().getFullYear() - 1;
+const twoYear = new Date().getFullYear() - 2;
+const threeYear = new Date().getFullYear() - 3;
+const fourYear = new Date().getFullYear() - 4;
 const PeerComparison = (props) => {
     const { keyType, ric, allData } = props;
     const userInfo = getAuthority();//获取用户相关信息
@@ -39,7 +43,7 @@ const PeerComparison = (props) => {
     /** 国际化配置 */
     const intl = useIntl();
 
-    useMemo(() => {
+    useEffect(() => {
         if (intl.locale === "zh-CN") {
             if (keyType && keyType == 801) {
                 setOneInfoTitle('财务比率比较');
@@ -65,6 +69,7 @@ const PeerComparison = (props) => {
                 setOneInfoTitle('Comparison of Profit Forecasts');
             }
         }
+
         //行业分类数据
         getIndustryType(industryParams).then(
             res => {
@@ -82,8 +87,29 @@ const PeerComparison = (props) => {
                 }
             }
         )
+    }, [keyType]);
 
-    }, [keyType, allData]);
+    //监测ric查询结果的变化
+    useEffect(() => {
+        changeTitle(RTLR);
+    }, [allData]);
+
+    //802类别的类别切换
+    const changeTitle = (e) => {
+        if (intl.locale === "zh-CN") {
+            if (e == 'RTLR') {
+                setTitleType('总收入(万元)');
+            } else if (e == 'CIAC') {
+                setTitleType('净利润(万元)');
+            }
+        } else {
+            if (e == 'RTLR') {
+                setTitleType('Total Revenue (ten thousand yuan)');
+            } else if (e == 'CIAC') {
+                setTitleType('Net profit (ten thousand yuan)');
+            }
+        }
+    }
 
     const [industryState, setIndustryState] = useState([]);
     //行业分类数据
@@ -204,6 +230,16 @@ const PeerComparison = (props) => {
         }
     }
 
+    const RTLR = 'RTLR';//总收入
+    const CIAC = 'CIAC';//净利润  
+    const [titleType, setTitleType] = useState('总收入(万元)')
+    const [valueType, setValueType] = useState('RTLR')
+    //选择类别的操作
+    const getIndicators = (e) => {
+        setValueType(e)
+        changeTitle(e)
+    }
+
     return (
         <div className={styles.companyInfo}>
             <div className={styles.infoTitle}>
@@ -226,271 +262,391 @@ const PeerComparison = (props) => {
                     )) : ''
                     }
                 </Select>
+
+                {
+                    keyType == 802 ?
+                        <span style={{ marginLeft: '32px' }}>
+                            <FormattedMessage id="pages.peerComparison.indicators" defaultMessage="指标:" />
+                            <Select
+                                defaultValue={RTLR}
+                                onSelect={(e) => getIndicators(e)}
+                                style={{ width: 200, margin: '24px' }}
+                                placeholder={intl.formatMessage({
+                                    id: 'pages.peerComparison.indicators.placeholder',
+                                    defaultMessage: '请选择指标',
+                                })}
+                            >
+                                <Option key='0' value={RTLR}>{intl.locale === "zh-CN" ? '总收入' : 'Total revenue'}</Option>
+                                <Option key='1' value={CIAC}>{intl.locale === "zh-CN" ? '净利润' : 'Net profit'}</Option>
+                            </Select>
+                        </span> : ''
+                }
             </div>
+
             {
                 keyType == 801 ?
                     <div>
                         <div className={styles.titilePeer}>
-                            <div>
-                                <span>代码</span>
-                                <span>证券简称</span>
-                            </div>
-                            <div>
-                                <span className={styles.spanPeer}>
-                                    <div>销售毛利率GPM(%)</div>
-                                    <div className={styles.titilePeerRow}>
-                                        {JSON.stringify(financialState) !== '{}' && allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol?.Value ?
-                                            financialState ? financialState[allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol?.Value].map((value) => (
-                                                <div>
-                                                    {value.financial[0].fiscaYear}
-                                                    {intl.locale === "zh-CN" ? titleYearCn : titleYearEn}</div>
-                                            )) : '' : ''}
-                                    </div>
-                                </span>
-                            </div>
+                            <Row>
+                                <Col span={4}>代码</Col>
+                                <Col span={4}>证券简称</Col>
+                                <Col span={16}>
+                                    <span className={styles.spanPeer}>
+                                        <div>销售毛利率GPM(%)</div>
+                                        <div className={styles.titilePeerRow}>
+                                            <span>
+                                                {oneYear}
+                                                {intl.locale === "zh-CN" ? titleYearCn : titleYearEn}
+                                            </span>
+                                            <span>
+                                                {twoYear}
+                                                {intl.locale === "zh-CN" ? titleYearCn : titleYearEn}
+                                            </span>
+                                            <span>
+                                                {threeYear}
+                                                {intl.locale === "zh-CN" ? titleYearCn : titleYearEn}
+                                            </span>
+                                            <span>
+                                                {fourYear}
+                                                {intl.locale === "zh-CN" ? titleYearCn : titleYearEn}
+                                            </span>
+                                        </div>
+                                    </span>
+                                </Col>
+                            </Row>
                         </div>
                         {JSON.stringify(financialState) !== '{}' ? Object.keys(financialState).map((fs) => (
                             allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol ?
                                 allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value == fs ?
                                     <div className={styles.dataPeer}>
-                                        <div>
-                                            <span>
+                                        <Row>
+                                            <Col span={4}>
                                                 {financialState[fs].map((value, index) => (
                                                     index == 0 ?
                                                         value.financial[0].ric : ''
                                                 ))
                                                 }
-                                            </span>
-                                            <span>
+                                            </Col>
+                                            <Col span={4}>
                                                 {financialState[fs].map((value, index) => (
                                                     index == 0 ?
                                                         JSON.stringify(financialName) !== '{}' ? financialName[value.financial[0].ric] : '' : ''
                                                 ))
                                                 }
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span>
+                                            </Col>
+                                            <Col span={16}>
                                                 <div className={styles.dataPeerRow}>
-                                                    {financialState[fs].map((value) => (
-                                                        <div>
-                                                            {value.financial.map((v) => (
-                                                                v.saleMargin ? v.saleMargin + '%' : ''
+                                                    <span>
+                                                        {financialState[fs].map((value) => (
+                                                            value.financial.map((v) => (
+                                                                v.saleMargin && v.fiscaYear == oneYear ? v.saleMargin + '%' : ''
                                                             ))
-                                                            }
-                                                        </div>
-                                                    ))}
+                                                        ))}
+                                                    </span>
+                                                    <span>
+                                                        {financialState[fs].map((value) => (
+                                                            value.financial.map((v) => (
+                                                                v.saleMargin && v.fiscaYear == twoYear ? v.saleMargin + '%' : ''
+                                                            ))
+                                                        ))}
+                                                    </span>
+                                                    <span>
+                                                        {financialState[fs].map((value) => (
+                                                            value.financial.map((v) => (
+                                                                v.saleMargin && v.fiscaYear == threeYear ? v.saleMargin + '%' : ''
+                                                            ))
+                                                        ))}
+                                                    </span>
+                                                    <span>
+                                                        {financialState[fs].map((value) => (
+                                                            value.financial.map((v) => (
+                                                                v.saleMargin && v.fiscaYear == fourYear ? v.saleMargin + '%' : ''
+                                                            ))
+                                                        ))}
+                                                    </span>
                                                 </div>
-                                            </span>
-                                        </div>
+                                            </Col>
+                                        </Row>
                                     </div> : ''
                                 : '')) : <Spin className={styles.spinLoading} />}
 
-                        {JSON.stringify(financialState) !== '{}' ? Object.keys(financialState).map((fs) => (
+                        {JSON.stringify(financialState) !== '{}' ? Object.keys(financialState).map((fs, index) => (
                             allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol ?
                                 allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value != fs ?
-                                    <div className={styles.dataPeer}>
-                                        <div>
-                                            <span>
+                                    <div className={[styles.dataPeer, index % 2 != 0 ? styles.oddBack : ''].join(' ')}>
+                                        <Row>
+                                            <Col span={4}>
                                                 {financialState[fs].map((value, index) => (
                                                     index == 0 ?
                                                         value.financial[0].ric : ''
                                                 ))
                                                 }
-                                            </span>
-                                            <span>
+                                            </Col>
+                                            <Col span={4}>
                                                 {financialState[fs].map((value, index) => (
                                                     index == 0 ?
                                                         JSON.stringify(financialName) !== '{}' ? financialName[value.financial[0].ric] : '' : ''
                                                 ))
                                                 }
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span>
+                                            </Col>
+                                            <Col span={16}>
                                                 <div className={styles.dataPeerRow}>
-                                                    {financialState[fs].map((value) => (
-                                                        <div>
-                                                            {value.financial.map((v) => (
-                                                                v.saleMargin ? v.saleMargin + '%' : ''
+                                                    <span>
+                                                        {financialState[fs].map((value) => (
+                                                            value.financial.map((v) => (
+                                                                v.saleMargin && v.fiscaYear == oneYear ? v.saleMargin + '%' : ''
                                                             ))
-                                                            }
-                                                        </div>
-                                                    ))}
+                                                        ))}
+                                                    </span>
+                                                    <span>
+                                                        {financialState[fs].map((value) => (
+                                                            value.financial.map((v) => (
+                                                                v.saleMargin && v.fiscaYear == twoYear ? v.saleMargin + '%' : ''
+                                                            ))
+                                                        ))}
+                                                    </span>
+                                                    <span>
+                                                        {financialState[fs].map((value) => (
+                                                            value.financial.map((v) => (
+                                                                v.saleMargin && v.fiscaYear == threeYear ? v.saleMargin + '%' : ''
+                                                            ))
+                                                        ))}
+                                                    </span>
+                                                    <span>
+                                                        {financialState[fs].map((value) => (
+                                                            value.financial.map((v) => (
+                                                                v.saleMargin && v.fiscaYear == fourYear ? v.saleMargin + '%' : ''
+                                                            ))
+                                                        ))}
+                                                    </span>
                                                 </div>
-                                            </span>
-                                        </div>
+                                            </Col>
+                                        </Row>
                                     </div> : ''
                                 : '')) : <Spin className={styles.spinLoading} />}
                     </div> :
                     keyType == 802 ?
                         <div>
                             <div className={styles.titilePeer}>
-                                <div>
-                                    <span>代码</span>
-                                    <span>证券简称</span>
-                                </div>
-                                <div>
-                                    <span className={styles.spanPeer}>
-                                        <div>总收入(万元)</div>
-                                        <div className={styles.titilePeerRow}>
-                                            {JSON.stringify(financialState) !== '{}' && allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol?.Value ?
-                                                financialState ? financialState[allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value].map((value) => (
-                                                    <div>
-                                                        {value.financial[0].fiscaYear}
-                                                        {intl.locale === "zh-CN" ? titleYearCn : titleYearEn}</div>
-                                                )) : '' : ''}
-                                        </div>
-                                    </span>
-                                </div>
+                                <Row>
+                                    <Col span={4}>代码</Col>
+                                    <Col span={4}>证券简称</Col>
+                                    <Col span={16}>
+                                        <span className={styles.spanPeer}>
+                                            <div>{titleType}</div>
+                                            <div className={styles.titilePeerRow}>
+                                                <span>
+                                                    {oneYear}
+                                                    {intl.locale === "zh-CN" ? titleYearCn : titleYearEn}
+                                                </span>
+                                                <span>
+                                                    {twoYear}
+                                                    {intl.locale === "zh-CN" ? titleYearCn : titleYearEn}
+                                                </span>
+                                                <span>
+                                                    {threeYear}
+                                                    {intl.locale === "zh-CN" ? titleYearCn : titleYearEn}
+                                                </span>
+                                                <span>
+                                                    {fourYear}
+                                                    {intl.locale === "zh-CN" ? titleYearCn : titleYearEn}
+                                                </span>
+                                            </div>
+                                        </span>
+                                    </Col>
+                                </Row>
                             </div>
                             {JSON.stringify(financialState) !== '{}' ? Object.keys(financialState).map((fs) => (
                                 allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol ?
                                     allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value == fs ?
                                         <div className={styles.dataPeer}>
-                                            <div>
-                                                <span>
+                                            <Row>
+                                                <Col span={4}>
                                                     {financialState[fs].map((value, index) => (
                                                         index == 0 ?
                                                             value.financial[0].ric : ''
                                                     ))
                                                     }
-                                                </span>
-                                                <span>
+                                                </Col>
+                                                <Col span={4}>
                                                     {financialState[fs].map((value, index) => (
                                                         index == 0 ?
                                                             JSON.stringify(financialName) !== '{}' ? financialName[value.financial[0].ric] : '' : ''
                                                     ))
                                                     }
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <span>
+                                                </Col>
+                                                <Col span={16}>
                                                     <div className={styles.dataPeerRow}>
-                                                        {financialState[fs].map((value) => (
-                                                            <div>
-                                                                {value.financial.map((v) => (
-                                                                    v.lineItemObject ?
+                                                        <span>
+                                                            {financialState[fs].map((value) => (
+                                                                value.financial.map((v) => (
+                                                                    v.lineItemObject && v.fiscaYear == oneYear ?
                                                                         v.lineItemObject.map((lo) => (
-                                                                            lo.coaCode == 'RTLR' ? parseInt(lo.Value) : ''
+                                                                            lo.coaCode == valueType ? parseInt(lo.Value) : ''
                                                                         )) : ''
                                                                 ))
-                                                                }
-                                                            </div>
-                                                        ))}
+                                                            ))}
+                                                        </span>
+                                                        <span>
+                                                            {financialState[fs].map((value) => (
+                                                                value.financial.map((v) => (
+                                                                    v.lineItemObject && v.fiscaYear == twoYear ?
+                                                                        v.lineItemObject.map((lo) => (
+                                                                            lo.coaCode == valueType ? parseInt(lo.Value) : ''
+                                                                        )) : ''
+                                                                ))
+                                                            ))}
+                                                        </span>
+                                                        <span>
+                                                            {financialState[fs].map((value) => (
+                                                                value.financial.map((v) => (
+                                                                    v.lineItemObject && v.fiscaYear == threeYear ?
+                                                                        v.lineItemObject.map((lo) => (
+                                                                            lo.coaCode == valueType ? parseInt(lo.Value) : ''
+                                                                        )) : ''
+                                                                ))
+                                                            ))}
+                                                        </span>
+                                                        <span>
+                                                            {financialState[fs].map((value) => (
+                                                                value.financial.map((v) => (
+                                                                    v.lineItemObject && v.fiscaYear == fourYear ?
+                                                                        v.lineItemObject.map((lo) => (
+                                                                            lo.coaCode == valueType ? parseInt(lo.Value) : ''
+                                                                        )) : ''
+                                                                ))
+                                                            ))}
+                                                        </span>
                                                     </div>
-                                                </span>
-                                            </div>
+                                                </Col>
+                                            </Row>
                                         </div> : ''
                                     : '')) : <Spin className={styles.spinLoading} />}
 
-                            {JSON.stringify(financialState) !== '{}' ? Object.keys(financialState).map((fs) => (
+                            {JSON.stringify(financialState) !== '{}' ? Object.keys(financialState).map((fs, index) => (
                                 allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol ?
                                     allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value != fs ?
-                                        <div className={styles.dataPeer}>
-                                            <div>
-                                                <span>
+                                        <div className={[styles.dataPeer, index % 2 != 0 ? styles.oddBack : ''].join(' ')}>
+                                            <Row>
+                                                <Col span={4}>
                                                     {financialState[fs].map((value, index) => (
                                                         index == 0 ?
                                                             value.financial[0].ric : ''
                                                     ))
                                                     }
-                                                </span>
-                                                <span>
+                                                </Col>
+                                                <Col span={4}>
                                                     {financialState[fs].map((value, index) => (
                                                         index == 0 ?
                                                             JSON.stringify(financialName) !== '{}' ? financialName[value.financial[0].ric] : '' : ''
                                                     ))
                                                     }
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <span>
+                                                </Col>
+                                                <Col span={16}>
                                                     <div className={styles.dataPeerRow}>
-                                                        {financialState[fs].map((value) => (
-                                                            <div>
-                                                                {value.financial.map((v) => (
-                                                                    v.lineItemObject ?
+                                                        <span>
+                                                            {financialState[fs].map((value) => (
+                                                                value.financial.map((v) => (
+                                                                    v.lineItemObject && v.fiscaYear == oneYear ?
                                                                         v.lineItemObject.map((lo) => (
-                                                                            lo.coaCode == 'RTLR' ? parseInt(lo.Value) : ''
+                                                                            lo.coaCode == valueType ? parseInt(lo.Value) : ''
                                                                         )) : ''
                                                                 ))
-                                                                }
-                                                            </div>
-                                                        ))}
+                                                            ))}
+                                                        </span>
+                                                        <span>
+                                                            {financialState[fs].map((value) => (
+                                                                value.financial.map((v) => (
+                                                                    v.lineItemObject && v.fiscaYear == twoYear ?
+                                                                        v.lineItemObject.map((lo) => (
+                                                                            lo.coaCode == valueType ? parseInt(lo.Value) : ''
+                                                                        )) : ''
+                                                                ))
+                                                            ))}
+                                                        </span>
+                                                        <span>
+                                                            {financialState[fs].map((value) => (
+                                                                value.financial.map((v) => (
+                                                                    v.lineItemObject && v.fiscaYear == threeYear ?
+                                                                        v.lineItemObject.map((lo) => (
+                                                                            lo.coaCode == valueType ? parseInt(lo.Value) : ''
+                                                                        )) : ''
+                                                                ))
+                                                            ))}
+                                                        </span>
+                                                        <span>
+                                                            {financialState[fs].map((value) => (
+                                                                value.financial.map((v) => (
+                                                                    v.lineItemObject && v.fiscaYear == fourYear ?
+                                                                        v.lineItemObject.map((lo) => (
+                                                                            lo.coaCode == valueType ? parseInt(lo.Value) : ''
+                                                                        )) : ''
+                                                                ))
+                                                            ))}
+                                                        </span>
                                                     </div>
-                                                </span>
-                                            </div>
+                                                </Col>
+                                            </Row>
                                         </div> : ''
                                     : '')) : <Spin className={styles.spinLoading} />}
                         </div> :
                         keyType == 803 ?
                             <div>
                                 <div className={styles.titilePeer}>
-                                    <div>
-                                        <span>代码</span>
-                                        <span>证券简称</span>
-                                    </div>
-                                    <div>
-                                        <span>季度收盘价</span>
-                                        <span>每股现金流</span>
-                                    </div>
-                                    <div>
-                                        <span className={styles.spanPeer}>
-                                            <div style={{ height: 36 }}></div>
-                                            <div className={styles.titilePeerRow}>
-                                                <div>市盈率</div>
-                                                <div>市销率</div>
-                                                <div>市净率</div>
-                                            </div>
-                                        </span>
-                                    </div>
+                                    <Row>
+                                        <Col span={3}>代码</Col>
+                                        <Col span={3}>证券简称</Col>
+                                        <Col span={3}>季度收盘价</Col>
+                                        <Col span={3}>每股现金流</Col>
+                                        <Col span={12}>
+                                            <span className={styles.spanPeer}>
+                                                <div style={{ height: 36 }}></div>
+                                                <div className={styles.titilePeerRow}>
+                                                    <span>市盈率</span>
+                                                    <span>市销率</span>
+                                                    <span>市净率</span>
+                                                </div>
+                                            </span>
+                                        </Col>
+                                    </Row>
                                 </div>
                                 {valuation.length > 0 ? valuation.map((value) => (
                                     allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol ?
                                         allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value == value.ric ?
                                             <div className={styles.dataPeer}>
-                                                <div>
-                                                    <span>{value.ric}</span>
-                                                    <span>{JSON.stringify(valuationName) !== '{}' ? valuationName[value.ric] : ''}</span>
-                                                </div>
-                                                <div>
-                                                    <span>{value.close}</span>
-                                                    <span>{value.pcf}</span>
-                                                </div>
-                                                <div>
-                                                    <span>
+                                                <Row>
+                                                    <Col span={3}>{value.ric}</Col>
+                                                    <Col span={3}>{JSON.stringify(valuationName) !== '{}' ? valuationName[value.ric] : ''}</Col>
+                                                    <Col span={3}>{value.close}</Col>
+                                                    <Col span={3}>{value.pcf}</Col>
+                                                    <Col span={12}>
                                                         <div className={styles.dataPeerRow}>
-                                                            <div>{value.pe && value.close ? eval(value.pe * value.close).toFixed(2) : ''}</div>
-                                                            <div>{value.ps && value.close ? eval(value.ps * value.close).toFixed(2) : ''}</div>
-                                                            <div>{value.pb && value.close ? eval(value.pb * value.close).toFixed(2) : ''}</div>
+                                                            <span>{value.pe && value.close ? eval(value.pe * value.close).toFixed(2) : ''}</span>
+                                                            <span>{value.ps && value.close ? eval(value.ps * value.close).toFixed(2) : ''}</span>
+                                                            <span>{value.pb && value.close ? eval(value.pb * value.close).toFixed(2) : ''}</span>
                                                         </div>
-                                                    </span>
-                                                </div>
+                                                    </Col>
+                                                </Row>
                                             </div>
                                             : '' : ''
                                 )) : <Spin className={styles.spinLoading} />}
-                                {valuation ? valuation.map((value) => (
+                                {valuation ? valuation.map((value, index) => (
                                     allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol ?
                                         allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value != value.ric ?
-                                            <div className={styles.dataPeer}>
-                                                <div>
-                                                    <span>{value.ric}</span>
-                                                    <span>{JSON.stringify(valuationName) !== '{}' ? valuationName[value.ric] : ''}</span>
-                                                </div>
-                                                <div>
-                                                    <span>{value.close}</span>
-                                                    <span>{value.pcf}</span>
-                                                </div>
-                                                <div>
-                                                    <span>
+                                            <div className={[styles.dataPeer, index % 2 != 0 ? styles.oddBack : ''].join(' ')}>
+                                                <Row>
+                                                    <Col span={3}>{value.ric}</Col>
+                                                    <Col span={3}>{JSON.stringify(valuationName) !== '{}' ? valuationName[value.ric] : ''}</Col>
+                                                    <Col span={3}>{value.close}</Col>
+                                                    <Col span={3}>{value.pcf}</Col>
+                                                    <Col span={12}>
                                                         <div className={styles.dataPeerRow}>
-                                                            <div>{value.pe && value.close ? eval(value.pe * value.close).toFixed(2) : ''}</div>
-                                                            <div>{value.ps && value.close ? eval(value.ps * value.close).toFixed(2) : ''}</div>
-                                                            <div>{value.pb && value.close ? eval(value.pb * value.close).toFixed(2) : ''}</div>
+                                                            <span>{value.pe && value.close ? eval(value.pe * value.close).toFixed(2) : ''}</span>
+                                                            <span>{value.ps && value.close ? eval(value.ps * value.close).toFixed(2) : ''}</span>
+                                                            <span>{value.pb && value.close ? eval(value.pb * value.close).toFixed(2) : ''}</span>
                                                         </div>
-                                                    </span>
-                                                </div>
+                                                    </Col>
+                                                </Row>
                                             </div>
                                             : '' : ''
                                 )) : <Spin className={styles.spinLoading} />}
@@ -498,206 +654,198 @@ const PeerComparison = (props) => {
                             (keyType == 804 || keyType == 0) && marketState ?
                                 <div>
                                     <div className={styles.titilePeer}>
-                                        <div>
-                                            <span>代码</span>
-                                            <span>证券简称</span>
-                                            <span>52周最高(前复权)</span>
-                                            <span>52周最低(前复权)</span>
-                                        </div>
-                                        <div>
-                                            <span className={styles.spanPeer}>
+                                        <Row>
+                                            <Col span={3}>代码</Col>
+                                            <Col span={3}>证券简称</Col>
+                                            <Col span={3}>52周最高(前复权)</Col>
+                                            <Col span={3}>52周最低(前复权)</Col>
+                                            <Col span={12} className={styles.spanPeer}>
                                                 <div>涨跌幅(%)</div>
                                                 <div className={styles.titilePeerRow}>
-                                                    <div>最新</div>
-                                                    <div>本周</div>
-                                                    <div>本月</div>
-                                                    <div>本年</div>
-                                                    <div>近一月</div>
-                                                    <div>近三月</div>
+                                                    <Col span={4}>最新</Col>
+                                                    <Col span={4}>本周</Col>
+                                                    <Col span={4}>本月</Col>
+                                                    <Col span={4}>本年</Col>
+                                                    <Col span={4}>近一月</Col>
+                                                    <Col span={4}>近三月</Col>
                                                 </div>
-                                            </span>
-                                        </div>
+                                            </Col>
+                                        </Row>
                                     </div>
                                     {JSON.stringify(marketState) !== '{}' && allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol?.Value ?
                                         marketState ? marketState[allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value] ?
                                             marketState[allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value].length > 0 ?
                                                 marketState[allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value].map((value) => (
                                                     <div className={styles.dataPeer}>
-                                                        <div>
-                                                            <span>{value.ric}</span>
-                                                            <span>{JSON.stringify(companyName) !== '{}' ? companyName[value.ric] : ''}</span>
-                                                            <span>
+                                                        <Row>
+                                                            <Col span={3}>{value.ric}</Col>
+                                                            <Col span={3}>{JSON.stringify(companyName) !== '{}' ? companyName[value.ric] : ''}</Col>
+                                                            <Col span={3}>
                                                                 {value.lineItemObject ?
                                                                     value.lineItemObject.Group ?
                                                                         value.lineItemObject.Group.map((g) => (
                                                                             g.Ratio ? g.Ratio.map((r) => (
-                                                                                r.FieldName == 'NHIG' ? r.Value : ''
+                                                                                r.FieldName == 'NHIG' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
                                                                             )) : ''
                                                                         )) : '' : ''
                                                                 }
-                                                            </span>
-                                                            <span>
+                                                            </Col>
+                                                            <Col span={3}>
                                                                 {value.lineItemObject ?
                                                                     value.lineItemObject.Group ?
                                                                         value.lineItemObject.Group.map((g) => (
                                                                             g.Ratio ? g.Ratio.map((r) => (
-                                                                                r.FieldName == 'NLOW' ? r.Value : ''
+                                                                                r.FieldName == 'NLOW' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
                                                                             )) : ''
                                                                         )) : '' : ''
                                                                 }
-                                                            </span>
-                                                        </div>
-                                                        <div>
-                                                            <span>
-                                                                <div className={styles.dataPeerRow}>
-                                                                    <div>
-                                                                        {value.lineItemObject ?
-                                                                            value.lineItemObject.Group ?
-                                                                                value.lineItemObject.Group.map((g) => (
-                                                                                    g.Ratio ? g.Ratio.map((r) => (
-                                                                                        r.FieldName == 'PR1DAYPRC' ? r.Value : ''
-                                                                                    )) : ''
-                                                                                )) : '' : ''
-                                                                        }
-                                                                    </div>
-                                                                    <div>
-                                                                        {value.lineItemObject ?
-                                                                            value.lineItemObject.Group ?
-                                                                                value.lineItemObject.Group.map((g) => (
-                                                                                    g.Ratio ? g.Ratio.map((r) => (
-                                                                                        r.FieldName == 'PR5DAYPRC' ? r.Value : ''
-                                                                                    )) : ''
-                                                                                )) : '' : ''
-                                                                        }
-                                                                    </div>
-                                                                    <div>
-                                                                        {value.lineItemObject ?
-                                                                            value.lineItemObject.Group ?
-                                                                                value.lineItemObject.Group.map((g) => (
-                                                                                    g.Ratio ? g.Ratio.map((r) => (
-                                                                                        r.FieldName == 'ChPctPriceMTD' ? r.Value : ''
-                                                                                    )) : ''
-                                                                                )) : '' : ''
-                                                                        }
-                                                                    </div>
-                                                                    <div>
-                                                                        {value.lineItemObject ?
-                                                                            value.lineItemObject.Group ?
-                                                                                value.lineItemObject.Group.map((g) => (
-                                                                                    g.Ratio ? g.Ratio.map((r) => (
-                                                                                        r.FieldName == 'PRYTDPCT' ? r.Value : ''
-                                                                                    )) : ''
-                                                                                )) : '' : ''
-                                                                        }
-                                                                    </div>
-                                                                    <div>
+                                                            </Col>
 
-                                                                    </div>
-                                                                    <div>
+                                                            <Col span={12}>
+                                                                <div className={styles.dataPeerRow}>
+                                                                    <Col span={4}>
                                                                         {value.lineItemObject ?
                                                                             value.lineItemObject.Group ?
                                                                                 value.lineItemObject.Group.map((g) => (
                                                                                     g.Ratio ? g.Ratio.map((r) => (
-                                                                                        r.FieldName == 'PR13WKPCT' ? r.Value : ''
+                                                                                        r.FieldName == 'PR1DAYPRC' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
                                                                                     )) : ''
                                                                                 )) : '' : ''
                                                                         }
-                                                                    </div>
+                                                                    </Col>
+                                                                    <Col span={4}>
+                                                                        {value.lineItemObject ?
+                                                                            value.lineItemObject.Group ?
+                                                                                value.lineItemObject.Group.map((g) => (
+                                                                                    g.Ratio ? g.Ratio.map((r) => (
+                                                                                        r.FieldName == 'PR5DAYPRC' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
+                                                                                    )) : ''
+                                                                                )) : '' : ''
+                                                                        }
+                                                                    </Col>
+                                                                    <Col span={4}>
+                                                                        {value.lineItemObject ?
+                                                                            value.lineItemObject.Group ?
+                                                                                value.lineItemObject.Group.map((g) => (
+                                                                                    g.Ratio ? g.Ratio.map((r) => (
+                                                                                        r.FieldName == 'ChPctPriceMTD' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
+                                                                                    )) : ''
+                                                                                )) : '' : ''
+                                                                        }
+                                                                    </Col>
+                                                                    <Col span={4}>
+                                                                        {value.lineItemObject ?
+                                                                            value.lineItemObject.Group ?
+                                                                                value.lineItemObject.Group.map((g) => (
+                                                                                    g.Ratio ? g.Ratio.map((r) => (
+                                                                                        r.FieldName == 'PRYTDPCT' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
+                                                                                    )) : ''
+                                                                                )) : '' : ''
+                                                                        }
+                                                                    </Col>
+                                                                    <Col span={4}></Col>
+                                                                    <Col span={4}>
+                                                                        {value.lineItemObject ?
+                                                                            value.lineItemObject.Group ?
+                                                                                value.lineItemObject.Group.map((g) => (
+                                                                                    g.Ratio ? g.Ratio.map((r) => (
+                                                                                        r.FieldName == 'PR13WKPCT' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
+                                                                                    )) : ''
+                                                                                )) : '' : ''
+                                                                        }
+                                                                    </Col>
                                                                 </div>
-                                                            </span>
-                                                        </div>
+                                                            </Col>
+                                                        </Row>
                                                     </div>
 
                                                 )) : <Spin className={styles.spinLoading} /> : '' : '' : ''}
 
-                                    {JSON.stringify(marketState) !== '{}' ? Object.keys(marketState).map((ms) => (
+                                    {JSON.stringify(marketState) !== '{}' ? Object.keys(marketState).map((ms, index) => (
                                         allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol ?
                                             allData.GetShareholdersReport_Response_1.SymbolReport.Symbol.Value != ms ?
                                                 marketState[ms].map((value) => (
-                                                    <div className={styles.dataPeer}>
-                                                        <div>
-                                                            <span>{value.ric}</span>
-                                                            <span>{JSON.stringify(companyName) !== '{}' ? companyName[value.ric] : ''}</span>
-                                                            <span>
+                                                    <div className={[styles.dataPeer, index % 2 != 0 ? styles.oddBack : ''].join(' ')}>
+                                                        <Row>
+                                                            <Col span={3}>{value.ric}</Col>
+                                                            <Col span={3}>{JSON.stringify(companyName) !== '{}' ? companyName[value.ric] : ''}</Col>
+                                                            <Col span={3}>
                                                                 {value.lineItemObject ?
                                                                     value.lineItemObject.Group ?
                                                                         value.lineItemObject.Group.map((g) => (
                                                                             g.Ratio ? g.Ratio.map((r) => (
-                                                                                r.FieldName == 'NHIG' ? r.Value : ''
+                                                                                r.FieldName == 'NHIG' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
                                                                             )) : ''
                                                                         )) : '' : ''
                                                                 }
-                                                            </span>
-                                                            <span>
+                                                            </Col>
+                                                            <Col span={3}>
                                                                 {value.lineItemObject ?
                                                                     value.lineItemObject.Group ?
                                                                         value.lineItemObject.Group.map((g) => (
                                                                             g.Ratio ? g.Ratio.map((r) => (
-                                                                                r.FieldName == 'NLOW' ? r.Value : ''
+                                                                                r.FieldName == 'NLOW' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
                                                                             )) : ''
                                                                         )) : '' : ''
                                                                 }
-                                                            </span>
-                                                        </div>
-                                                        <div>
-                                                            <span>
-                                                                <div className={styles.dataPeerRow}>
-                                                                    <div>
-                                                                        {value.lineItemObject ?
-                                                                            value.lineItemObject.Group ?
-                                                                                value.lineItemObject.Group.map((g) => (
-                                                                                    g.Ratio ? g.Ratio.map((r) => (
-                                                                                        r.FieldName == 'PR1DAYPRC' ? r.Value : ''
-                                                                                    )) : ''
-                                                                                )) : '' : ''
-                                                                        }
-                                                                    </div>
-                                                                    <div>
-                                                                        {value.lineItemObject ?
-                                                                            value.lineItemObject.Group ?
-                                                                                value.lineItemObject.Group.map((g) => (
-                                                                                    g.Ratio ? g.Ratio.map((r) => (
-                                                                                        r.FieldName == 'PR5DAYPRC' ? r.Value : ''
-                                                                                    )) : ''
-                                                                                )) : '' : ''
-                                                                        }
-                                                                    </div>
-                                                                    <div>
-                                                                        {value.lineItemObject ?
-                                                                            value.lineItemObject.Group ?
-                                                                                value.lineItemObject.Group.map((g) => (
-                                                                                    g.Ratio ? g.Ratio.map((r) => (
-                                                                                        r.FieldName == 'ChPctPriceMTD' ? r.Value : ''
-                                                                                    )) : ''
-                                                                                )) : '' : ''
-                                                                        }
-                                                                    </div>
-                                                                    <div>
-                                                                        {value.lineItemObject ?
-                                                                            value.lineItemObject.Group ?
-                                                                                value.lineItemObject.Group.map((g) => (
-                                                                                    g.Ratio ? g.Ratio.map((r) => (
-                                                                                        r.FieldName == 'PRYTDPCT' ? r.Value : ''
-                                                                                    )) : ''
-                                                                                )) : '' : ''
-                                                                        }
-                                                                    </div>
-                                                                    <div>
+                                                            </Col>
 
-                                                                    </div>
-                                                                    <div>
+                                                            <Col span={12}>
+                                                                <div className={styles.dataPeerRow}>
+                                                                    <Col span={4}>
                                                                         {value.lineItemObject ?
                                                                             value.lineItemObject.Group ?
                                                                                 value.lineItemObject.Group.map((g) => (
                                                                                     g.Ratio ? g.Ratio.map((r) => (
-                                                                                        r.FieldName == 'PR13WKPCT' ? r.Value : ''
+                                                                                        r.FieldName == 'PR1DAYPRC' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
                                                                                     )) : ''
                                                                                 )) : '' : ''
                                                                         }
-                                                                    </div>
+                                                                    </Col>
+                                                                    <Col span={4}>
+                                                                        {value.lineItemObject ?
+                                                                            value.lineItemObject.Group ?
+                                                                                value.lineItemObject.Group.map((g) => (
+                                                                                    g.Ratio ? g.Ratio.map((r) => (
+                                                                                        r.FieldName == 'PR5DAYPRC' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
+                                                                                    )) : ''
+                                                                                )) : '' : ''
+                                                                        }
+                                                                    </Col>
+                                                                    <Col span={4}>
+                                                                        {value.lineItemObject ?
+                                                                            value.lineItemObject.Group ?
+                                                                                value.lineItemObject.Group.map((g) => (
+                                                                                    g.Ratio ? g.Ratio.map((r) => (
+                                                                                        r.FieldName == 'ChPctPriceMTD' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
+                                                                                    )) : ''
+                                                                                )) : '' : ''
+                                                                        }
+                                                                    </Col>
+                                                                    <Col span={4}>
+                                                                        {value.lineItemObject ?
+                                                                            value.lineItemObject.Group ?
+                                                                                value.lineItemObject.Group.map((g) => (
+                                                                                    g.Ratio ? g.Ratio.map((r) => (
+                                                                                        r.FieldName == 'PRYTDPCT' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
+                                                                                    )) : ''
+                                                                                )) : '' : ''
+                                                                        }
+                                                                    </Col>
+                                                                    <Col span={4}></Col>
+                                                                    <Col span={4}>
+                                                                        {value.lineItemObject ?
+                                                                            value.lineItemObject.Group ?
+                                                                                value.lineItemObject.Group.map((g) => (
+                                                                                    g.Ratio ? g.Ratio.map((r) => (
+                                                                                        r.FieldName == 'PR13WKPCT' ? r.Value ? parseFloat(r.Value).toFixed(2) : '' : ''
+                                                                                    )) : ''
+                                                                                )) : '' : ''
+                                                                        }
+                                                                    </Col>
                                                                 </div>
-                                                            </span>
-                                                        </div>
+                                                            </Col>
+                                                        </Row>
                                                     </div>
                                                 )) : ''
                                             : '')) : <Spin className={styles.spinLoading} />}

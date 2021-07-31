@@ -56,7 +56,15 @@ const Register = (props) => {
       payload: params,
       callback: (res) => {
         if (res) {
-          message.success(res.message);
+          if (res.state) {
+            if (intl.locale === "zh-CN") {
+              message.success('注册成功！')
+            } else {
+              message.success('Registration successful!')
+            }
+          } else {
+            message.error(res.message);
+          }
         }
       }
     });

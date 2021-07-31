@@ -33,7 +33,7 @@ const ProfitForecast = (props) => {
     useEffect(() => {
         if (intl.locale === "zh-CN") {
             if (keyType && keyType == 401) {
-                setOneInfoTitle('现金流量表预测');
+                setOneInfoTitle('现金流量表/资产负债表/损益表预测');
             } else if (keyType && keyType == 402) {
                 setOneInfoTitle('资产负债表预测');
             } else if (keyType && keyType == 403) {
@@ -41,7 +41,7 @@ const ProfitForecast = (props) => {
             }
         } else {
             if (keyType && keyType == 401) {
-                setOneInfoTitle('Cash flow statement forecast');
+                setOneInfoTitle('Cash flow statement/Balance sheet/Profit and loss statement forecast');
             } else if (keyType && keyType == 402) {
                 setOneInfoTitle('Balance sheet forecast');
             } else if (keyType && keyType == 403) {
@@ -191,9 +191,9 @@ const ProfitForecast = (props) => {
                 <div>
                     <div className={styles.dataTitle}>
                         <span>报告期</span>
-                        <span>{intl.locale === "zh-CN" ? titleNameCn : titleNameEn}{dataState.FinancialStatements ? dataState.FinancialStatements.AnnualPeriods.FiscalPeriod[0].FiscalYear : ''}</span>
+                        {/* <span>{intl.locale === "zh-CN" ? titleNameCn : titleNameEn}{dataState.FinancialStatements ? dataState.FinancialStatements.AnnualPeriods.FiscalPeriod[0].FiscalYear : ''}</span>
                         <span>{intl.locale === "zh-CN" ? titleNameCn : titleNameEn}{dataState.FinancialStatements ? dataState.FinancialStatements.AnnualPeriods.FiscalPeriod[1].FiscalYear : ''}</span>
-                        <span>{intl.locale === "zh-CN" ? titleNameCn : titleNameEn}{dataState.FinancialStatements ? dataState.FinancialStatements.AnnualPeriods.FiscalPeriod[2].FiscalYear : ''}</span>
+                        <span>{intl.locale === "zh-CN" ? titleNameCn : titleNameEn}{dataState.FinancialStatements ? dataState.FinancialStatements.AnnualPeriods.FiscalPeriod[2].FiscalYear : ''}</span> */}
                         <span>{intl.locale === "zh-CN" ? titleNameCn : titleNameEn}{oneForecastData ? oneForecastData[0] ? oneForecastData[0].Periods.Period[0].CalendarYear : '' : ''}</span>
                         <span>{intl.locale === "zh-CN" ? titleNameCn : titleNameEn}{twoForecastData ? twoForecastData[0] ? twoForecastData[0].Periods.Period[0].CalendarYear : '' : ''}</span>
                         <span>{intl.locale === "zh-CN" ? titleNameCn : titleNameEn}{threeForecastData ? threeForecastData[0] ? threeForecastData[0].Periods.Period[0].CalendarYear : '' : ''}</span>
@@ -204,7 +204,7 @@ const ProfitForecast = (props) => {
                                 className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                 <span>{intl.locale === "zh-CN" ? df.nameCN : df.nameEN}</span>
 
-                                <span>
+                                {/* <span>
                                     {df.section == casType ?
                                         <span>
                                             {casState && casState.one && casState.one.length > 0 ? casState.one.map((one) => (
@@ -267,7 +267,7 @@ const ProfitForecast = (props) => {
                                                     )) : ''}
                                                 </span> : ''
                                     }
-                                </span>
+                                </span> */}
                                 <span>
                                     {oneForecastData && oneForecastData.length > 0 ? oneForecastData.map((one) => (
                                         (one.Abbreviation == df.type) ? one.Periods ? one.Periods.Period ? toDecimal(one.Periods.Period[0].Estimates.Estimate[0].Mean) : '' : '' : ''

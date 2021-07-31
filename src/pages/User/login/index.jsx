@@ -30,19 +30,21 @@ const Login = (props) => {
   const [typeTab, setTypeTab] = useState('mobile');
   const intl = useIntl();
   const [form] = ProForm.useForm();
+  const [defaultPhone, setDefaultPhone] = useState('');
 
   const handleSubmit = (values) => {
     const { dispatch } = props;
     let formValue = form.getFieldsValue();
     let params = {
       info: formValue.userName,
-      password: formValue.password,
+      password: typeTab === 'mobile' ? formValue.password : formValue.passwordAccount,
       type: "3"
     }
+    let typeParams = { typeTab: typeTab }//切换的类型
     let autoLoginParam = { autoLogin: formValue.autoLogin }
     dispatch({
       type: 'login/login',
-      payload: { params, autoLoginParam }
+      payload: { params, autoLoginParam, typeParams }
     });
   };
 
@@ -57,11 +59,18 @@ const Login = (props) => {
 
   useEffect(() => {
     //记住密码自动填充密码
-    if (getCookie('username') != '' && getCookie('password') != '') {
-      form.setFieldsValue({ userName: getCookie('username'), password: getCookie('password') })
+    if (typeTab === 'mobile') {
+      if (getCookie('username') != '' && getCookie('password') != '') {
+        setDefaultPhone(getCookie('username'))
+        form.setFieldsValue({ password: getCookie('password') })
+      }
+    } else {
+      if (getCookie('usernameAccount') != '' && getCookie('passwordAccount') != '') {
+        form.setFieldsValue({ userName: getCookie('usernameAccount'), passwordAccount: getCookie('passwordAccount') })
+      }
     }
     setPhoneL();
-  }, [])
+  }, [typeTab])
 
   const [phoneLoginWay, setPhoneLoginWay] = useState(0)//手机登陆方式，默认是0：手机密码登陆，1:验证码登陆
 
@@ -176,7 +185,7 @@ const Login = (props) => {
               <LoginMessage
                 content={intl.formatMessage({
                   id: 'pages.login.accountLogin.errorMessage',
-                  defaultMessage: '账户或密码错误（admin/ant.design)',
+                  defaultMessage: '账户或密码错误',
                 })}
               />
             )}
@@ -204,7 +213,7 @@ const Login = (props) => {
                   ]}
                 />
                 <ProFormText.Password
-                  name="password"
+                  name="passwordAccount"
                   fieldProps={{
                     size: 'large',
                   }}
@@ -248,6 +257,7 @@ const Login = (props) => {
                   onChange={getPhoneValue}
                   localization={phoneLang}
                   name="mobile"
+                  value={defaultPhone}
                   placeholder={intl.formatMessage({
                     id: 'pages.login.phoneNumber.placeholder',
                     defaultMessage: '手机号',
