@@ -326,3 +326,16 @@ export const sortArray = (property) => {
     return startTime.getTime() - endTime.getTime();
   }
 }
+
+//获取年度范围值
+export const yearScope = (years) => {
+  const Time = new Date()
+  let currentYear = Time.getFullYear()
+  years = years ? years : 5;
+  let fitstYear = currentYear - years
+  let lastYear = currentYear
+  let times = {};
+  times.startYear = fitstYear;
+  times.endYear = lastYear;
+  return times;
+}

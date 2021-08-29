@@ -160,8 +160,8 @@ const FinancialNews = () => {
           countsId = listParams.classId;
           setLoadingListState(false);
           if (res.data) {
-            setNewsList(res.data.RetrieveHeadlineML_Response_1.HeadlineMLResponse.HEADLINEML.HL);
-            setNewsPageList(subGroupArray(res.data.RetrieveHeadlineML_Response_1.HeadlineMLResponse.HEADLINEML.HL, 20)[0]);
+            setNewsList(res.data?.RetrieveHeadlineML_Response_1?.HeadlineMLResponse?.HEADLINEML?.HL);
+            setNewsPageList(subGroupArray(res.data?.RetrieveHeadlineML_Response_1?.HeadlineMLResponse?.HEADLINEML?.HL, 20)[0]);
           } else {
             setNewsList([]);
           }

@@ -1,13 +1,13 @@
-import { message, Table, Pagination, DatePicker } from 'antd';
+import { message, Table, Pagination, DatePicker, Empty } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useIntl, FormattedMessage } from 'umi';
-import { querySharePrice, queryValuationAnalysis } from '../service';
+import { querySharePrice, queryValuationAnalysis, queryValuation } from '../service';
 import styles from './index.less';
 import { getAuthority } from '@/utils/authority';
 import { subGroupArray, timeSpan } from '@/utils/utils';
 import { dataValuation } from './DataUtil';
 import moment from 'moment';
-import { join } from 'lodash';
+import { Chart, Line, Point, Tooltip, Legend, Axis } from 'bizcharts';
 
 const { RangePicker } = DatePicker;
 let dateFormat = 'YYYY-MM-DDTHH:mm:ss';
@@ -63,8 +63,17 @@ const TradingValuation = (props) => {
     //估值分析
     let paramsValuation = {
         ric: '',
-        startTime: timeSpan(170).startDate.getTime(),
-        endTime: timeSpan(170).endDate.getTime(),
+        startTime: timeSpan(7).startDate.getTime(),
+        endTime: timeSpan(7).endDate.getTime(),
+        accessToken: userInfo.accessToken
+    }
+    //估值分析折线图
+    let paramsLine = {
+        ric: '',
+        startTime: timeSpan(7).startDate.getTime(),
+        endTime: timeSpan(7).endDate.getTime(),
+        period: 'DAILY',
+        dimension: 'CLOSE',
         accessToken: userInfo.accessToken
     }
 
@@ -86,7 +95,8 @@ const TradingValuation = (props) => {
                 querySharePriceLists(ric);
             } else if (keyType && keyType == 502) {
                 setOneInfoTitle('估值分析');
-                queryValuationAnalysisData(ric);
+                // queryValuationAnalysisData(ric);
+                queryValuationData(ric)
             }
         } else {
             pageTotal = 'Total';
@@ -96,7 +106,8 @@ const TradingValuation = (props) => {
                 querySharePriceLists(ric);
             } else if (keyType && keyType == 502) {
                 setOneInfoTitle('Valuation analysis');
-                queryValuationAnalysisData(ric);
+                // queryValuationAnalysisData(ric);
+                queryValuationData(ric)
             }
         }
 
@@ -140,6 +151,53 @@ const TradingValuation = (props) => {
         )
     }
 
+    const [valuationLine, setValuationLine] = useState([]);
+
+    //查询行情分析折线图
+    const queryValuationData = (ric) => {
+        paramsLine.ric = ric;
+        queryValuation(paramsLine).then(
+            res => {
+                if (res.state) {
+                    if (res.data) {
+                        let dataArray = []
+                        res.data.map((item) => {
+                            for (var i in item) {
+                                let lineObj = {}
+                                if (i === 'pb') {
+                                    lineObj.type = i;
+                                    lineObj.value = item[i] ? parseFloat(parseFloat(item[i]).toFixed(2)) : 0;
+                                    lineObj.quarterTime = item.quarterTime ? moment(item.quarterTime).format('YYYY-MM-DD') : '';
+                                    dataArray.push(lineObj)
+                                } else if (i === 'ps') {
+                                    lineObj.type = i;
+                                    lineObj.value = item[i] ? parseFloat(parseFloat(item[i]).toFixed(2)) : 0;
+                                    lineObj.quarterTime = item.quarterTime ? moment(item.quarterTime).format('YYYY-MM-DD') : '';
+                                    dataArray.push(lineObj)
+                                } else if (i === 'pcf') {
+                                    lineObj.type = i;
+                                    lineObj.value = item[i] ? parseFloat(parseFloat(item[i]).toFixed(2)) : 0;
+                                    lineObj.quarterTime = item.quarterTime ? moment(item.quarterTime).format('YYYY-MM-DD') : '';
+                                    dataArray.push(lineObj)
+                                } else if (i === 'pe') {
+                                    lineObj.type = i;
+                                    lineObj.value = item[i] ? parseFloat(parseFloat(item[i]).toFixed(2)) : 0;
+                                    lineObj.quarterTime = item.quarterTime ? moment(item.quarterTime).format('YYYY-MM-DD') : '';
+                                    dataArray.push(lineObj)
+                                }
+                            }
+                        })
+                        setValuationLine(dataArray)
+                    } else {
+                        setValuationLine([])
+                    }
+                } else {
+                    message.error(res.message);
+                }
+            }
+        )
+    }
+
     const [cutPage, setCutPage] = useState(1);
 
     const onChange = (page, pageSize) => {
@@ -158,10 +216,28 @@ const TradingValuation = (props) => {
         params.endTime = moment(e[1]._d).format(dateFormat);
         paramsValuation.startTime = e[0]._d.getTime();
         paramsValuation.endTime = e[1]._d.getTime();
+        paramsLine.startTime = e[0]._d.getTime();
+        paramsLine.endTime = e[1]._d.getTime();
         if (keyType == 501) {
             querySharePriceLists(ric);
         } else if (keyType == 502) {
-            queryValuationAnalysisData(ric);
+            // queryValuationAnalysisData(ric);
+            queryValuationData(ric)
+        }
+    }
+
+    //行情分析折线图
+    const scale = {
+        value: { min: 0, },
+        type: {
+            formatter: v => {
+                return {
+                    ps: 'ps',
+                    pb: 'pb',
+                    pe: 'pe',
+                    pcf: 'pcf'
+                }[v]
+            }
         }
     }
 
@@ -199,40 +275,51 @@ const TradingValuation = (props) => {
                         </div>
                     </div> :
                     keyType == 502 ?
+                        // <div>
+                        //     <div className={[styles.dataTitle, styles.oddBack].join(' ')}>
+                        //         <span></span>
+                        //         {
+                        //             valuation.length > 0 ? valuation.map((item) => (
+                        //                 <span>{item.quarterTime ? item.quarterTime : ''}</span>
+                        //             )) : ''
+                        //         }
+                        //     </div>
+                        //     {
+                        //         valuation.length > 0 ? valuation.map((value) => (
+                        //             dataValuation.length > 0 ? dataValuation.map((code, index) => (
+                        //                 <div className={styles.dataContent}
+                        //                     className={[styles.dataContent, index % 2 != 0 ? styles.oddBack : ''].join(' ')}>
+                        //                     <span>{intl.locale === "zh-CN" ? code.nameCN : code.nameEN}</span>
+                        //                     {code.type == 'pe' ?
+                        //                         <span>
+                        //                             {value.pe && value.close ? eval(value.pe * value.close).toFixed(2) : ''}
+                        //                         </span>
+                        //                         : code.type == 'pb' ?
+                        //                             <span>
+                        //                                 {value.pb && value.close ? eval(value.pb * value.close).toFixed(2) : ''}
+                        //                             </span> : code.type == 'ps' ?
+                        //                                 <span>
+                        //                                     {value.ps && value.close ? eval(value.ps * value.close).toFixed(2) : ''}
+                        //                                 </span> : code.type == 'pcf' ?
+                        //                                     <span>
+                        //                                         {value.pcf && value.close ? eval(value.pcf * value.close).toFixed(2) : ''}
+                        //                                     </span> : ''}
+                        //                 </div>
+                        //             )) : ''
+                        //         )) : ''
+                        //     }
+                        // </div> 
                         <div>
-                            <div className={[styles.dataTitle, styles.oddBack].join(' ')}>
-                                <span></span>
-                                {
-                                    valuation.length > 0 ? valuation.map((item) => (
-                                        <span>{item.quarterTime ? item.quarterTime : ''}</span>
-                                    )) : ''
-                                }
-                            </div>
-                            {
-                                valuation.length > 0 ? valuation.map((value) => (
-                                    dataValuation.length > 0 ? dataValuation.map((code, index) => (
-                                        <div className={styles.dataContent}
-                                            className={[styles.dataContent, index % 2 != 0 ? styles.oddBack : ''].join(' ')}>
-                                            <span>{intl.locale === "zh-CN" ? code.nameCN : code.nameEN}</span>
-                                            { code.type == 'pe' ?
-                                                <span>
-                                                    {value.pe && value.close ? eval(value.pe * value.close).toFixed(2) : ''}
-                                                </span>
-                                                : code.type == 'pb' ?
-                                                    <span>
-                                                        {value.pb && value.close ? eval(value.pb * value.close).toFixed(2) : ''}
-                                                    </span> : code.type == 'ps' ?
-                                                        <span>
-                                                            {value.ps && value.close ? eval(value.ps * value.close).toFixed(2) : ''}
-                                                        </span> : code.type == 'pcf' ?
-                                                            <span>
-                                                                {value.pcf && value.close ? eval(value.pcf * value.close).toFixed(2) : ''}
-                                                            </span> : ''}
-                                        </div>
-                                    )) : ''
-                                )) : ''
-                            }
-                        </div> : ''}
+                            {valuationLine.length > 0 ?
+                                <Chart scale={scale} padding={[30, 100, 60, 100]} autoFit height={500} data={valuationLine} interactions={['element-active']}>
+                                    <Axis name="value" tickLine line grid={null} />
+                                    <Point position="quarterTime*value" color="type" shape='circle' />
+                                    <Line shape="smooth" position="quarterTime*value" color="type" label="value" />
+                                    <Tooltip shared showCrosshairs />
+                                    <Legend />
+                                </Chart> : <Empty />}
+                        </div>
+                        : ''}
             </div>
         </div>
     )

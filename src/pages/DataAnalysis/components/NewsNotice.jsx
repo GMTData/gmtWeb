@@ -1,10 +1,10 @@
 import { message, Table, Pagination } from 'antd';
 import React, { useState, useEffect } from 'react';
-import { useIntl, FormattedMessage } from 'umi';
-import { queryNoticeByRic, downloadkNotice } from '../service';
+import { useIntl, FormattedMessage, Link } from 'umi';
+import { queryNoticeByRic, downloadkNotice, querytNewsByRic } from '../service';
 import styles from './index.less';
 import { getAuthority } from '@/utils/authority';
-import { fileSizeTransform, mimeType } from '@/utils/utils';
+import { fileSizeTransform, mimeType, subGroupArray } from '@/utils/utils';
 import moment from 'moment';
 
 const NewsNotice = (props) => {
@@ -12,11 +12,46 @@ const NewsNotice = (props) => {
     let pageItems = '条';
     const { keyType, ric } = props;
     const userInfo = getAuthority();//获取用户相关信息
-    const [oneInfoTitle, setOneInfoTitle] = useState('新闻公告&研究报告');//一级名称
+    const [oneInfoTitle, setOneInfoTitle] = useState('新闻公告');//一级名称
     const [loadingState, setLoadingState] = useState(true);//loading
     const [newsNoticeData, setNewsNoticeData] = useState({});//所有数据
     const [newsNoticePage, setNewsNoticePage] = useState([]);//分页数据
 
+    //新闻数据
+    const columnsNews = [
+        {
+            title: <FormattedMessage id="pages.newsNotice.sequenceNumber" defaultMessage="序号" />,
+            dataIndex: 'sequenceNumber',
+            width: 100,
+            render: (val, record, index) => {
+                return <span>{index + 1}</span>
+            }
+        },
+        {
+            title: <FormattedMessage id="pages.newsNotice.newsHeadlines" defaultMessage="新闻标题" />,
+            dataIndex: 'newsHeadlines',
+            render: (val, record) => {
+                return <span>
+                    <Link target="_blank" to={{
+                        pathname: `/news/details/${record.ID}`
+                    }}>
+                        <span className={styles.checkInfo} style={{ color: 'white' }}>{record.HT}</span>
+                    </Link>
+                </span>
+            }
+        },
+        {
+            title: <FormattedMessage id="pages.companyNotice.releaseDate" defaultMessage="发布时间" />,
+            dataIndex: 'releaseDate',
+            width: 200,
+            render: (val, record) => {
+                return <span>{record.LT ? moment(record.LT).format("YYYY-MM-DD HH:mm:ss") : ''}</span>
+            }
+        },
+
+    ];
+
+    //研究报告
     const columns = [
         {
             title: <FormattedMessage id="pages.companyNotice.noticeDate" defaultMessage="公告日期" />,
@@ -70,11 +105,12 @@ const NewsNotice = (props) => {
     ];
 
     //默认ric
-    let params = {
+    let paramsNews = {
+        size: 200,
         ric: '',
         accessToken: userInfo.accessToken
     }
-    //资产负债表、损益表、现金流量预测数据    
+    //研究报告    
     let noticeParams = {
         ric: "",  //可以为空
         stockTypes: [],  //股票的分类 跟公告接口传参一样。
@@ -97,20 +133,47 @@ const NewsNotice = (props) => {
             noticeParams.language = 'ZH';
             pageTotal = '共';
             pageItems = '条';
-            if ((keyType && keyType == 2) || keyType == 0) {
-                setOneInfoTitle('新闻公告&研究报告');
+            if ((keyType && keyType == 201) || keyType == 0) {
+                setOneInfoTitle('新闻公告');
+            } else if (keyType && keyType == 202) {
+                setOneInfoTitle('研究报告');
+                queryNewsNoticeLists(ric);
             }
         } else {
             noticeParams.language = 'EN';
             pageTotal = 'Total';
             pageItems = 'items';
-            if ((keyType && keyType == 2) || keyType == 0) {
-                setOneInfoTitle('Press Announcements & Research Reports');
+            if ((keyType && keyType == 201) || keyType == 0) {
+                setOneInfoTitle('Press Announcements');
+            } else if (keyType && keyType == 202) {
+                setOneInfoTitle('Research Reports');
+                queryNewsNoticeLists(ric);
             }
         }
-        queryNewsNoticeLists(ric);
+        querytNewsByRicLists(ric)
 
-    }, [ric]);
+    }, [ric, keyType]);
+
+    const [newsList, setNewsList] = useState([]);//新闻数据
+    const [newsPage, setNewsPage] = useState([]);//新闻分页
+    //查询新闻列表
+    const querytNewsByRicLists = (ric) => {
+        paramsNews.ric = ric;
+        querytNewsByRic(paramsNews).then(
+            res => {
+                if (res.state) {
+                    setLoadingState(false);
+                    if (res.data) {
+                        setNewsList(res.data?.RetrieveHeadlineML_Response_1?.HeadlineMLResponse?.HEADLINEML?.HL)
+                        setNewsPage(subGroupArray(res.data?.RetrieveHeadlineML_Response_1?.HeadlineMLResponse?.HEADLINEML?.HL, 20)[0]);
+                    }
+                } else {
+                    setLoadingState(false);
+                    message.error(res.message);
+                }
+            }
+        )
+    }
 
     //查询公告列表
     const queryNewsNoticeLists = (ric) => {
@@ -134,17 +197,25 @@ const NewsNotice = (props) => {
     const [cutPage, setCutPage] = useState(1);
 
     const onChange = (page, pageSize) => {
-        noticeParams.pageSize = pageSize ? pageSize : 20;
-        noticeParams.currentPage = page ? page : 1;
         setCutPage(page);
-        queryNewsNoticeLists();
+        if (keyType == 201) {
+            setNewsPage(subGroupArray(newsList, pageSize)[page - 1]);
+        } else if (keyType == 202) {
+            noticeParams.pageSize = pageSize ? pageSize : 20;
+            noticeParams.currentPage = page ? page : 1;
+            queryNewsNoticeLists(ric);
+        }
     }
 
     const onShowSizeChange = (current, size) => {
-        noticeParams.pageSize = size ? size : 20;
-        noticeParams.currentPage = current ? current : 1;
         setCutPage(current);
-        queryNewsNoticeLists();
+        if (keyType == 201) {
+            setNewsPage(subGroupArray(newsList, size)[current - 1]);
+        } else if (keyType == 202) {
+            noticeParams.pageSize = size ? size : 20;
+            noticeParams.currentPage = current ? current : 1;
+            queryNewsNoticeLists(ric);
+        }
     }
 
     //文件下载参数
@@ -191,25 +262,48 @@ const NewsNotice = (props) => {
             <div className={styles.infoTitle}>
                 <span className={styles.titleTxt}>{oneInfoTitle}</span>
             </div>
-            <div>
-                <Table loading={loadingState}
-                    scroll={{ x: '100%' }}
-                    rowKey={(record) => record.commonID}
-                    columns={columns}
-                    rowClassName={getRowClassName}
-                    dataSource={newsNoticePage}
-                    pagination={false} />
-                <div className={styles.pageBox}>
-                    <Pagination
-                        total={newsNoticeData.totalHit}
-                        showTotal={(total) => `${pageTotal} ${newsNoticeData.totalHit ? newsNoticeData.totalHit : 0} ${pageItems} `}
-                        defaultPageSize={20}
-                        current={cutPage ? cutPage : 1}
-                        onChange={onChange}
-                        onShowSizeChange={onShowSizeChange}
-                    />
-                </div>
-            </div>
+            {
+                (keyType == 201 || keyType == 0) ?
+                    <div>
+                        <Table loading={loadingState}
+                            scroll={{ x: '100%' }}
+                            rowKey={(record) => record.ID}
+                            columns={columnsNews}
+                            rowClassName={getRowClassName}
+                            dataSource={newsPage}
+                            pagination={false} />
+                        <div className={styles.pageBox}>
+                            <Pagination
+                                total={newsList.length}
+                                showTotal={(total) => `${pageTotal} ${newsList.length} ${pageItems} `}
+                                defaultPageSize={20}
+                                current={cutPage ? cutPage : 1}
+                                onChange={onChange}
+                                onShowSizeChange={onShowSizeChange}
+                            />
+                        </div>
+                    </div> :
+                    keyType == 202 ?
+                        <div>
+                            <Table loading={loadingState}
+                                scroll={{ x: '100%' }}
+                                rowKey={(record) => record.commonID}
+                                columns={columns}
+                                rowClassName={getRowClassName}
+                                dataSource={newsNoticePage}
+                                pagination={false} />
+                            <div className={styles.pageBox}>
+                                <Pagination
+                                    total={newsNoticeData.totalHit}
+                                    showTotal={(total) => `${pageTotal} ${newsNoticeData.totalHit ? newsNoticeData.totalHit : 0} ${pageItems} `}
+                                    defaultPageSize={20}
+                                    current={cutPage ? cutPage : 1}
+                                    onChange={onChange}
+                                    onShowSizeChange={onShowSizeChange}
+                                />
+                            </div>
+                        </div>
+                        : ''}
         </div>
     )
 };

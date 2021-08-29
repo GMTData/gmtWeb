@@ -39,6 +39,7 @@ export default [
                 path: '/home',
                 name: 'welcome',
                 component: './Welcome',
+                hideInBreadcrumb: true 
               },
               {
                 path: '/admin',
@@ -70,35 +71,41 @@ export default [
                   {
                     name: 'financial',
                     path: '/news/financial',
-                    component: './NewsInfo/FinancialNews'
+                    component: './NewsInfo/FinancialNews',
+                    hideInBreadcrumb: true 
                   },
                   {
                     name: 'newsDetails',
                     path: '/news/details/:newsId',
                     hideInMenu: true,
-                    component: './NewsInfo/NewsDetails'
+                    component: './NewsInfo/NewsDetails',
+                    hideInBreadcrumb: true 
                   },
                   {
                     name: 'companyNotice',
                     path: '/news/companyNotice',
-                    component: './NewsInfo/CompanyNotice'
+                    component: './NewsInfo/CompanyNotice',
+                    hideInBreadcrumb: true 
                   },
                   {
                     name: 'economicCalenda',
                     path: '/news/economicCalenda',
-                    component: './NewsInfo/EconomicCalenda'
+                    component: './NewsInfo/EconomicCalenda',
+                    hideInBreadcrumb: true 
                   },
                 ]
               },
               {
                 name: 'dataAnalysis',
                 path: '/dataAnalysis',
-                component: './DataAnalysis'
+                component: './DataAnalysis',
+                hideInBreadcrumb: true 
               },
               {
                 name: 'chartingLibrary',
                 path: '/chartingLibrary',
-                component: './ChartingLibrary'
+                component: './ChartingLibrary',
+                hideInBreadcrumb: true 
               },
               {
                 component: './404',

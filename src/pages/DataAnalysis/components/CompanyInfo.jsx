@@ -1,4 +1,4 @@
-import { Descriptions, message} from 'antd';
+import { Descriptions, message } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useIntl, FormattedMessage } from 'umi';
 import styles from './index.less';
@@ -13,6 +13,8 @@ const CompanyInfo = (props) => {
   const [shareInfo, setShareInfo] = useState({});//股票信息
   const [otherInfo, setOtherInfo] = useState({});//其余信息
   const [oneInfoTitle, setOneInfoTitle] = useState('');//一级名称
+  const stateZeroText = intl.locale === "zh-CN" ? '非上市' : 'unlisted';
+  const stateOneText = intl.locale === "zh-CN" ? '上市' : 'listed';
 
   useEffect(() => {
     if (intl.locale === "zh-CN") {
@@ -77,11 +79,11 @@ const CompanyInfo = (props) => {
             <Descriptions.Item label={intl.formatMessage({
               id: 'pages.companyInfo.largestShareholder',
               defaultMessage: '第一大股东',
-            })}></Descriptions.Item>
+            })}>{shareInfo?.Shareholders?.Investor[0]?.Name}</Descriptions.Item>
             <Descriptions.Item label={intl.formatMessage({
               id: 'pages.companyInfo.shareholdingRateLargest',
               defaultMessage: '第一大股东持股比例',
-            })}></Descriptions.Item>
+            })}>{shareInfo?.Shareholders?.Investor[0]?.Holding?.PctOfSharesOutstanding + '%'}</Descriptions.Item>
             <Descriptions.Item label={intl.formatMessage({
               id: 'pages.companyInfo.subordinateIndustry',
               defaultMessage: '所属行业',
@@ -208,13 +210,19 @@ const CompanyInfo = (props) => {
                 id: 'pages.companyInfo.currentTradingStatus',
                 defaultMessage: '当前交易状态',
               })}>
-                {otherInfo.IssueInformation ? otherInfo.IssueInformation.Issue[0].IssueStatus.Status[0].Value : ''}
-                {otherInfo.IssueInformation ? otherInfo.IssueInformation.Issue[0].IssueStatus.Status[1].Value : ''}
+                {otherInfo?.CompanyInformation?.CompanyStatus?.Status.map((item) => (
+                  item.Type === "ActiveStatus" ? item.Value : item.Type === "ActiveStatus" ? item.Value : ''
+                ))}
               </Descriptions.Item>
               <Descriptions.Item label={intl.formatMessage({
                 id: 'pages.companyInfo.specialAndDelisting',
                 defaultMessage: '特别处理和退市',
-              })}></Descriptions.Item>
+              })}>
+                {otherInfo?.CompanyInformation?.CompanyStatus?.Status.map((item) => (
+                  item.Type === "ActiveStatus" ? (item.Value === 0 ? stateZeroText : stateOneText)
+                    : item.Type === "ActiveStatus" ? (item.Value === 0 ? stateZeroText : stateOneText) : ''
+                ))}
+              </Descriptions.Item>
               <Descriptions.Item label={intl.formatMessage({
                 id: 'pages.companyInfo.delistingDate',
                 defaultMessage: '摘牌日期',

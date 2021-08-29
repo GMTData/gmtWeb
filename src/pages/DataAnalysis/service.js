@@ -41,11 +41,25 @@ export async function queryTargetAndRecommandation(params) {
     headers: { 'accessToken': params.accessToken },
   });
 }
-//f10-5资产负债表、损益表、现金流量预测数据接口
-export async function queryForecast(params) {
-  return request(`${PATH}/f105/forecast?ric=${params.ric}&forecastNumber=${params.forecastNumber}`, {
+//f10-5研究报告接口
+export async function queryResearchReport(params) {
+  return request(`${PATH}/f105/getResearchReport?ric=${params.ric}`, {
     method: 'get',
     headers: { 'accessToken': params.accessToken },
+  });
+}
+//f10-5资产负债表、损益表、现金流量预测数据接口
+export async function queryForecast(params) {
+  return request(`${PATH}/f105/queryForecast?ric=${params.ric}&startYear=${params.startYear}&endYear=${params.endYear}`, {
+    method: 'get',
+    headers: { 'accessToken': params.accessToken },
+  });
+}
+//f10-3新闻
+export async function querytNewsByRic(params) {
+  return request(`${PATH}/news/getNewsByRic?ric=${params.ric}&size=${params.size}`, {
+    method: 'get',
+    headers: { 'accessToken': params.accessToken, },
   });
 }
 //f10-3接口
@@ -85,6 +99,13 @@ export async function queryValuationAnalysis(params) {
     headers: { 'accessToken': params.accessToken, },
   });
 }
+//f10-6估值分析-折线图接口
+export async function queryValuation(params) {
+  return request(`${PATH}/f106/getValuation?ric=${params.ric}&startTime=${params.startTime}&endTime=${params.endTime}&period=${params.period}&dimension=${params.dimension}`, {
+    method: 'get',
+    headers: { 'accessToken': params.accessToken, },
+  });
+}
 //f10-8获取事件正文接口
 export async function queryEventContent(params) {
   return request(`${PATH}/f108/getEventContent?eventId=${params.eventId}`, {
@@ -109,7 +130,7 @@ export async function querySignificantEvent(params) {
   formData.append('maxNumberOfItems', params.maxNumberOfItems);
   return request(`${PATH}/f108/significantEvent`, {
     method: 'post',
-    headers: { 'accessToken': params.accessToken,  "Content-Type": "application/json"},
+    headers: { 'accessToken': params.accessToken, "Content-Type": "application/json" },
     data: JSON.stringify(params)
   });
 }
@@ -122,14 +143,14 @@ export async function queryExDividendsHeadline(params) {
 }
 //f10-9市场表现比较接口
 export async function queryRatiosReport(params) {
-  return request(`${PATH}/f109/queryRatiosReport?industryType=${params.industryType}`, {
+  return request(`${PATH}/f109/queryRatiosReport?ric=${params.ric}`, {
     method: 'get',
     headers: { 'accessToken': params.accessToken, },
   });
 }
 //f10-9获取估值分析接口
 export async function queryValueData(params) {
-  return request(`${PATH}/f109/queryValueData?industryType=${params.industryType}`, {
+  return request(`${PATH}/f109/queryValueData?ric=${params.ric}`, {
     method: 'get',
     headers: { 'accessToken': params.accessToken, },
   });
@@ -143,7 +164,7 @@ export async function getIndustryType(params) {
 }
 //f10-9获取财务比率和财务数据比较
 export async function queryFinancialReport(params) {
-  return request(`${PATH}/f109/queryFinancialReprot?industryType=${params.industryType}&timeType=${params.timeType}`, {
+  return request(`${PATH}/f109/queryFinancialReprot?ric=${params.ric}&timeType=${params.timeType}`, {
     method: 'get',
     headers: { 'accessToken': params.accessToken, },
   });

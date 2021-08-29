@@ -20,12 +20,12 @@ const PeerComparison = (props) => {
     const [oneInfoTitle, setOneInfoTitle] = useState('');//一级名称
     //估值分析比较
     let params = {
-        industryType: '',
+        ric: '',
         accessToken: userInfo.accessToken
     }
     //市场表现比较参数  
     let marketParams = {
-        industryType: '',
+        ric: '',
         accessToken: userInfo.accessToken
     }
     //行业分类接口
@@ -36,7 +36,7 @@ const PeerComparison = (props) => {
     }
     //财务比率和财务数据比较
     let reportParams = {
-        industryType: '',
+        ric: '',
         timeType: 'Annual',
         accessToken: userInfo.accessToken
     }
@@ -48,13 +48,17 @@ const PeerComparison = (props) => {
             if (keyType && keyType == 801) {
                 setOneInfoTitle('财务比率比较');
                 changeTitleRatio(SALEM)
+                getFinancialReport(ric);
             } else if (keyType && keyType == 802) {
                 setOneInfoTitle('财务数据比较');
                 changeTitle(RTLR);
+                getFinancialReport(ric);
             } else if (keyType && keyType == 803) {
                 setOneInfoTitle('估值分析比较');
+                getValueData(ric)
             } else if ((keyType && keyType == 804) || keyType == 0) {
                 setOneInfoTitle('市场表现比较');
+                getRatiosReport(ric);
             } else if (keyType && keyType == 805) {
                 setOneInfoTitle('盈利预测比较');
             }
@@ -62,36 +66,40 @@ const PeerComparison = (props) => {
             if (keyType && keyType == 801) {
                 setOneInfoTitle('Financial ratio comparison');
                 changeTitleRatio(SALEM)
+                getFinancialReport(ric);
             } else if (keyType && keyType == 802) {
                 changeTitle(RTLR);
                 setOneInfoTitle('Comparison of financial data');
+                getFinancialReport(ric);
             } else if (keyType && keyType == 803) {
                 setOneInfoTitle('Valuation analysis and comparison');
+                getValueData(ric)
             } else if ((keyType && keyType == 804) || keyType == 0) {
                 setOneInfoTitle('Market performance comparison');
+                getRatiosReport(ric);
             } else if (keyType && keyType == 805) {
                 setOneInfoTitle('Comparison of Profit Forecasts');
             }
         }
 
         //行业分类数据
-        getIndustryType(industryParams).then(
-            res => {
-                if (res.state) {
-                    setIndustryState(res.data ? res.data.result : [])
-                    if (keyType == 801 || keyType == 802) {
-                        getFinancialReport(res.data.result[0].rcsQcode);
-                    } else if (keyType == 803) {
-                        getValueData(res.data.result[0].rcsQcode)
-                    } else if (keyType == 804 || keyType == 0) {
-                        getRatiosReport(res.data.result[0].rcsQcode);
-                    }
-                } else {
-                    message.error(res.message);
-                }
-            }
-        )
-    }, [keyType]);
+        // getIndustryType(industryParams).then(
+        //     res => {
+        //         if (res.state) {
+        //             setIndustryState(res.data ? res.data.result : [])
+        //             if (keyType == 801 || keyType == 802) {
+        //                 getFinancialReport(res.data.result[0].rcsQcode);
+        //             } else if (keyType == 803) {
+        //                 getValueData(res.data.result[0].rcsQcode)
+        //             } else if (keyType == 804 || keyType == 0) {
+        //                 getRatiosReport(res.data.result[0].rcsQcode);
+        //             }
+        //         } else {
+        //             message.error(res.message);
+        //         }
+        //     }
+        // )
+    }, [keyType, ric]);
 
     //监测ric查询结果的变化
     useEffect(() => {
@@ -116,8 +124,8 @@ const PeerComparison = (props) => {
     const [marketState, setMarketState] = useState({});
     const [companyName, setCompanyName] = useState({});//公司名称集合
     //市场表现
-    const getRatiosReport = (industryType) => {
-        marketParams.industryType = industryType;
+    const getRatiosReport = (ric) => {
+        marketParams.ric = ric;
         queryRatiosReport(marketParams).then(
             res => {
                 if (res.state) {
@@ -136,8 +144,8 @@ const PeerComparison = (props) => {
     const [financialState, setFinancialState] = useState({});
     const [financialName, setFinancialName] = useState({});
     //财务比率和财务数据比较
-    const getFinancialReport = (industryType) => {
-        reportParams.industryType = industryType;
+    const getFinancialReport = (ric) => {
+        reportParams.ric = ric;
         queryFinancialReport(reportParams).then(
             res => {
                 if (res.state) {
@@ -246,8 +254,8 @@ const PeerComparison = (props) => {
     const [valuation, setValuation] = useState([]);//估值分析数据
     const [valuationName, setValuationName] = useState({});
     //估值分析
-    const getValueData = (industryType) => {
-        params.industryType = industryType;
+    const getValueData = (ric) => {
+        params.ric = ric;
         queryValueData(params).then(
             res => {
                 if (res.state) {
@@ -276,11 +284,11 @@ const PeerComparison = (props) => {
     //根据选择的行业查询对应数据
     const getDataInfo = (e) => {
         if (keyType == 801 || keyType == 802) {
-            getFinancialReport(e);
+            getFinancialReport(ric);
         } else if (keyType == 803) {
-            getValueData(e)
+            getValueData(ric)
         } else if (keyType == 804 || keyType == 0) {
-            getRatiosReport(e);
+            getRatiosReport(ric);
         }
     }
 
@@ -383,7 +391,7 @@ const PeerComparison = (props) => {
                 <span className={styles.titleTxt}>{oneInfoTitle}</span>
             </div>
             <div style={{ marginLeft: '32px' }}>
-                <FormattedMessage id="pages.peerComparison.industry" defaultMessage="行业:" />
+                {/* <FormattedMessage id="pages.peerComparison.industry" defaultMessage="行业:" />
                 <Select
                     showSearch
                     onSelect={(e) => getDataInfo(e)}
@@ -398,7 +406,7 @@ const PeerComparison = (props) => {
                         <Option key={item.id} value={item.rcsQcode}>{intl.locale === "zh-CN" ? item.topicDescriptionZh : item.topicDescriptionEn}</Option>
                     )) : ''
                     }
-                </Select>
+                </Select> */}
 
                 {
                     keyType == 801 ?
@@ -453,8 +461,8 @@ const PeerComparison = (props) => {
                     <div>
                         <div className={styles.titilePeer}>
                             <Row>
-                                <Col span={4}>代码</Col>
-                                <Col span={4}>证券简称</Col>
+                                <Col span={4}>{intl.locale === "zh-CN" ? '代码' : 'code'}</Col>
+                                <Col span={4}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as"'}</Col>
                                 <Col span={16}>
                                     <span className={styles.spanPeer}>
                                         <div>{titleTypeRatio}</div>
@@ -585,8 +593,8 @@ const PeerComparison = (props) => {
                         <div>
                             <div className={styles.titilePeer}>
                                 <Row>
-                                    <Col span={4}>代码</Col>
-                                    <Col span={4}>证券简称</Col>
+                                    <Col span={4}>{intl.locale === "zh-CN" ? '代码' : 'code'}</Col>
+                                    <Col span={4}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as"'}</Col>
                                     <Col span={16}>
                                         <span className={styles.spanPeer}>
                                             <div>{titleType}</div>
@@ -702,17 +710,17 @@ const PeerComparison = (props) => {
                             <div>
                                 <div className={styles.titilePeer}>
                                     <Row>
-                                        <Col span={3}>代码</Col>
-                                        <Col span={3}>证券简称</Col>
-                                        <Col span={3}>季度收盘价</Col>
-                                        <Col span={3}>每股现金流</Col>
+                                        <Col span={4}>{intl.locale === "zh-CN" ? '代码' : 'code'}</Col>
+                                        <Col span={4}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as"'}</Col>
+                                        <Col span={3}>{intl.locale === "zh-CN" ? '季度收盘价' : 'Quarterly closing price'}季度收盘价</Col>
+                                        <Col span={3}>{intl.locale === "zh-CN" ? '每股现金流' : 'Cash flow per share'}</Col>
                                         <Col span={12}>
                                             <span className={styles.spanPeer}>
                                                 <div style={{ height: 36 }}></div>
                                                 <div className={styles.titilePeerRow}>
-                                                    <span>市盈率</span>
-                                                    <span>市销率</span>
-                                                    <span>市净率</span>
+                                                    <span>{intl.locale === "zh-CN" ? '市盈率' : 'P/e ratio'}</span>
+                                                    <span>{intl.locale === "zh-CN" ? '市销率' : 'Price-to-sales ratio'}</span>
+                                                    <span>{intl.locale === "zh-CN" ? '市净率' : 'price-to-book'}</span>
                                                 </div>
                                             </span>
                                         </Col>
@@ -740,19 +748,19 @@ const PeerComparison = (props) => {
                                 <div>
                                     <div className={styles.titilePeer}>
                                         <Row>
-                                            <Col span={3}>代码</Col>
-                                            <Col span={3}>证券简称</Col>
-                                            <Col span={3}>52周最高(前复权)</Col>
-                                            <Col span={3}>52周最低(前复权)</Col>
+                                            <Col span={4}>{intl.locale === "zh-CN" ? '代码' : 'code'}</Col>
+                                            <Col span={4}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as"'}</Col>
+                                            <Col span={3}>{intl.locale === "zh-CN" ? '52周最高(前复权)' : '52 weeks maximum (previous recovery)'}</Col>
+                                            <Col span={3}>{intl.locale === "zh-CN" ? '52周最低(前复权)' : '52 weeks minimum (previous recovery)'}</Col>
                                             <Col span={12} className={styles.spanPeer}>
-                                                <div>涨跌幅(%)</div>
+                                                <div>{intl.locale === "zh-CN" ? '涨跌幅(%)' : 'Size (%)'}</div>
                                                 <div className={styles.titilePeerRow}>
-                                                    <Col span={4}>最新</Col>
-                                                    <Col span={4}>本周</Col>
-                                                    <Col span={4}>本月</Col>
-                                                    <Col span={4}>本年</Col>
-                                                    <Col span={4}>近一月</Col>
-                                                    <Col span={4}>近三月</Col>
+                                                    <Col span={4}>{intl.locale === "zh-CN" ? '最新' : 'The latest'}</Col>
+                                                    <Col span={4}>{intl.locale === "zh-CN" ? '本周' : 'This week,'}</Col>
+                                                    <Col span={4}>{intl.locale === "zh-CN" ? '本月' : 'This month,'}</Col>
+                                                    <Col span={4}>{intl.locale === "zh-CN" ? '本年' : 'This year,'}</Col>
+                                                    <Col span={4}>{intl.locale === "zh-CN" ? '近一月' : 'In recent month'}</Col>
+                                                    <Col span={4}>{intl.locale === "zh-CN" ? '近三月' : 'Close to march'}</Col>
                                                 </div>
                                             </Col>
                                         </Row>

@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Spin, Table, message } from 'antd';
+import { Spin, Table, message, Radio } from 'antd';
 import { useIntl, FormattedMessage } from 'umi';
 import { queryReportInfo, queryFinancialAnalysis } from '../service';
 import styles from './index.less';
 import { getAuthority } from '@/utils/authority';
+import { sortArray } from '@/utils/utils';
 
 const titleYearCn = '(年报)';
-const titleYearEn = '(annual report)';
+const titleYearEn = '(Annual report)';
+const interimYearCn = '(季报)';
+const interimYearEn = '(Quarterly results)'
 const FinancialData = (props) => {
     const { keyType, ric } = props;
 
@@ -71,6 +74,8 @@ const FinancialData = (props) => {
 
     }, [keyType])
 
+    const [currencyCode, setCurrencyCode] = useState('');//货币单位
+
     useEffect(() => {
         params.ric = ric;
         //查询财务数据
@@ -103,12 +108,16 @@ const FinancialData = (props) => {
                                 const balData = { ...balState };
                                 const incData = { ...incState };
                                 item.map((subItem) => {
+                                    setCurrencyCode(subItem.currencyCode);
                                     if (subItem.reportType == 'CAS') {
                                         casData.year.push({ lineitem: subItem.lineItemObject, fiscaYear: subItem.fiscaYear, reportYearTime: subItem.reportYearTime });
+                                        casData.year.sort(sortArray('fiscaYear')).reverse()
                                     } else if (subItem.reportType == 'BAL') {
                                         balData.year.push({ lineitem: subItem.lineItemObject, fiscaYear: subItem.fiscaYear, reportYearTime: subItem.reportYearTime });
+                                        balData.year.sort(sortArray('fiscaYear')).reverse()
                                     } else if (subItem.reportType == 'INC') {
                                         incData.year.push({ lineitem: subItem.lineItemObject, fiscaYear: subItem.fiscaYear, reportYearTime: subItem.reportYearTime });
+                                        incData.year.sort(sortArray('fiscaYear')).reverse()
                                     }
                                 })
 
@@ -127,10 +136,13 @@ const FinancialData = (props) => {
                                 item.map((subItem) => {
                                     if (subItem.reportType == 'CAS') {
                                         casData.interim.push({ lineitem: subItem.lineItemObject, fiscaYear: subItem.fiscaYear, reportYearTime: subItem.reportYearTime });
+                                        casData.interim.sort(sortArray('reportYearTime')).reverse()
                                     } else if (subItem.reportType == 'BAL') {
                                         balData.interim.push({ lineitem: subItem.lineItemObject, fiscaYear: subItem.fiscaYear, reportYearTime: subItem.reportYearTime });
+                                        balData.interim.sort(sortArray('reportYearTime')).reverse()
                                     } else if (subItem.reportType == 'INC') {
                                         incData.interim.push({ lineitem: subItem.lineItemObject, fiscaYear: subItem.fiscaYear, reportYearTime: subItem.reportYearTime });
+                                        incData.interim.sort(sortArray('reportYearTime')).reverse()
                                     }
                                 })
 
@@ -148,26 +160,45 @@ const FinancialData = (props) => {
         );
     }, [ric])
 
+    //切换数据维度   年报，季报，全部   默认年报
+    const [dataType, setDataType] = useState('1');
+
+    const onchange = (e) => {
+        setDataType(e.target.value)
+    }
+
     return (
         <div className={styles.companyInfo}>
             <div className={styles.infoTitle}>
                 <span className={styles.titleTxt}>{oneInfoTitle}</span>
+                <span className={styles.dataRadio}>
+                    <Radio.Group defaultValue={dataType} onChange={onchange} buttonStyle="solid" style={{ height: '30px' }}>
+                        <Radio.Button value="0">{intl.locale === "zh-CN" ? '全部' : 'All'}</Radio.Button>
+                        <Radio.Button value="1">{intl.locale === "zh-CN" ? '年报' : 'Annual report'}</Radio.Button>
+                        <Radio.Button value="2">{intl.locale === "zh-CN" ? '季报' : 'Quarterly results'}</Radio.Button>
+                    </Radio.Group>
+                </span>
             </div>
 
             {
                 casState.year.length > 0 && keyType == 602 ?
                     <div>
                         <div className={styles.dataTitle}>
-                            <span>报告期</span>
+                            <span>{intl.locale === "zh-CN" ? '报告期' : 'During the reporting period'}</span>
                             {
-                                casState ? casState.year.map((item) => (
-                                    <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item.fiscaYear ? item.fiscaYear : ''}</span>
+                                (dataType === '0' || dataType === '1') && casState ? casState.year.map((item) => (
+                                    <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item.reportYearTime ? item.reportYearTime : ''}</span>
+                                )) : ''
+                            }
+                            {
+                                (dataType === '0' || dataType === '2') && casState ? casState.interim.map((item) => (
+                                    <span>{intl.locale === "zh-CN" ? interimYearCn : interimYearEn}{item.reportYearTime ? item.reportYearTime : ''}</span>
                                 )) : ''
                             }
                         </div>
                         <div>
-                            <span className={styles.levelTitle}>现金流量</span>
-                            <span className={styles.levelTitleExt}>（单位：万元，CNY）</span>
+                            <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '现金流量' : 'The cash flow'}</span>
+                            <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：万元，' + currencyCode + '）' : '(Unit: TEN thousand Yuan, ' + currencyCode + ')'}</span>
                         </div>
                         {
                             casState.year.length > 0 ? casState.year[0].lineitem.map((cas, index) => (
@@ -177,9 +208,16 @@ const FinancialData = (props) => {
                                             <span>
                                                 {code.coaValueEn}
                                             </span>
-                                            {casState.year.length > 0 ? casState.year.map((yearItem) => (
+                                            {(dataType === '0' || dataType === '1') && casState.year.length > 0 ? casState.year.map((yearItem) => (
                                                 <span>
                                                     {yearItem.lineitem ? yearItem.lineitem.map((item) => (
+                                                        <span>{code.coaItem == item.coaCode ? item.Value ? parseInt(item.Value) : '' : ''}</span>
+                                                    )) : ''}
+                                                </span>
+                                            )) : ''}
+                                            {(dataType === '0' || dataType === '2') && casState.interim.length > 0 ? casState.interim.map((interimItem) => (
+                                                <span>
+                                                    {interimItem.lineitem ? interimItem.lineitem.map((item) => (
                                                         <span>{code.coaItem == item.coaCode ? item.Value ? parseInt(item.Value) : '' : ''}</span>
                                                     )) : ''}
                                                 </span>
@@ -192,16 +230,21 @@ const FinancialData = (props) => {
                     incState.year.length > 0 && keyType == 603 ?
                         <div>
                             <div className={styles.dataTitle}>
-                                <span>报告期</span>
+                                <span>{intl.locale === "zh-CN" ? '报告期' : 'During the reporting period'}</span>
                                 {
-                                    incState ? incState.year.map((item) => (
-                                        <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item.fiscaYear ? item.fiscaYear : ''}</span>
+                                    (dataType === '0' || dataType === '1') && incState ? incState.year.map((item) => (
+                                        <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item.reportYearTime ? item.reportYearTime : ''}</span>
+                                    )) : ''
+                                }
+                                {
+                                    (dataType === '0' || dataType === '2') && incState ? incState.interim.map((item) => (
+                                        <span>{intl.locale === "zh-CN" ? interimYearCn : interimYearEn}{item.reportYearTime ? item.reportYearTime : ''}</span>
                                     )) : ''
                                 }
                             </div>
                             <div>
-                                <span className={styles.levelTitle}>营业总收入</span>
-                                <span className={styles.levelTitleExt}>（单位：万元，CNY）</span>
+                                <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '营业总收入' : 'Gross revenue'}</span>
+                                <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：万元，CNY）' : '(Unit: TEN thousand Yuan, CNY)'}</span>
                             </div>
                             {
                                 incState.year.length > 0 ? incState.year[0].lineitem.map((cas, index) => (
@@ -211,9 +254,16 @@ const FinancialData = (props) => {
                                                 <span>
                                                     {code.coaValueEn}
                                                 </span>
-                                                {incState.year.length > 0 ? incState.year.map((yearItem) => (
+                                                {(dataType === '0' || dataType === '1') && incState.year.length > 0 ? incState.year.map((yearItem) => (
                                                     <span>
                                                         {yearItem.lineitem ? yearItem.lineitem.map((item) => (
+                                                            <span>{code.coaItem == item.coaCode ? item.Value ? parseInt(item.Value) : '' : ''}</span>
+                                                        )) : ''}
+                                                    </span>
+                                                )) : ''}
+                                                {(dataType === '0' || dataType === '2') && incState.interim.length > 0 ? incState.interim.map((interimItem) => (
+                                                    <span>
+                                                        {interimItem.lineitem ? interimItem.lineitem.map((item) => (
                                                             <span>{code.coaItem == item.coaCode ? item.Value ? parseInt(item.Value) : '' : ''}</span>
                                                         )) : ''}
                                                     </span>
@@ -226,16 +276,20 @@ const FinancialData = (props) => {
                         balState.year.length > 0 && keyType == 604 ?
                             <div>
                                 <div className={styles.dataTitle}>
-                                    <span>报告期</span>
+                                    <span>{intl.locale === "zh-CN" ? '报告期' : 'During the reporting period'}</span>
                                     {
-                                        balState ? balState.year.map((item) => (
-                                            <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item.fiscaYear ? item.fiscaYear : ''}</span>
+                                        (dataType === '0' || dataType === '1') && balState ? balState.year.map((item) => (
+                                            <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item.reportYearTime ? item.reportYearTime : ''}</span>
+                                        )) : ''
+                                    } {
+                                        (dataType === '0' || dataType === '2') && balState ? balState.interim.map((item) => (
+                                            <span>{intl.locale === "zh-CN" ? interimYearCn : interimYearEn}{item.reportYearTime ? item.reportYearTime : ''}</span>
                                         )) : ''
                                     }
                                 </div>
                                 <div>
-                                    <span className={styles.levelTitle}>资产</span>
-                                    <span className={styles.levelTitleExt}>（单位：万元，CNY）</span>
+                                    <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '资产' : 'assets'}</span>
+                                    <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：万元，CNY）' : '(Unit: TEN thousand Yuan, CNY)'}</span>
                                 </div>
                                 {
                                     balState.year.length > 0 ? balState.year[0].lineitem.map((cas, index) => (
@@ -245,13 +299,20 @@ const FinancialData = (props) => {
                                                     <span>
                                                         {code.coaValueEn}
                                                     </span>
-                                                    {balState.year.length > 0 ? balState.year.map((yearItem) => (
+                                                    {(dataType === '0' || dataType === '1') && balState.year.length > 0 ? balState.year.map((yearItem) => (
                                                         <span>
                                                             {yearItem.lineitem ? yearItem.lineitem.map((item) => (
                                                                 <span>{code.coaItem == item.coaCode ? item.Value ? parseInt(item.Value) : '' : ''}</span>
                                                             )) : ''}
                                                         </span>
                                                     )) : ''}
+                                                    {(dataType === '0' || dataType === '2') && balState.interim.length > 0 ? balState.interim.map((interimItem) => (
+                                                        <span>
+                                                            {interimItem.lineitem ? interimItem.lineitem.map((item) => (
+                                                                <span>{code.coaItem == item.coaCode ? item.Value ? parseInt(item.Value) : '' : ''}</span>
+                                                            )) : ''}
+                                                        </span>
+                                                    )) : ''}˝
                                                 </div> : ''
                                         )) : ''
                                     )) : ''
@@ -260,7 +321,7 @@ const FinancialData = (props) => {
                             financial && keyType == 601 ?
                                 <div>
                                     <div className={styles.dataTitle}>
-                                        <span>报告期</span>
+                                        <span>{intl.locale === "zh-CN" ? '报告期' : 'During the reporting period'}</span>
                                         {
                                             financial ? Object.keys(financial).map((item) => (
                                                 <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item ? item : ''}</span>
@@ -268,8 +329,8 @@ const FinancialData = (props) => {
                                         }
                                     </div>
                                     <div>
-                                        <span className={styles.levelTitle}>现金流量</span>
-                                        <span className={styles.levelTitleExt}>（单位：万元，CNY）</span>
+                                        <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '现金流量' : 'The cash flow'}</span>
+                                        <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：万元，CNY）' : '(Unit: TEN thousand Yuan, CNY)'}</span>
                                     </div>
                                     {
                                         financial ? Object.keys(financial).map((item, index) => (
@@ -294,7 +355,7 @@ const FinancialData = (props) => {
                                 financial && keyType == 605 ?
                                     <div>
                                         <div className={styles.dataTitle}>
-                                            <span>报告期</span>
+                                            <span>{intl.locale === "zh-CN" ? '报告期' : 'During the reporting period'}</span>
                                             {
                                                 financial ? Object.keys(financial).map((item) => (
                                                     <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item ? item : ''}</span>
@@ -302,8 +363,8 @@ const FinancialData = (props) => {
                                             }
                                         </div>
                                         <div>
-                                            <span className={styles.levelTitle}>现金流量</span>
-                                            <span className={styles.levelTitleExt}>（单位：万元，CNY）</span>
+                                            <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '现金流量' : 'The cash flow'}</span>
+                                            <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：万元，CNY）' : '(Unit: TEN thousand Yuan, CNY)'}</span>
                                         </div>
                                         {
                                             financial ? Object.keys(financial).map((item, index) => (
@@ -328,7 +389,7 @@ const FinancialData = (props) => {
                                     financial && keyType == 606 ?
                                         <div>
                                             <div className={styles.dataTitle}>
-                                                <span>报告期</span>
+                                                <span>{intl.locale === "zh-CN" ? '报告期' : 'During the reporting period'}</span>
                                                 {
                                                     financial ? Object.keys(financial).map((item) => (
                                                         <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item ? item : ''}</span>
@@ -336,8 +397,8 @@ const FinancialData = (props) => {
                                                 }
                                             </div>
                                             <div>
-                                                <span className={styles.levelTitle}>现金流量</span>
-                                                <span className={styles.levelTitleExt}>（单位：万元，CNY）</span>
+                                                <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '现金流量' : 'The cash flow'}</span>
+                                                <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：万元，CNY）' : '(Unit: TEN thousand Yuan, CNY)'}</span>
                                             </div>
                                             {
                                                 financial ? Object.keys(financial).map((item, index) => (
@@ -362,7 +423,7 @@ const FinancialData = (props) => {
                                         financial && keyType == 608 ?
                                             <div>
                                                 <div className={styles.dataTitle}>
-                                                    <span>报告期</span>
+                                                    <span>{intl.locale === "zh-CN" ? '报告期' : 'During the reporting period'}</span>
                                                     {
                                                         financial ? Object.keys(financial).map((item) => (
                                                             <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item ? item : ''}</span>
@@ -370,8 +431,8 @@ const FinancialData = (props) => {
                                                     }
                                                 </div>
                                                 <div>
-                                                    <span className={styles.levelTitle}>现金流量</span>
-                                                    <span className={styles.levelTitleExt}>（单位：万元，CNY）</span>
+                                                    <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '现金流量' : 'The cash flow'}</span>
+                                                    <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：万元，CNY）' : '(Unit: TEN thousand Yuan, CNY)'}</span>
                                                 </div>
                                                 {
                                                     financial ? Object.keys(financial).map((item, index) => (

@@ -30,7 +30,19 @@ export const menuList = [
     {
         id: 2,
         name: '新闻公告&研究报告',
-        nameEn: 'Press Announcements & Research Reports'
+        nameEn: 'Press Announcements & Research Reports',
+        subMenu: [
+            {
+                id: 201,
+                name: '新闻公告',
+                nameEn: 'Press Announcements',
+            },
+            {
+                id: 202,
+                name: '研究报告',
+                nameEn: 'Research Reports',
+            },
+        ]
     },
     {
         id: 3,
@@ -58,24 +70,29 @@ export const menuList = [
         subMenu: [
             {
                 id: 401,
-                name: '现金流量表/资产负债表/损益表预测',
-                nameEn: 'Cash flow statement/Balance sheet/Profit and loss statement forecast',
+                name: '现金流量表',
+                nameEn: 'Cash flow statement',
             },
-            // {
-            //     id: 402,
-            //     name: '资产负债表预测',
-            //     nameEn: 'Balance sheet forecast',
-            // },
-            // {
-            //     id: 403,
-            //     name: '损益表预测',
-            //     nameEn: 'Profit and loss statement forecast',
-            // },
-            // {
-            //     id: 404,
-            //     name: '推荐&目标价',
-            //     nameEn: 'Recommendation & Target Price',
-            // },
+            {
+                id: 402,
+                name: '资产负债表预测',
+                nameEn: 'Balance sheet forecast',
+            },
+            {
+                id: 403,
+                name: '损益表预测',
+                nameEn: 'Income statement forecast',
+            },
+            {
+                id: 404,
+                name: '估值预测',
+                nameEn: 'Valuation forecast',
+            },
+            {
+                id: 405,
+                name: '研究报告',
+                nameEn: 'The research report',
+            },
         ]
     },
     {

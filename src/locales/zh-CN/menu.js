@@ -36,7 +36,7 @@ export default {
   'menu.news.information.companyNotice':'公司公告',
   'menu.news.information.economicCalenda':'财经日历',
   'menu.dataAnalysis': '数据分析',
-  'menu.chartingLibrary':'chartingLibrary',
+  'menu.chartingLibrary':'行情走势',
   'menu.profile': '详情页',
   'menu.profile.basic': '基础详情页',
   'menu.profile.advanced': '高级详情页',

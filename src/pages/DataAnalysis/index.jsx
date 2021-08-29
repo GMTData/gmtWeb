@@ -16,6 +16,7 @@ import TradingValuation from './components/TradingValuation';
 import PeerComparison from './components/PeerComparison';
 import { menuList } from './components/DataUtil';
 import SignificantEvent from './components/SignificantEvent';
+import ResearchReport from './components/ResearchReport';
 
 const { Option } = AutoComplete;
 const DataAnalysis = () => {
@@ -224,7 +225,7 @@ const DataAnalysis = () => {
                 stateData.GetGeneralInformation_Response_1 ?
                   <Executives allData={stateData} keyType={infoKey} /> :
                   <Spin className={styles.spinLoading} /> :
-                (infoKey == 2) ?
+                (infoKey == 201 || infoKey == 202) ?
                   <NewsNotice keyType={infoKey} ric={ricState} /> :
                   (infoKey == 301 || infoKey == 302) ?
                     <div>
@@ -235,17 +236,19 @@ const DataAnalysis = () => {
                         <FinancialData keyType={infoKey} ric={ricState} />
                       </div>
                       :
-                      (infoKey == 401 || infoKey == 402 || infoKey == 403) ?
-                        <ProfitForecast keyType={infoKey} ric={ricState} /> :
-                        // infoKey == 404 ?
-                        //   <ProfitForecastReport keyType={infoKey} ric={ricState} /> :
-                          (infoKey == 501 || infoKey == 502) ?
-                            <TradingValuation keyType={infoKey} ric={ricState} /> :
-                            (infoKey == 801 || infoKey == 802 || infoKey == 803 || infoKey == 804) ?
-                              <PeerComparison keyType={infoKey} ric={ricState} allData={stateData} /> :
-                              (infoKey == 701 || infoKey == 702) ?
-                                <SignificantEvent keyType={infoKey} ric={ricState} /> :
-                                ''
+                      (infoKey == 401 || infoKey == 402 || infoKey == 403 || infoKey == 404) ?
+                        <ProfitForecast keyType={infoKey} ric={ricState} allData={stateData} /> :
+                        infoKey == 406 ?
+                          <ProfitForecastReport keyType={infoKey} ric={ricState} /> :
+                          infoKey == 405 ?
+                            <ResearchReport keyType={infoKey} ric={ricState} /> :
+                            (infoKey == 501 || infoKey == 502) ?
+                              <TradingValuation keyType={infoKey} ric={ricState} /> :
+                              (infoKey == 801 || infoKey == 802 || infoKey == 803 || infoKey == 804) ?
+                                <PeerComparison keyType={infoKey} ric={ricState} allData={stateData} /> :
+                                (infoKey == 701 || infoKey == 702) ?
+                                  <SignificantEvent keyType={infoKey} ric={ricState} /> :
+                                  ''
           }
         </div> :
         <Spin className={styles.spinLoading} />}

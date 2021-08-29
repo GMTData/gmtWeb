@@ -28,8 +28,8 @@ const NewsDetails = (props) => {
       res => {
         setLoadingState(false);
         if (res.state) {
-          if (res.data && res.data.RetrieveStoryML_Response_1.StoryMLResponse.STORYML.HL.length > 0) {
-            setNewsInfo(res.data.RetrieveStoryML_Response_1.StoryMLResponse.STORYML.HL[0]);
+          if (res.data && res.data?.RetrieveStoryML_Response_1?.StoryMLResponse?.STORYML?.HL.length > 0) {
+            setNewsInfo(res.data?.RetrieveStoryML_Response_1?.StoryMLResponse?.STORYML?.HL[0]);
           }
         } else {
           setLoadingState(false);

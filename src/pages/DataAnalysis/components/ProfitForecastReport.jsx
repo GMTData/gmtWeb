@@ -25,11 +25,11 @@ const ProfitForecastReport = (props) => {
 
     useEffect(() => {
         if (intl.locale === "zh-CN") {
-            if (keyType && keyType == 404) {
+            if (keyType && keyType == 406) {
                 setOneInfoTitle('推荐&目标价');
             }
         } else {
-            if (keyType && keyType == 404) {
+            if (keyType && keyType == 406) {
                 setOneInfoTitle('Recommendation & Target Price');
             }
         }

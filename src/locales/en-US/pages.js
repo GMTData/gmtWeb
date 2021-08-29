@@ -217,4 +217,10 @@ export default {
   'pages.significantEvent.announcement':'The announcement',
   'pages.significantEvent.PaymentType':'Payment type',
   'pages.significantEvent.currency':'currency',
+  'pages.researchReport.researchDate':'Research to date',
+  'pages.researchReport.reportId':'The report ID',
+  'pages.researchReport.releaseTime':'Release time',
+  'pages.researchReport.size':'size',
+  'pages.newsNotice.sequenceNumber':'sequence number',
+  'pages.newsNotice.newsHeadlines':'News headlines',
 };

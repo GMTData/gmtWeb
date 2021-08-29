@@ -215,4 +215,10 @@ export default {
   'pages.significantEvent.announcement':'公告日',
   'pages.significantEvent.PaymentType':'支付类型',
   'pages.significantEvent.currency':'货币',
+  'pages.researchReport.researchDate':'研报日期',
+  'pages.researchReport.reportId':'报告ID',
+  'pages.researchReport.releaseTime':'发布时间',
+  'pages.researchReport.size':'大小',
+  'pages.newsNotice.sequenceNumber':'序号',
+  'pages.newsNotice.newsHeadlines':'新闻标题',
 };

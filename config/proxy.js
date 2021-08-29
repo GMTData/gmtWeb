@@ -7,8 +7,15 @@
  */
 export default {
   dev: {
-    'http://52.77.209.254:8088/gmt/': {
-      target: 'http://52.77.209.254:8088',
+    // 'http://52.77.209.254:8088/gmt/': {
+    //   target: 'http://52.77.209.254:8088',
+    //   changeOrigin: true,
+    //   pathRewrite: {
+    //     '^': '',
+    //   },
+    // },
+    'http://13.212.32.169:8088/gmt/': {
+      target:'http://13.212.32.169:8088',
       changeOrigin: true,
       pathRewrite: {
         '^': '',
@@ -17,7 +24,8 @@ export default {
   },
   test: {
     '/gmt/': {
-      target: 'http://52.77.209.254:8088',
+      // target: 'http://52.77.209.254:8088',
+      target:'http://13.212.32.169:8088',
       changeOrigin: true,
       pathRewrite: {
         '^': '',
@@ -26,7 +34,8 @@ export default {
   },
   pre: {
     '/gmt/': {
-      target: 'http://52.77.209.254:8088',
+      // target: 'http://52.77.209.254:8088',
+      target:'http://13.212.32.169:8088',
       changeOrigin: true,
       pathRewrite: {
         '^': '',
