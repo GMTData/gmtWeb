@@ -1,20 +1,10 @@
 import { getAuthority } from '@/utils/authority';
+import { message } from 'antd';
 const userInfo = getAuthority();//获取用户相关信息
 import { queryInterdayTH } from './service';
 
 class DataFeed {
     constructor() {
-        //查询同花顺接口数据
-        this.state = {
-            params: {
-                // ric: '002594.SZ',
-                ric: 'AAPL.O',
-                startTime: '2020-01-01',
-                endTime: '2020-02-01',
-                period: 'D',
-                accessToken: userInfo.accessToken
-            }
-        }
     }
 
     // 服务端配置
@@ -48,8 +38,9 @@ class DataFeed {
     }
 
     // 渲染首次视图的数据
-    getBars(symbolInfo, resolution, from, to, onHistoryCallback, onErrorCallback, firstDataRequest) {
-        console.log(firstDataRequest)
+    getBars(symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) {
+        this.symbolInfo = symbolInfo;
+        let { from, to, firstDataRequest } = periodParams;
         this.firstDataRequest = firstDataRequest;
         this.onHistoryCallback = onHistoryCallback;
         this.resolution = resolution;
@@ -59,7 +50,6 @@ class DataFeed {
 
     // 封装渲染视图的函数
     async history(from, to, cb) {
-
         if (to && to < 1262275200000) {
             this.bar = [];
             cb([], {
@@ -70,45 +60,57 @@ class DataFeed {
         let bar = [];
         const step = this.resolution * 60
 
-        if (!this.firstDataRequest) {
+        if (this.firstDataRequest) {
+            //查询同花顺接口数据
+            let params = {
+                ric: this.symbolInfo.name,
+                period: this.resolution,
+                startTime: '2020-01-01',
+                endTime: '2020-02-01',
+                accessToken: userInfo.accessToken
+            }
+
             try {
                 // 请求k线数据
-                queryInterdayTH(this.state.params).then(res => {
-                    if (res.status === 200) {
+                queryInterdayTH(params).then(res => {
+                    if (res.state) {
                         const { data } = res;
-                        const len = data.length;
-                        // if (len > 0) {
-                        //     data.map(item => {
-                        //         let barValue = {};
-                        //         // 时间戳
-                        //         barValue.time = Number(item[0]);
-                        //         // 开
-                        //         barValue.open = Number(item[1]);
-                        //         // 高
-                        //         barValue.high = Number(item[2]);
-                        //         // 低
-                        //         barValue.low = Number(item[3]);
-                        //         // 收
-                        //         barValue.close = Number(item[4]);
-                        //         // 量
-                        //         barValue.volume = Number(item[5]);
-                        //         bar.push(barValue);
-                        //     })
-                        //     cb(bar, {
-                        //         noData: false
-                        //     });
-                        // } else {
-                        //     cb([], {
-                        //         noData: true
-                        //     });
-                        // }
+                        const len = data ? data[params.ric] ? data[params.ric].length : 0 : 0;
+                        if (len > 0) {
+                            data[params.ric].map(item => {
+                                let barValue = {};
+                                // 时间戳
+                                barValue.time = Number(item.time);
+                                // 开
+                                barValue.open = Number(item.open);
+                                // 高
+                                barValue.high = Number(item.high);
+                                // 低
+                                barValue.low = Number(item.low);
+                                // 收
+                                barValue.close = Number(item.close);
+                                // 量
+                                barValue.volume = Number(item.volume);
+                                bar.push(barValue);
+                            })
+                            cb(bar, {
+                                noData: false
+                            });
+                        } else {
+                            cb([], {
+                                noData: true, nextTime: new Date().getTime()
+                            });
+                        }
                     } else {
+                        message.error(res.message)
                         cb([], {
-                            noData: true
+                            noData: true, nextTime: new Date().getTime()
                         });
                     }
                 })
-            } catch (err) { }
+            } catch (err) {
+                console.log(err)
+            }
         }
         this.bar = bar;
     }
@@ -117,7 +119,7 @@ class DataFeed {
     // 新数据更新    
     subscribeBars(symbolInfo, resolution, onRealtimeCallback, listenerGuid, onResetCacheNeededCallback) {
         this.onResetCacheNeededCallback = onResetCacheNeededCallback
-        if (this._subscribers.hasOwnProperty(listenerGuid)) {
+        if (this._subscribers?.hasOwnProperty(listenerGuid)) {
             return;
         }
         this._subscribers[listenerGuid] = {
@@ -157,14 +159,14 @@ class DataFeed {
             for (let listenerGuid in this._subscribers) {
                 let item = window.g_k_ticker;
                 if (item[0]) {
-                    // let d = {
-                    //     time: parseInt(item[0]),
-                    //     open: Number(item[1]),
-                    //     high: Number(item[2]),
-                    //     low: Number(item[3]),
-                    //     close: Number(item[4]),
-                    //     volume: Number(item[5])
-                    // };
+                    let d = {
+                        time: parseInt(item.time),
+                        open: Number(item.open),
+                        high: Number(item.high),
+                        low: Number(item.low),
+                        close: Number(item.close),
+                        volume: Number(item.volume)
+                    };
                     // 更新 tradingView 视图
                     this.update(listenerGuid, d);
                 }

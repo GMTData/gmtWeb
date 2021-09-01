@@ -20,19 +20,27 @@ export class TVChartContainer extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		//查询是否有权限
-		let params = {
-			ric: 'AAPL.O',
-			accessToken: userInfo.accessToken
-		}
 		this.state = {
-			dataFlag: true
+			dataFlag: false,
+			params: {
+				ric: 'AAPL.0',
+				accessToken: userInfo.accessToken
+			}
 		}
+		this.checkAuthorize = this.checkAuthorize.bind(this)
+		this.tradingviewLoad = this.tradingviewLoad.bind(this)
+		this.checkAuthorize()
 
-		//查看数据是否有权限
-		queryStockAuthorize(params).then(
+
+	}
+
+	//查看数据是否有权限
+	checkAuthorize() {
+		queryStockAuthorize(this.state.params).then(
 			res => {
 				if (res.state) {
 					this.setState({ dataFlag: res.data })
+					this.tradingviewLoad()
 				} else {
 					message.error(res.message)
 				}
@@ -61,16 +69,15 @@ export class TVChartContainer extends React.PureComponent {
 	tvWidget = null;
 
 
-	componentDidMount() {
+	tradingviewLoad() {
 		// 创建datafeed实例，此时实例为自己编写的类，需要按照官网的规则编写
 		datafeed = new DataFeed();
-
 
 		let widgetOptions = {
 
 		};
 		//判断是否有权限
-		if (this.state.dataFlag) {
+		if (!this.state.dataFlag) {
 			widgetOptions = {
 				theme: 'Dark',
 				symbol: this.props.symbol,
@@ -116,6 +123,7 @@ export class TVChartContainer extends React.PureComponent {
 		this.tvWidget = tvWidget;
 
 		tvWidget.onChartReady(() => {
+
 			tvWidget.headerReady().then(() => {
 				const button = tvWidget.createButton();
 				button.setAttribute('title', 'Click to show a notification popup');
@@ -130,7 +138,21 @@ export class TVChartContainer extends React.PureComponent {
 
 				button.innerHTML = 'Check API';
 			});
+
+			//图标因为权限问题未加载则去请求权限,有权限的继续回调,无权限则调用同花顺接口
+			if (!tvWidget.activeChart().dataReady()) {
+				let nextParams = {
+					ric: tvWidget.chart().symbolExt().symbol,
+					period: tvWidget.chart().resolution()
+				}
+				this.state.params = {
+					ric: tvWidget.chart().symbolExt().symbol
+				}
+				this.checkAuthorize()
+			}
+
 		});
+
 	}
 
 	componentWillUnmount() {

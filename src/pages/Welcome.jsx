@@ -302,7 +302,7 @@ const WelcomeHome = () => {
                     <Col span={19}><Link target="_blank" to={{
                       pathname: `/news/details/${item.ID}`
                     }}>
-                      <span className={styles.textOverflow} style={{ color: 'white' }}>{item.HT}</span>
+                      <span className={styles.textOverflow} style={{ color: 'white' }} title={item.HT ? item.HT : ''}>{item.HT ? item.HT : ''}</span>
                     </Link></Col>
                     <Col span={2}>{item.LT ? moment(item.LT).format(" HH:mm") : ''}</Col>
                   </Row>

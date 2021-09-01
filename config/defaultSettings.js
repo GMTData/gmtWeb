@@ -8,7 +8,7 @@ const proSettings = {
   fixSiderbar: true,
   colorWeak: false,
   headerHeight: 64,
-  title: 'GMT',
+  title: '',
   pwa: false,
   iconfontUrl: '',
   menu: {
