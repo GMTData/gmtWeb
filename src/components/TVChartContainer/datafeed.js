@@ -2,6 +2,8 @@ import { getAuthority } from '@/utils/authority';
 import { message } from 'antd';
 const userInfo = getAuthority();//获取用户相关信息
 import { queryInterdayTH } from './service';
+import moment from 'moment';
+
 
 class DataFeed {
     constructor() {
@@ -12,8 +14,8 @@ class DataFeed {
         cb({
             exchanges: [],
             symbols_types: [],
-            supports_time: true,
             supported_resolutions: [1, 5, 15, 30, 60, 240, 360, 480, 720, 1440, 10080, 44640],
+            supports_time: true,
             supports_marks: false,
             supports_timescale_marks: false
         })
@@ -40,7 +42,7 @@ class DataFeed {
     // 渲染首次视图的数据
     getBars(symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) {
         this.symbolInfo = symbolInfo;
-        let { from, to, firstDataRequest } = periodParams;
+        let { from, to, firstDataRequest, countBack } = periodParams;
         this.firstDataRequest = firstDataRequest;
         this.onHistoryCallback = onHistoryCallback;
         this.resolution = resolution;
@@ -53,7 +55,8 @@ class DataFeed {
         if (to && to < 1262275200000) {
             this.bar = [];
             cb([], {
-                noData: true
+                noData: true,
+                nextTime: new Date().getTime()
             });
             return;
         }
@@ -64,9 +67,9 @@ class DataFeed {
             //查询同花顺接口数据
             let params = {
                 ric: this.symbolInfo.name,
-                period: this.resolution,
-                startTime: '2020-01-01',
-                endTime: '2020-02-01',
+                period: 'D',
+                startTime: from ? moment(from).format('YYYY-MM-DD') : '',
+                endTime: to ? moment(to).format('YYYY-MM-DD') : '',
                 accessToken: userInfo.accessToken
             }
 
@@ -80,7 +83,7 @@ class DataFeed {
                             data[params.ric].map(item => {
                                 let barValue = {};
                                 // 时间戳
-                                barValue.time = Number(item.time);
+                                barValue.time = item.time ? Number(new Date(item.time).getTime()) * 1000 : new Date().getTime();
                                 // 开
                                 barValue.open = Number(item.open);
                                 // 高
@@ -118,6 +121,7 @@ class DataFeed {
 
     // 新数据更新    
     subscribeBars(symbolInfo, resolution, onRealtimeCallback, listenerGuid, onResetCacheNeededCallback) {
+        console.log(9)
         this.onResetCacheNeededCallback = onResetCacheNeededCallback
         if (this._subscribers?.hasOwnProperty(listenerGuid)) {
             return;
@@ -132,6 +136,7 @@ class DataFeed {
 
     // 更新
     update(listenerGuid, lastBar) {
+        console.log(10)
         // 已取消监听取消追加
         if (!this._subscribers.hasOwnProperty(listenerGuid)) {
             return;
@@ -160,7 +165,7 @@ class DataFeed {
                 let item = window.g_k_ticker;
                 if (item[0]) {
                     let d = {
-                        time: parseInt(item.time),
+                        time: item.time ? Number(new Date(item.time).getTime()) : new Date().getTime(),
                         open: Number(item.open),
                         high: Number(item.high),
                         low: Number(item.low),

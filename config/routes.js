@@ -55,11 +55,6 @@ export default [
                   },
                 ],
               },
-              // {
-              //   name: 'list.table-list',
-              //   path: '/list',
-              //   component: './TableList',
-              // },
               {
                 path: '/news',
                 name: 'news.information',
@@ -105,7 +100,7 @@ export default [
                 name: 'chartingLibrary',
                 path: '/chartingLibrary',
                 component: './ChartingLibrary',
-                hideInBreadcrumb: true 
+                hideInBreadcrumb: true ,
               },
               {
                 component: './404',

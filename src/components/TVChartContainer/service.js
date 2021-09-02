@@ -13,3 +13,11 @@ export async function queryInterdayTH(params) {
         headers: { 'accessToken': params.accessToken },
     });
 }
+
+//查询RIC数据
+export async function queryRicLists(params) {
+    return request(`${PATH}/ric/queryByRic?ric=${params.ric}&pageSize=${params.pageSize}&page=${params.page}`, {
+        method: 'get',
+        headers: { 'accessToken': params.accessToken },
+    });
+}
