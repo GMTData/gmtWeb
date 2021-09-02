@@ -11,7 +11,6 @@ const { Option } = AutoComplete;
 const userInfo = getAuthority();//获取用户相关信息
 // 定义变量读取参数
 let datafeed;
-let checkRic = 'AAPL'
 function getLanguageFromURL() {
 	const regex = new RegExp('[\\?&]lang=([^&#]*)');
 	const results = regex.exec(window.location.search);
@@ -64,8 +63,8 @@ export class TVChartContainer extends React.PureComponent {
 
 
 	static defaultProps = {
-		symbol: checkRic,
-		// symbol: '002594.SZ',
+		// symbol: 'AAPL',
+		symbol: '002594.SZ',
 		interval: 'D',
 		containerId: 'tv_chart_container',
 		datafeedUrl: 'https://demo_feed.tradingview.com',
@@ -95,7 +94,7 @@ export class TVChartContainer extends React.PureComponent {
 		if (this.state.dataFlag) {
 			widgetOptions = {
 				theme: 'Dark',
-				symbol: this.props.symbol,
+				symbol: ric ? ric : this.props.symbol,
 				// BEWARE: no trailing slash is expected in feed URL
 				datafeed: new window.Datafeeds.UDFCompatibleDatafeed(this.props.datafeedUrl),
 				interval: this.props.interval,
