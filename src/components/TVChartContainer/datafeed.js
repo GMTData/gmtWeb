@@ -83,7 +83,7 @@ class DataFeed {
                             data[params.ric].map(item => {
                                 let barValue = {};
                                 // 时间戳
-                                barValue.time = item.time ? Number(new Date(item.time).getTime()) * 1000 : new Date().getTime();
+                                barValue.time = item.time ? Number(new Date(item.time).getTime()) : new Date().getTime();
                                 // 开
                                 barValue.open = Number(item.open);
                                 // 高
@@ -136,7 +136,6 @@ class DataFeed {
 
     // 更新
     update(listenerGuid, lastBar) {
-        console.log(10)
         // 已取消监听取消追加
         if (!this._subscribers.hasOwnProperty(listenerGuid)) {
             return;
@@ -163,7 +162,7 @@ class DataFeed {
         if (window.g_k_ticker && window.g_k_ticker.length) {
             for (let listenerGuid in this._subscribers) {
                 let item = window.g_k_ticker;
-                if (item[0]) {
+                if (item) {
                     let d = {
                         time: item.time ? Number(new Date(item.time).getTime()) : new Date().getTime(),
                         open: Number(item.open),

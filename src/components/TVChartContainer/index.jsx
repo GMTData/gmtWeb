@@ -109,6 +109,7 @@ export class TVChartContainer extends React.PureComponent {
 				user_id: this.props.userId,
 				fullscreen: this.props.fullscreen,
 				autosize: this.props.autosize,
+				debug: true,
 				studies_overrides: this.props.studiesOverrides,
 			}
 		} else {
@@ -129,6 +130,7 @@ export class TVChartContainer extends React.PureComponent {
 				user_id: this.props.userId,
 				fullscreen: this.props.fullscreen,
 				autosize: this.props.autosize,
+				debug: true,
 				studies_overrides: this.props.studiesOverrides,
 			}
 		}
