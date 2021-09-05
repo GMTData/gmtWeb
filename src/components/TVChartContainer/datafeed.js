@@ -4,187 +4,299 @@ const userInfo = getAuthority();//获取用户相关信息
 import { queryInterdayTH } from './service';
 import moment from 'moment';
 
+var detafeed_historyTime = 0
 
-class DataFeed {
+var detafeed_lastResolution = null
+
+var detafeed_lastSymbol = null
+
+var t_init = null
+
+var timeFrom = null;
+var timeTo = new Date().getTime()
+
+
+export default class DataFeed {
     constructor() {
     }
+    onReady = function (callback) {
 
-    // 服务端配置
-    onReady(cb) {
-        cb({
-            exchanges: [],
-            symbols_types: [],
-            supported_resolutions: [1, 5, 15, 30, 60, 240, 360, 480, 720, 1440, 10080, 44640],
-            supports_time: true,
-            supports_marks: false,
-            supports_timescale_marks: false
+        callback(this._configuration)
+
+    }
+
+    getSendSymbolName = function (symbolName) {
+
+        var name = symbolName.split('/')
+
+        return (name[0] + name[1]).toLocaleUpperCase()
+
+    }
+
+    resolveSymbol = function (symbolName, onResolve, onError) {
+
+        onResolve({
+
+            'name': symbolName,
+
+            // 'timezone': 'Asia/Shanghai',
+
+            'pricescale': 100,
+
+            'minmov': 1,
+
+            'minmov2': 0,
+
+            'ticker': symbolName,
+
+            'description': '',
+
+            'session': '24x7',
+
+            'type': 'bitcoin',
+
+            'volume_precision': 10,
+
+            'has_intraday': true,
+
+            'intraday_multipliers': ['3', '5', '15', '60', '240', '1D'],
+
+            'has_weekly_and_monthly': false,
+
+            'has_no_volume': false,
+
+            'regular_session': '24x7'
+
         })
+
     }
 
-    // 解析数据
-    resolveSymbol(symbolName, onSymbolResolvedCallback, onResolveErrorCallback) {
-        var data = {
-            name: symbolName,
-            has_intraday: true, // 分钟数据
-            has_daily: true, // 日k线数据
-            has_weekly_and_monthly: true, // 月，周数据
-        };
+    getApiTime = function (resolution) {
 
-        if (!this.onSymbolResolvedCallback) {
-            this.onSymbolResolvedCallback = onSymbolResolvedCallback;
+        switch (resolution) {
+
+            case '3':
+
+                return '3m'
+
+            case '5':
+
+                return '5m'
+
+            case '15':
+
+                return '15m'
+
+            case '60':
+
+                return '1h'
+
+            case '240':
+
+                return '4h'
+
+            case '1D':
+
+                return '1d'
+
+            default:
+
+                return '15m'
+
         }
 
-        setTimeout(function () {
-            onSymbolResolvedCallback(data);
-        }, 0);
     }
 
-    // 渲染首次视图的数据
-    getBars(symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) {
-        this.symbolInfo = symbolInfo;
+    getBars = function (symbolInfo, resolution, periodParams, onResult, onError) {
+
+        if (!detafeed_historyTime || (resolution !== detafeed_lastResolution) || detafeed_lastSymbol !== symbolInfo.name) {
+
+            // 储存请求过的产品
+
+            detafeed_lastSymbol = symbolInfo.name
+
+            // 记录目前时间搓，就用目前的目前时间搓往前请求历史数据
+
+            detafeed_historyTime = Date.now()
+
+        }
+
         let { from, to, firstDataRequest, countBack } = periodParams;
-        this.firstDataRequest = firstDataRequest;
-        this.onHistoryCallback = onHistoryCallback;
-        this.resolution = resolution;
-        // 封装函数渲染视图
-        this.history(from * 1000, to * 1000, onHistoryCallback);
-    }
+        timeFrom = from * 1000;
+        timeTo = to * 1000;
+        clearInterval(t_init)
 
-    // 封装渲染视图的函数
-    async history(from, to, cb) {
-        if (to && to < 1262275200000) {
-            this.bar = [];
-            cb([], {
-                noData: true,
-                nextTime: new Date().getTime()
-            });
-            return;
+        const e_time = Number((Date.now() + '').substr(0, 9) + '0000')
+
+        //查询同花顺接口数据
+        let params = {
+            ric: detafeed_lastSymbol,
+            period: 'D',
+            startTime: from ? moment(from * 1000).format('YYYY-MM-DD') : '',
+            endTime: to ? moment(to * 1000).format('YYYY-MM-DD') : '',
+            accessToken: userInfo.accessToken
         }
-        let bar = [];
-        const step = this.resolution * 60
 
-        if (this.firstDataRequest) {
+        // 请求k线数据
+        queryInterdayTH(params).then(res => {
+            if (res.state) {
+                const { data } = res;
+                const len = data ? data[params.ric] ? data[params.ric].length : 0 : 0;
+                if (len > 0) {
+
+                    // 记录这次请求的时间周期
+
+                    const k_list = data[params.ric]
+
+                    detafeed_lastResolution = resolution
+
+                    var meta = { noData: false }
+
+                    var bars = []
+
+                    if (k_list.length) {
+
+
+                        localStorage.setItem('k_open', Number(k_list[k_list.length - 1].open).toFixed(2))
+
+                        localStorage.setItem('k_high', Number(k_list[k_list.length - 1].high).toFixed(2))
+
+                        localStorage.setItem('k_low', Number(k_list[k_list.length - 1].low).toFixed(2))
+
+                        localStorage.setItem('k_close', Number(k_list[k_list.length - 1].close).toFixed(2))
+
+                        localStorage.setItem('k_volume', Number(k_list[k_list.length - 1].volume).toFixed(2))
+
+                        detafeed_historyTime = e_time
+
+                        for (var i = 0; i < k_list.length; i += 1) {
+
+                            bars.push({
+
+                                time: k_list[i].time ? Number(new Date(k_list[i].time).getTime()) : new Date().getTime(),
+
+                                close: k_list[i].close,
+
+                                open: k_list[i].open,
+
+                                high: k_list[i].high,
+
+                                low: k_list[i].low,
+
+                                volume: k_list[i].volume
+
+                            })
+
+                        }
+
+                    } else {
+
+                        meta = { noData: true }
+
+                    }
+                    onResult(bars, meta)
+
+                }
+
+            } else {
+
+                console.log(message)
+
+            }
+
+        })
+
+    }
+    subscribeBars = function (symbolInfo, resolution, onTick, listenerGuid, onResetCacheNeededCallback) {
+
+        const self = this
+
+        t_init = setInterval(function () {
+
+            const e_time = Number((Date.now() + '').substr(0, 9) + '0000')
+
             //查询同花顺接口数据
             let params = {
-                ric: this.symbolInfo.name,
+                ric: self.getSendSymbolName(symbolInfo.name),
                 period: 'D',
-                startTime: from ? moment(from).format('YYYY-MM-DD') : '',
-                endTime: to ? moment(to).format('YYYY-MM-DD') : '',
+                startTime: timeFrom,
+                endTime: timeTo,
                 accessToken: userInfo.accessToken
             }
 
-            try {
-                // 请求k线数据
-                queryInterdayTH(params).then(res => {
-                    if (res.state) {
-                        const { data } = res;
-                        const len = data ? data[params.ric] ? data[params.ric].length : 0 : 0;
-                        if (len > 0) {
-                            data[params.ric].map(item => {
-                                let barValue = {};
-                                // 时间戳
-                                barValue.time = item.time ? Number(new Date(item.time).getTime()) : new Date().getTime();
-                                // 开
-                                barValue.open = Number(item.open);
-                                // 高
-                                barValue.high = Number(item.high);
-                                // 低
-                                barValue.low = Number(item.low);
-                                // 收
-                                barValue.close = Number(item.close);
-                                // 量
-                                barValue.volume = Number(item.volume);
-                                bar.push(barValue);
-                            })
-                            cb(bar, {
-                                noData: false
-                            });
+            queryInterdayTH(params).then(res => {
+                if (res.state) {
+                    const { data } = res;
+                    const len = data ? data[params.ric] ? data[params.ric].length : 0 : 0;
+                    if (len > 0) {
+
+                        // 记录这次请求的时间周期
+
+                        const k_list = data[params.ric]
+
+                        detafeed_lastResolution = resolution
+
+                        var meta = { noData: false }
+
+                        var bars = []
+
+                        if (k_list.length) {
+                            localStorage.setItem('k_open', Number(k_list[k_list.length - 1].open).toFixed(2))
+
+                            localStorage.setItem('k_high', Number(k_list[k_list.length - 1].high).toFixed(2))
+
+                            localStorage.setItem('k_low', Number(k_list[k_list.length - 1].low).toFixed(2))
+
+                            localStorage.setItem('k_close', Number(k_list[k_list.length - 1].close).toFixed(2))
+
+                            localStorage.setItem('k_volume', Number(k_list[k_list.length - 1].volume).toFixed(2))
+
+                            detafeed_historyTime = e_time
+
+                            for (var i = 0; i < k_list.length; i += 1) {
+
+                                bars.push({
+
+                                    time: k_list[i].time ? Number(new Date(k_list[i].time).getTime()) : new Date().getTime(),
+
+                                    close: k_list[i].close,
+
+                                    open: k_list[i].open,
+
+                                    high: k_list[i].high,
+
+                                    low: k_list[i].low,
+
+                                    volume: k_list[i].volume
+                                })
+                            }
+
                         } else {
-                            cb([], {
-                                noData: true, nextTime: new Date().getTime()
-                            });
+
+                            meta = { noData: true }
+
                         }
-                    } else {
-                        message.error(res.message)
-                        cb([], {
-                            noData: true, nextTime: new Date().getTime()
-                        });
+                        onResult(bars, meta)
+
                     }
-                })
-            } catch (err) {
-                console.log(err)
-            }
-        }
-        this.bar = bar;
-    }
+                
 
+                } else {
 
-    // 新数据更新    
-    subscribeBars(symbolInfo, resolution, onRealtimeCallback, listenerGuid, onResetCacheNeededCallback) {
-        console.log(9)
-        this.onResetCacheNeededCallback = onResetCacheNeededCallback
-        if (this._subscribers?.hasOwnProperty(listenerGuid)) {
-            return;
-        }
-        this._subscribers[listenerGuid] = {
-            lastBarTime: null,
-            listener: onRealtimeCallback,
-            resolution: resolution,
-            symbolInfo: symbolInfo
-        };
-    }
+                    console.log(res.message)
 
-    // 更新
-    update(listenerGuid, lastBar) {
-        // 已取消监听取消追加
-        if (!this._subscribers.hasOwnProperty(listenerGuid)) {
-            return;
-        }
-        let subscriptionRecord = this._subscribers[listenerGuid];
-        if (
-            subscriptionRecord.lastBarTime !== null &&
-            lastBar.time < subscriptionRecord.lastBarTime
-        ) {
-            return;
-        }
-        const isNewBar =
-            subscriptionRecord.lastBarTime !== null &&
-            lastBar.time > subscriptionRecord.lastBarTime;
-        if (isNewBar) {
-            subscriptionRecord.lastBarTime = lastBar.time;
-        }
-        subscriptionRecord.listener(lastBar);
-    }
-
-    // 循环读取实时数据
-    async readTicker() {
-        // ws 将数据存放在 windown.g_k_ticker 中
-        if (window.g_k_ticker && window.g_k_ticker.length) {
-            for (let listenerGuid in this._subscribers) {
-                let item = window.g_k_ticker;
-                if (item) {
-                    let d = {
-                        time: item.time ? Number(new Date(item.time).getTime()) : new Date().getTime(),
-                        open: Number(item.open),
-                        high: Number(item.high),
-                        low: Number(item.low),
-                        close: Number(item.close),
-                        volume: Number(item.volume)
-                    };
-                    // 更新 tradingView 视图
-                    this.update(listenerGuid, d);
                 }
-            }
-        }
-        // 更新完成后清空上次的数据
-        window.g_k_ticker = [];
-        // 轮询延时
-        await new Promise(resolve => {
-            setTimeout(resolve, 300);
-        });
-        // 轮询
-        this.readTicker();
-    }
-}
 
-export default DataFeed;
+            })
+
+        }, 6000)
+
+    }
+
+    unsubscribeBars = function (listenerGuid) {
+
+        // 取消订阅产品的callback
+
+    }
+
+}

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './index.css';
 import { widget } from '../../static/charting_library';
-import DataFeed from './datafeed';
+import DataFeed from './dataFeed';
 import { getAuthority } from '@/utils/authority';
 import { queryStockAuthorize, queryRicLists } from './service';
 import { message, AutoComplete } from 'antd';
@@ -157,7 +157,9 @@ export class TVChartContainer extends React.PureComponent {
 
 			//图标因为权限问题未加载则去请求权限,有权限的继续回调,无权限则调用同花顺接口
 			if (!tvWidget.activeChart().dataReady()) {
-				this.checkAuthorize()
+				setTimeout(function () {
+					this.checkAuthorize()
+				}, 10000);
 			}
 
 		});

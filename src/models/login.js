@@ -4,6 +4,7 @@ import { accountLogin, loginOut } from '@/services/login';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery, setCookie, removeCookie } from '@/utils/utils';
 import { message } from 'antd';
+
 const Model = {
   namespace: 'login',
   state: {
