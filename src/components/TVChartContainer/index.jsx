@@ -25,8 +25,8 @@ export class TVChartContainer extends React.PureComponent {
 		this.state = {
 			dataFlag: false,
 			params: {
-				// ric: 'AAPL',
-				ric: '002594.SZ',
+				ric: 'AAPL.O',
+				// ric: '002594.SZ',
 				accessToken: userInfo.accessToken
 			},
 			ricList: [],
@@ -63,8 +63,8 @@ export class TVChartContainer extends React.PureComponent {
 
 
 	static defaultProps = {
-		// symbol: 'AAPL',
-		symbol: '002594.SZ',
+		symbol: 'AAPL.O',
+		// symbol: '002594.SZ',
 		interval: 'D',
 		containerId: 'tv_chart_container',
 		datafeedUrl: 'https://demo_feed.tradingview.com',
@@ -92,6 +92,9 @@ export class TVChartContainer extends React.PureComponent {
 		};
 		//判断是否有权限
 		if (this.state.dataFlag) {
+			if (this.props.symbol == 'AAPL.O') {
+				this.props.symbol = 'AAPl'
+			}
 			widgetOptions = {
 				theme: 'Dark',
 				symbol: ric ? ric : this.props.symbol,
@@ -109,7 +112,7 @@ export class TVChartContainer extends React.PureComponent {
 				user_id: this.props.userId,
 				fullscreen: this.props.fullscreen,
 				autosize: this.props.autosize,
-				debug: true,
+				// debug: true,
 				studies_overrides: this.props.studiesOverrides,
 			}
 		} else {
@@ -130,7 +133,7 @@ export class TVChartContainer extends React.PureComponent {
 				user_id: this.props.userId,
 				fullscreen: this.props.fullscreen,
 				autosize: this.props.autosize,
-				debug: true,
+				// debug: true,
 				studies_overrides: this.props.studiesOverrides,
 			}
 		}
@@ -157,8 +160,9 @@ export class TVChartContainer extends React.PureComponent {
 
 			//图标因为权限问题未加载则去请求权限,有权限的继续回调,无权限则调用同花顺接口
 			if (!tvWidget.activeChart().dataReady()) {
+				var that = this
 				setTimeout(function () {
-					this.checkAuthorize()
+					that.checkAuthorize()
 				}, 10000);
 			}
 

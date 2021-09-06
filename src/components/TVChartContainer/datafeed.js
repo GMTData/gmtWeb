@@ -199,8 +199,7 @@ export default class DataFeed {
                 }
 
             } else {
-
-                console.log(message)
+                console.log(res.message)
 
             }
 
@@ -214,7 +213,6 @@ export default class DataFeed {
         t_init = setInterval(function () {
 
             const e_time = Number((Date.now() + '').substr(0, 9) + '0000')
-
             //查询同花顺接口数据
             let params = {
                 ric: self.getSendSymbolName(symbolInfo.name),
@@ -282,7 +280,6 @@ export default class DataFeed {
                 
 
                 } else {
-
                     console.log(res.message)
 
                 }
