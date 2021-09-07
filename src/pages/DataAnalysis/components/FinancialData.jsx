@@ -76,6 +76,7 @@ const FinancialData = (props) => {
 
     const [currencyCode, setCurrencyCode] = useState('');//货币单位
 
+    const [nameState, setNameState] = useState({})   //中英文
     useEffect(() => {
         params.ric = ric;
         //查询财务数据
@@ -83,7 +84,12 @@ const FinancialData = (props) => {
             res => {
                 if (res.state) {
                     if (res.data) {
-                        setFinancial(res.data)
+                        setFinancial(res?.data?.result)
+                        if (intl.locale === "zh-CN") {
+                            setNameState(res?.data?.zh)
+                        } else {
+                            setNameState(res?.data?.en)
+                        }
                     } else {
                         setFinancial([])
                     }
@@ -171,13 +177,13 @@ const FinancialData = (props) => {
         <div className={styles.companyInfo}>
             <div className={styles.infoTitle}>
                 <span className={styles.titleTxt}>{oneInfoTitle}</span>
-                <span className={styles.dataRadio}>
+                {(keyType == 602 || keyType == 603 || keyType == 604) ? <span className={styles.dataRadio}>
                     <Radio.Group defaultValue={dataType} onChange={onchange} buttonStyle="solid" style={{ height: '30px' }}>
                         <Radio.Button value="0">{intl.locale === "zh-CN" ? '全部' : 'All'}</Radio.Button>
                         <Radio.Button value="1">{intl.locale === "zh-CN" ? '年报' : 'Annual report'}</Radio.Button>
                         <Radio.Button value="2">{intl.locale === "zh-CN" ? '季报' : 'Quarterly results'}</Radio.Button>
                     </Radio.Group>
-                </span>
+                </span> : ''}
             </div>
 
             {
@@ -342,7 +348,7 @@ const FinancialData = (props) => {
                                                                 Object.keys(financial[item].Annual[0].dataContentObject.growthAbility).map((grow, index) => (
                                                                     <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                                                         <span>
-                                                                            {grow}
+                                                                            {nameState && nameState[grow] ? nameState[grow] : grow}
                                                                         </span>
                                                                         {financial ? Object.keys(financial).map((itemValue) => (
                                                                             <span>{financial[item].Annual[0].dataContentObject.growthAbility[grow] ? parseInt(financial[item].Annual[0].dataContentObject.growthAbility[grow]) : ''}</span>
@@ -376,7 +382,7 @@ const FinancialData = (props) => {
                                                                     Object.keys(financial[item].Annual[0].dataContentObject.profitabilityAndIncomeQuality).map((profit, index) => (
                                                                         <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                                                             <span>
-                                                                                {profit}
+                                                                                {nameState && nameState[profit] ? nameState[profit] : profit}
                                                                             </span>
                                                                             {financial ? Object.keys(financial).map((itemValue) => (
                                                                                 <span>{financial[item].Annual[0].dataContentObject.profitabilityAndIncomeQuality[profit] ? parseInt(financial[item].Annual[0].dataContentObject.profitabilityAndIncomeQuality[profit]) : ''}</span>
@@ -410,7 +416,7 @@ const FinancialData = (props) => {
                                                                         Object.keys(financial[item].Annual[0].dataContentObject.operatingCapacity).map((oper, index) => (
                                                                             <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                                                                 <span>
-                                                                                    {oper}
+                                                                                    {nameState && nameState[oper] ? nameState[oper] : oper}
                                                                                 </span>
                                                                                 {financial ? Object.keys(financial).map((itemValue) => (
                                                                                     <span>{financial[item].Annual[0].dataContentObject.operatingCapacity[oper] ? parseInt(financial[item].Annual[0].dataContentObject.operatingCapacity[oper]) : ''}</span>
@@ -444,7 +450,7 @@ const FinancialData = (props) => {
                                                                             Object.keys(financial[item].Annual[0].dataContentObject.capitalStructureAndSolvency).map((capital, index) => (
                                                                                 <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                                                                     <span>
-                                                                                        {capital}
+                                                                                        {nameState && nameState[capital] ? nameState[capital] : capital}
                                                                                     </span>
                                                                                     {financial ? Object.keys(financial).map((itemValue) => (
                                                                                         <span>{financial[item].Annual[0].dataContentObject.capitalStructureAndSolvency[capital] ? parseInt(financial[item].Annual[0].dataContentObject.capitalStructureAndSolvency[capital]) : ''}</span>

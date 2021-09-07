@@ -78,23 +78,33 @@ const ProfitForecast = (props) => {
     const valIncreaseType = ['roeIncrease', 'roaIncrease'];
 
     const [years, setYears] = useState([]);//年度集合
+    const [nameState, setNameState] = useState({})   //中英文
+    let nameMap = {}
     //预测数据
     const getForecastData = () => {
         queryForecast(forecastParams).then(
             res => {
                 if (res.state) {
-                    if (res.data) {
+                    //处理中英文
+                    if (intl.locale === "zh-CN") {
+                        setNameState(res?.data?.zh)
+                        nameMap = res?.data?.zh;
+                    } else {
+                        setNameState(res?.data?.en)
+                        nameMap = res?.data?.en;
+                    }
+                    if (res?.data?.result) {
                         let cashDataArray = []
                         let balDataArray = []
                         let incDataArray = []
                         let valDataArray = []
                         let yearList = []
-                        if (res.data.length > 0) {
+                        if (res?.data?.result.length > 0) {
                             let cashObj = {}
                             let balObj = {}
                             let incObj = {}
                             let valObj = {}
-                            res.data.map((item) => {
+                            res.data.result.map((item) => {
                                 yearList.push(item.yearOf);
                                 Object.keys(item).forEach((key) => {
                                     if (cashType.includes(key) || cashIncreaseType.includes(key)) {
@@ -231,7 +241,7 @@ const ProfitForecast = (props) => {
                             <div>
                                 <div className={styles.dataContent}
                                     className={[styles.dataContent, styles.oddBack].join(' ')}>
-                                    <span>{c}</span>
+                                    <span>{nameState && nameState[c] ? nameState[c] : c}</span>
                                     {years && casState.length > 0 ? years.map((y) => (
                                         <span>
                                             {casState.map((cas) => (
@@ -244,7 +254,7 @@ const ProfitForecast = (props) => {
                                     ci.includes(c) ?
                                         <div className={styles.dataContent}
                                             className={[styles.dataContent, styles.oddBack].join(' ')}>
-                                            <span>{ci}</span>
+                                            <span>{nameState && nameState[ci] ? nameState[ci] : ci}</span>
                                             {years && casState.length > 0 ? years.map((y) => (
                                                 <span>
                                                     {casState.map((cas) => (
@@ -278,7 +288,7 @@ const ProfitForecast = (props) => {
                                 <div>
                                     <div className={styles.dataContent}
                                         className={[styles.dataContent, styles.oddBack].join(' ')}>
-                                        <span>{b}</span>
+                                        <span>{nameState && nameState[b] ? nameState[b] : b}</span>
                                         {years && balState.length > 0 ? years.map((y) => (
                                             <span>
                                                 {balState.map((bal) => (
@@ -291,7 +301,7 @@ const ProfitForecast = (props) => {
                                         bi.includes(b) ?
                                             <div className={styles.dataContent}
                                                 className={[styles.dataContent, styles.oddBack].join(' ')}>
-                                                <span>{bi}</span>
+                                                <span>{nameState && nameState[bi] ? nameState[bi] : bi}</span>
                                                 {years && balState.length > 0 ? years.map((y) => (
                                                     <span>
                                                         {balState.map((bal) => (
@@ -323,7 +333,7 @@ const ProfitForecast = (props) => {
                                     <div>
                                         <div className={styles.dataContent}
                                             className={[styles.dataContent, styles.oddBack].join(' ')}>
-                                            <span>{i}</span>
+                                            <span>{nameState && nameState[i] ? nameState[i] : i}</span>
                                             {years && incState.length > 0 ? years.map((y) => (
                                                 <span>
                                                     {incState.map((inc) => (
@@ -336,7 +346,7 @@ const ProfitForecast = (props) => {
                                             ic.includes(i) ?
                                                 <div className={styles.dataContent}
                                                     className={[styles.dataContent, styles.oddBack].join(' ')}>
-                                                    <span>{ic}</span>
+                                                    <span>{nameState && nameState[ic] ? nameState[ic] : ic}</span>
                                                     {years && incState.length > 0 ? years.map((y) => (
                                                         <span>
                                                             {incState.map((inc) => (
@@ -368,7 +378,7 @@ const ProfitForecast = (props) => {
                                         <div>
                                             <div className={styles.dataContent}
                                                 className={[styles.dataContent, styles.oddBack].join(' ')}>
-                                                <span>{v}</span>
+                                                <span>{nameState && nameState[v] ? nameState[v] : v}</span>
                                                 {years && valState.length > 0 ? years.map((y) => (
                                                     <span>
                                                         {valState.map((val) => (
@@ -381,7 +391,7 @@ const ProfitForecast = (props) => {
                                                 vi.includes(v) ?
                                                     <div className={styles.dataContent}
                                                         className={[styles.dataContent, styles.oddBack].join(' ')}>
-                                                        <span>{vi}</span>
+                                                        <span>{nameState && nameState[vi] ? nameState[vi] : vi}</span>
                                                         {years && valState.length > 0 ? years.map((y) => (
                                                             <span>
                                                                 {valState.map((val) => (
