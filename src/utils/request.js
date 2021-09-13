@@ -1,6 +1,8 @@
 /** Request 网络请求工具 更详细的 api 文档: https://github.com/umijs/umi-request */
 import { extend } from 'umi-request';
 import { notification } from 'antd';
+import { history } from 'umi';
+
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
   201: '新建或修改数据成功。',
@@ -45,5 +47,15 @@ const request = extend({
   errorHandler,
   // 默认错误处理
   credentials: false, // 默认请求是否带上cookie
+});
+
+// request响应拦截器, 统一处理错误信息
+request.interceptors.response.use(async (response, options) => {
+  const data = await response.clone().json();
+  if (!data.state && data.message == "accessToken invalid!") {
+    // 界面报错处理,token失效统一跳转登录
+    history.push(`/user/login`);
+  }
+  return response;
 });
 export default request;

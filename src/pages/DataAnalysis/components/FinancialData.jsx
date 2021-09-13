@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Spin, Table, message, Radio } from 'antd';
+import { Spin, Table, message, Radio, Empty } from 'antd';
 import { useIntl, FormattedMessage } from 'umi';
 import { queryReportInfo, queryFinancialAnalysis } from '../service';
 import styles from './index.less';
@@ -460,7 +460,7 @@ const FinancialData = (props) => {
                                                                             : '' : '' : '' : '' : '')) : ''
                                                 }
                                             </div> :
-                                            < Spin className={styles.spinLoading} />}
+                                            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false}  />}
         </div>
     )
 };

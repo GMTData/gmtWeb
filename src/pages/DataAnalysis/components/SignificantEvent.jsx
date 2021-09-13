@@ -350,7 +350,7 @@ const SignificantEvent = (props) => {
                                     <div className={styles.pageBox}>
                                         <Pagination
                                             total={dividendsPage ? dividendsPage.TotalRecords : 0}
-                                            showTotal={(total) => `${pageTotal} ${dividendsPage ? dividendsPage.TotalRecords : 0} ${pageItems} `}
+                                            showTotal={(total) => `${pageTotal} ${dividendsPage ? dividendsPage.TotalRecords ? dividendsPage.TotalRecords : 0 : 0} ${pageItems} `}
                                             defaultPageSize={10}
                                             current={cutPage ? cutPage : 1}
                                             onChange={onChange}

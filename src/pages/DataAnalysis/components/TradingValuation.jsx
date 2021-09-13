@@ -317,7 +317,7 @@ const TradingValuation = (props) => {
                                     <Line shape="smooth" position="quarterTime*value" color="type" label="value" />
                                     <Tooltip shared showCrosshairs />
                                     <Legend />
-                                </Chart> : <Empty />}
+                                </Chart> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />}
                         </div>
                         : ''}
             </div>

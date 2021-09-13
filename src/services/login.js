@@ -21,6 +21,6 @@ export async function getEmailCode(email) {
 //登出
 export async function loginOut() {
   return request(`${PATH}/userInfo/loginOut`, {
-    headers: { 'accessToken': getAuthority() },
+    headers: { 'accessToken': getAuthority().accessToken },
   });
 }

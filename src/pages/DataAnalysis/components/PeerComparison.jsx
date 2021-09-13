@@ -1,4 +1,4 @@
-import { Spin, Table, message, Select, Row, Col } from 'antd';
+import { Spin, Table, message, Select, Row, Col, Empty } from 'antd';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useIntl, FormattedMessage } from 'umi';
 import { queryRatiosReport, queryValueData, getIndustryType, queryFinancialReport } from '../service';
@@ -587,7 +587,7 @@ const PeerComparison = (props) => {
                                     </Col>
                                 </Row>
                             </div>
-                        )) : <Spin className={styles.spinLoading} />}
+                        )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false}  />}
                     </div> :
                     keyType == 802 ?
                         <div>
@@ -703,7 +703,7 @@ const PeerComparison = (props) => {
                                         </Col>
                                     </Row>
                                 </div>
-                            )) : <Spin className={styles.spinLoading} />}
+                            )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false}  />}
 
                         </div> :
                         keyType == 803 ?
@@ -742,7 +742,7 @@ const PeerComparison = (props) => {
                                             </Col>
                                         </Row>
                                     </div>
-                                )) : <Spin className={styles.spinLoading} />}
+                                )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false}  />}
                             </div> :
                             (keyType == 804 || keyType == 0) && marketState ?
                                 <div>
@@ -851,7 +851,7 @@ const PeerComparison = (props) => {
                                                 </Row>
                                             </div>
                                         ))
-                                    )) : <Spin className={styles.spinLoading} />}
+                                    )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false}  />}
                                 </div> : ''}
         </div>
     )

@@ -279,7 +279,7 @@ const ProfitForecast = (props) => {
                                                 }}
                                                 visible={false}
                                             />
-                                        </Chart> : <Empty />}
+                                        </Chart> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />}
                                 </div>
                             </div>
                         )) : ''
@@ -324,7 +324,7 @@ const ProfitForecast = (props) => {
                                                         return type === b
                                                     }}
                                                     visible={false} />
-                                            </Chart> : <Empty />}
+                                            </Chart> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />}
                                     </div>
                                 </div>
                             )) : ''
@@ -369,7 +369,7 @@ const ProfitForecast = (props) => {
                                                             return type === i
                                                         }}
                                                         visible={false} />
-                                                </Chart> : <Empty />}
+                                                </Chart> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />}
                                         </div>
                                     </div>
                                 )) : ''
@@ -414,13 +414,13 @@ const ProfitForecast = (props) => {
                                                                 return type === v
                                                             }}
                                                             visible={false} />
-                                                    </Chart> : <Empty />}
+                                                    </Chart> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />}
                                             </div>
                                         </div>
                                     )) : '' : ''
                     }
                 </div>
-                : < Spin className={styles.spinLoading} />}
+                : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />}
         </div>
     )
 };
