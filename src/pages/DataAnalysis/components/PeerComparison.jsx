@@ -256,6 +256,7 @@ const PeerComparison = (props) => {
     //估值分析
     const getValueData = (ric) => {
         params.ric = ric;
+        // params.ric = 'TSLA.O';
         queryValueData(params).then(
             res => {
                 if (res.state) {
@@ -587,7 +588,7 @@ const PeerComparison = (props) => {
                                     </Col>
                                 </Row>
                             </div>
-                        )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false}  />}
+                        )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />}
                     </div> :
                     keyType == 802 ?
                         <div>
@@ -703,17 +704,17 @@ const PeerComparison = (props) => {
                                         </Col>
                                     </Row>
                                 </div>
-                            )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false}  />}
+                            )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />}
 
                         </div> :
                         keyType == 803 ?
                             <div>
                                 <div className={styles.titilePeer}>
                                     <Row>
-                                        <Col span={4}>{intl.locale === "zh-CN" ? '代码' : 'code'}</Col>
-                                        <Col span={4}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as"'}</Col>
-                                        <Col span={3}>{intl.locale === "zh-CN" ? '季度收盘价' : 'Quarterly closing price'}季度收盘价</Col>
-                                        <Col span={3}>{intl.locale === "zh-CN" ? '每股现金流' : 'Cash flow per share'}</Col>
+                                        <Col span={3}>{intl.locale === "zh-CN" ? '代码' : 'code'}</Col>
+                                        <Col span={6}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as"'}</Col>
+                                        <Col span={3}>{intl.locale === "zh-CN" ? '季度收盘价' : 'Quarterly closing price'}</Col>
+                                        {/* <Col span={3}>{intl.locale === "zh-CN" ? '每股现金流' : 'Cash flow per share'}</Col> */}
                                         <Col span={12}>
                                             <span className={styles.spanPeer}>
                                                 <div style={{ height: 36 }}></div>
@@ -726,23 +727,27 @@ const PeerComparison = (props) => {
                                         </Col>
                                     </Row>
                                 </div>
-                                {valuation.length > 0 ? valuation.map((value) => (
-                                    <div className={styles.dataPeer}>
-                                        <Row>
-                                            <Col span={3}>{value.ric}</Col>
-                                            <Col span={3}>{JSON.stringify(valuationName) !== '{}' ? valuationName[value.ric] : ''}</Col>
-                                            <Col span={3}>{value.close}</Col>
-                                            <Col span={3}>{value.pcf}</Col>
-                                            <Col span={12}>
-                                                <div className={styles.dataPeerRow}>
-                                                    <span>{value.pe && value.close ? eval(value.pe * value.close).toFixed(2) : ''}</span>
-                                                    <span>{value.ps && value.close ? eval(value.ps * value.close).toFixed(2) : ''}</span>
-                                                    <span>{value.pb && value.close ? eval(value.pb * value.close).toFixed(2) : ''}</span>
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    </div>
-                                )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false}  />}
+                                {JSON.stringify(valuation) !== '{}' ? Object.keys(valuation).map((value) => (
+                                    JSON.stringify(valuation[value]) !== '{}' ? Object.keys(valuation[value]).map((v) => (
+                                        valuation[value][v].length > 0 ?
+                                            <div className={styles.dataPeer}>
+                                                <Row>
+                                                    <Col span={3}>{valuation[value][v][0].ric}</Col>
+                                                    <Col span={6}>{JSON.stringify(valuationName) !== '{}' ? valuationName[valuation[value][v][0].ric] : ''}</Col>
+                                                    {/* <Col span={3}>{ valuation[value][v][0].close}</Col> */}
+                                                    <Col span={3}>{valuation[value][v][0].pcf ? eval(valuation[value][v][0].pcf).toFixed(2) : ''}</Col>
+                                                    <Col span={12}>
+                                                        <div className={styles.dataPeerRow}>
+                                                            <span>{valuation[value][v][0].pe ? eval(valuation[value][v][0].pe).toFixed(2) : ''}</span>
+                                                            <span>{valuation[value][v][0].ps ? eval(valuation[value][v][0].ps).toFixed(2) : ''}</span>
+                                                            <span>{valuation[value][v][0].pb ? eval(valuation[value][v][0].pb).toFixed(2) : ''}</span>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
+                                            </div>
+                                            : ''
+                                    )) : ''
+                                )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />}
                             </div> :
                             (keyType == 804 || keyType == 0) && marketState ?
                                 <div>
@@ -851,7 +856,7 @@ const PeerComparison = (props) => {
                                                 </Row>
                                             </div>
                                         ))
-                                    )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false}  />}
+                                    )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />}
                                 </div> : ''}
         </div>
     )

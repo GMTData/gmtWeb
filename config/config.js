@@ -42,8 +42,8 @@ export default defineConfig({
     basePath: '/gmtweb/',
   },
   define: {
-    // PATH: 'http://47.243.170.163:8088/gmt',
-    PATH: '/gmt'
+    PATH: 'http://47.243.170.163:8088/gmt',
+    // PATH: '/gmt'
   },
   esbuild: {},
   // base: '/gmtweb',   //定义路由的基本路径

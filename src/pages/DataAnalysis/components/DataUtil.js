@@ -190,11 +190,11 @@ export const menuList = [
                 name: '财务数据比较',
                 nameEn: 'Comparison of financial data',
             },
-            // {
-            //     id: 803,
-            //     name: '估值分析比较',
-            //     nameEn: 'Valuation analysis and comparison',
-            // },
+            {
+                id: 803,
+                name: '估值分析比较',
+                nameEn: 'Valuation analysis and comparison',
+            },
             {
                 id: 804,
                 name: '市场表现比较',
