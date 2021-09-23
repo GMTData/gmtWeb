@@ -1,7 +1,7 @@
 import { Alert, Space, message, Tabs, Button } from 'antd';
 import React, { useState, useEffect } from 'react';
 import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
-import { useIntl, connect, FormattedMessage, Link } from 'umi';
+import { useIntl, connect, FormattedMessage, Link, history } from 'umi';
 import { getFakeCaptcha, getEmailCode } from '@/services/register';
 import styles from './index.less';
 import PhoneInput from 'react-phone-input-2';
@@ -48,7 +48,7 @@ const Register = (props) => {
       iphoneNumber: phoneNum,
       password: formValue.password,
       verificationCode: formValue.captcha,
-      recommendationCode: formValue.recommendationCode,
+      superiorRecommendationCode: formValue.recommendationCode,
       identity: "personal"
     }
     dispatch({
@@ -59,6 +59,7 @@ const Register = (props) => {
           if (res.state) {
             if (intl.locale === "zh-CN") {
               message.success('注册成功！')
+              history.push(`/user/login`);
             } else {
               message.success('Registration successful!')
             }

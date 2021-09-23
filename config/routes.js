@@ -103,6 +103,13 @@ export default [
                 hideInBreadcrumb: true ,
               },
               {
+                name: 'personCenter',
+                path: '/personCenter',
+                component: './PersonCenter',
+                hideInBreadcrumb: true ,
+                hideInMenu: true,
+              },
+              {
                 component: './404',
               },
             ],

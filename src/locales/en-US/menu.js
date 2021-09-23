@@ -37,6 +37,7 @@ export default {
   'menu.news.information.economicCalenda':'Economic Calenda',
   'menu.dataAnalysis': 'Data Analysis',
   'menu.chartingLibrary':'Market trends',
+  'menu.personCenter':'Personal center',
   'menu.profile': 'Profile',
   'menu.profile.basic': 'Basic Profile',
   'menu.profile.advanced': 'Advanced Profile',

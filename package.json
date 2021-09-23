@@ -52,6 +52,7 @@
     "@ant-design/pro-table": "^2.17.0",
     "@antv/data-set": "^0.11.8",
     "@umijs/route-utils": "^1.0.33",
+    "ali-oss": "^6.16.0",
     "antd": "^4.12.0",
     "bizcharts": "^3.5.8",
     "classnames": "^2.2.6",

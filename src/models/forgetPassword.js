@@ -1,6 +1,7 @@
 import { findPassWordByEmail, findPassWordByPhone } from '@/services/forgetPassword';
 import { getAuthority } from '@/utils/authority';
 import { message } from 'antd';
+import { history } from 'umi';
 
 const Model = {
   namespace: 'forgetPassword',
@@ -13,6 +14,7 @@ const Model = {
       if (response.state) {
         if (localStorage.umi_locale === "zh-CN") {
           message.success('找回密码成功')
+          history.push(`/user/login`);
         } else {
           message.success('Password retrieved successfully')
         }

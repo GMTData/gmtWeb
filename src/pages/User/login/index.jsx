@@ -58,7 +58,7 @@ const Login = (props) => {
   }
 
   useEffect(() => {
-    //记住密码自动填充密码
+    //记住密码自动填充密码    
     if (typeTab === 'mobile') {
       if (getCookie('username') != '' && getCookie('password') != '') {
         setDefaultPhone(getCookie('username'))

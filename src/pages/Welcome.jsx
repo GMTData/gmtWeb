@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { useIntl, FormattedMessage, Link } from 'umi';
+import { useIntl, FormattedMessage, Link, history } from 'umi';
 import styles from './Welcome.less';
 import { Row, Col, message, Spin, Carousel, Avatar, AutoComplete } from 'antd';
 import { getAuthority } from '@/utils/authority';
@@ -17,6 +17,7 @@ import ic_news from '../assets/ic_news_slices/ic_news.png';
 import ic_phone from '../assets/ic_phone_slices/ic_phone.png';
 import ic_quotation from '../assets/ic_quotation_slices/ic_quotation.png';
 import ic_shares from '../assets/ic_shares_slices/ic_shares.png';
+import { gradeZN } from '@/utils/utils'
 
 
 const { Option } = AutoComplete;
@@ -169,6 +170,10 @@ const WelcomeHome = () => {
     );
   }
 
+  const toCenter = () => {
+    history.push(`/personCenter`)
+  }
+
   return (
     <PageContainer loading={loadingState}>
       <div className={styles.homeContent} style={{ width: contentWdith }}>
@@ -194,12 +199,12 @@ const WelcomeHome = () => {
               <div>
                 <Avatar size={72} icon={<UserOutlined />} style={avatorStyle} />
                 <span className={styles.useName}>{userInfo.userName ? userInfo.userName : userInfo.emailAdress ? userInfo.emailAdress : ''}</span>
-                <span style={{ marginTop: 8, textAlign: 'center', display: 'block' }}>ID：GMT100242021</span>
+                <span style={{ marginTop: 8, textAlign: 'center', display: 'block' }}>ID：{userInfo?.recommendationCode}</span>
                 <div className={styles.useInfoSpace}></div>
                 <div className={styles.textLeft}><img src={ic_phone} className={styles.iconRight8} />联系方式：{userInfo.iphoneNumber ? userInfo.iphoneNumber : userInfo.emailAdress ? userInfo.emailAdress : ''}</div>
-                <div className={styles.textLeft}><img src={ic_level} className={styles.iconRight8} />会员等级：<img src={ic_member} />{userInfo.vipStr ? userInfo.vipStr : ''}</div>
-                <div className={styles.vipBg}>
-                  <span className={styles.forwardVip}><img src={ic_member} className={styles.iconVip} />前往会员中心</span>
+                <div className={styles.textLeft}><img src={ic_level} className={styles.iconRight8} />会员等级：<img src={ic_member} />{intl.locale === "zh-CN" ? gradeZN(userInfo?.agent) : userInfo?.agent}</div>
+                <div className={styles.vipBg} onClick={toCenter}>
+                  <span className={styles.forwardVip} ><img src={ic_member} className={styles.iconVip} />前往会员中心</span>
                   <img src={ic_forward} className={styles.iconForward} />
                 </div>
               </div>

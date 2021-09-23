@@ -5,11 +5,35 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-  <title>GMT</title>
+  <title>GMT DATA</title>
   <link rel="icon" href="<%= context.config.publicPath +'favicon.ico'%>" type="image/x-icon" />
   <script src="<%= context.config.publicPath +'charting_library/charting_library.js'%>"></script>
   <script src="<%= context.config.publicPath +'datafeeds/udf/dist/polyfills.js'%>"></script>
   <script src="<%= context.config.publicPath +'datafeeds/udf/dist/bundle.js'%>"></script>
+  <script src="http://gosspublic.alicdn.com/aliyun-oss-sdk-4.4.4.min.js"></script>
+  <style>
+    .ant-pro-page-container-warp {
+      display: none;
+    }
+
+    .ant-pro-grid-content {
+      margin-top: 44px !important;
+    }
+
+    input:-webkit-autofill,
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+      -webkit-text-fill-color: #ededed !important;
+      -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+      background-color: transparent;
+      background-image: none;
+      transition: background-color 50000s ease-in-out 0s; 
+    }
+
+    input {
+      background-color: transparent;
+    }
+  </style>
 </head>
 
 <body>

@@ -7,8 +7,8 @@
  */
 export default {
   dev: {
-    'http://47.243.170.163:8088/gmt/': {
-      target:'http://47.243.170.163:8088',
+    '/gmt': {
+      target:'https://Gmtdata.technology',
       changeOrigin: true,
       pathRewrite: {
         '^': '',
@@ -17,7 +17,7 @@ export default {
   },
   test: {
     '/gmt/': {
-      target:'http://47.243.170.163:8088',
+      target:'https://Gmtdata.technology',
       changeOrigin: true,
       pathRewrite: {
         '^': '',
@@ -26,7 +26,7 @@ export default {
   },
   pre: {
     '/gmt/': {
-      target:'http://47.243.170.163:8088',
+      target:'https://Gmtdata.technology',
       changeOrigin: true,
       pathRewrite: {
         '^': '',

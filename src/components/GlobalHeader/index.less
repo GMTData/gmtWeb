@@ -6,47 +6,61 @@
   :global(.anticon) {
     margin-right: 8px;
   }
+
   :global(.ant-dropdown-menu-item) {
     min-width: 160px;
   }
 }
 
+.lineLimit {
+  border       : 1px solid #2f3342;
+  margin-top   : 5px;
+  margin-bottom: 5px;
+}
+
 .right {
-  display: flex;
-  float: right;
-  height: 64px;
+  display    : flex;
+  float      : right;
+  height     : 64px;
   margin-left: auto;
-  overflow: hidden;
+  overflow   : hidden;
+
   .action {
-    display: flex;
+    display    : flex;
     align-items: center;
-    height: 100%;
-    padding: 0 12px;
-    cursor: pointer;
-    transition: all 0.3s;
-    > span {
+    height     : 100%;
+    padding    : 0 12px;
+    cursor     : pointer;
+    transition : all 0.3s;
+
+    >span {
       vertical-align: middle;
     }
+
     &:hover {
       background: @pro-header-hover-bg;
     }
+
     &:global(.opened) {
       background: @pro-header-hover-bg;
     }
   }
+
   .search {
     padding: 0 12px;
+
     &:hover {
       background: transparent;
     }
   }
+
   .account {
     .avatar {
-      margin: ~'calc((@{layout-header-height} - 24px) / 2)' 0;
-      margin-right: 8px;
-      color: @primary-color;
+      margin        :~'calc((@{layout-header-height} - 24px) / 2)'0;
+      margin-right  : 8px;
+      color         : @primary-color;
       vertical-align: top;
-      background: rgba(255, 255, 255, 0.85);
+      background    : rgba(255, 255, 255, 0.85);
     }
   }
 }
@@ -54,9 +68,11 @@
 .dark {
   .action {
     color: rgba(255, 255, 255, 0.85);
-    > span {
+
+    >span {
       color: rgba(255, 255, 255, 0.85);
     }
+
     &:hover,
     &:global(.opened) {
       background: @primary-color;
@@ -68,12 +84,15 @@
   .dark {
     .action {
       color: @text-color;
-      > span {
+
+      >span {
         color: @text-color;
       }
+
       &:hover {
         color: rgba(255, 255, 255, 0.85);
-        > span {
+
+        >span {
           color: rgba(255, 255, 255, 0.85);
         }
       }
