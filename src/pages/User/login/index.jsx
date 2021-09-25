@@ -36,7 +36,7 @@ const Login = (props) => {
     const { dispatch } = props;
     let formValue = form.getFieldsValue();
     let params = {
-      info: formValue.userName,
+      info: typeTab === 'mobile' ? phoneNum : formValue.userName,
       password: typeTab === 'mobile' ? formValue.password : formValue.passwordAccount,
       type: typeTab === 'mobile' ? '2' : '3',
     }
