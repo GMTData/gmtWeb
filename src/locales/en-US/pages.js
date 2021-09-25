@@ -1,7 +1,7 @@
 export default {
   'pages.layouts.userLayout.title': 'WELCOME LOGIN GMT',
   'pages.layouts.forgetPassword.title': 'FORGET PASSWORD',
-  'pages.login.accountLogin.tab': 'Account Login',
+  'pages.login.accountLogin.tab': 'Email Login',
   'pages.login.accountLogin.errorMessage': 'Incorrect username/password',
   'pages.login.username.placeholder': 'Please input your username',
   'pages.login.username.required': 'Please input your username!',

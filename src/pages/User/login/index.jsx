@@ -38,7 +38,7 @@ const Login = (props) => {
     let params = {
       info: formValue.userName,
       password: typeTab === 'mobile' ? formValue.password : formValue.passwordAccount,
-      type: "3"
+      type: typeTab === 'mobile' ? '2' : '3',
     }
     let typeParams = { typeTab: typeTab }//切换的类型
     let autoLoginParam = { autoLogin: formValue.autoLogin }
@@ -175,7 +175,7 @@ const Login = (props) => {
               key="account"
               tab={intl.formatMessage({
                 id: 'pages.login.accountLogin.tab',
-                defaultMessage: '账户登录',
+                defaultMessage: '邮箱登录',
               })}
             />
           </Tabs>

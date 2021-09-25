@@ -2,14 +2,13 @@ import { Button, message, Steps, Input, InputNumber, Modal, Pagination, AutoComp
 import React, { useState, useEffect } from 'react';
 import { useIntl, FormattedMessage, Link } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
-import { changePassword, getWithdrawList, commissionList, purchaseRecord, productList, calPayMoney, generateOrder, insertDatum, insertWithdraw, getBlance, infoUpdate } from './service';
+import { changePassword, getWithdrawList, commissionList, purchaseRecord, productList, calPayMoney, generateOrder, insertDatum, insertWithdraw, getBlance, infoUpdate, getUserInfo } from './service';
 import styles from './index.less';
-import { getAuthority } from '@/utils/authority';
+import { getAuthority, setAuthority } from '@/utils/authority';
 import { EditOutlined, CheckOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { fileSizeTransform, isEmpty, passwordReg, clientUp, gradeZN, UUIDGMT, eamilReg } from '@/utils/utils';
 import payment from '../../assets/payment.png'
-import Submitter from '@ant-design/pro-form/lib/components/Submitter';
 import { useForm } from 'antd/lib/form/Form';
 
 const { Step } = Steps;
@@ -206,14 +205,16 @@ const PersonCenter = () => {
     },
   ];
 
-  const userInfo = getAuthority();//获取用户相关信息
+  let user = getAuthority();//获取用户相关信息
+
+  const [userInfo, setuUserInfo] = useState(user)
 
   //出金列表参数
   let params = {
     keyWord: userInfo.userName ? userInfo.userName : '',
     pageSize: 20,
     pageNumber: 1,
-    accessToken: userInfo.accessToken
+    accessToken: user?.accessToken
   }
 
   const [withdraw, setWithdraw] = useState([]);
@@ -236,7 +237,7 @@ const PersonCenter = () => {
     pageSize: 20,
     pageNumber: 1,
     recommand: '',
-    accessToken: userInfo.accessToken
+    accessToken: user?.accessToken
   }
 
   const [purchase, setPurchase] = useState([]);
@@ -258,7 +259,7 @@ const PersonCenter = () => {
     id: userInfo.id ? userInfo.id : '',
     pageSize: 20,
     pageNumber: 1,
-    accessToken: userInfo.accessToken
+    accessToken: user.accessToken
   }
 
   const [commission, setCommission] = useState([]);
@@ -283,7 +284,7 @@ const PersonCenter = () => {
     stockTypes: [], //股票分类  非必填（只给二级分类的id 如果用户选择一级就把当前一级下的所有二级id传递进来）
     pageSize: 20,
     currentPage: 1,
-    accessToken: userInfo.accessToken,
+    accessToken: user?.accessToken,
     language: "ZH"
   };
 
@@ -302,6 +303,8 @@ const PersonCenter = () => {
       pageTotal = 'Total';
       pageItems = 'items';
     }
+
+    queryUserInfo()
 
   }, []);
 
@@ -342,7 +345,7 @@ const PersonCenter = () => {
       info: userInfo.userName ? userInfo.userName : userInfo.iphoneNumber ? userInfo.iphoneNumber : userInfo.emailAdress ? userInfo.emailAdress : '',
       newPassword: item.newPassword,
       oldPassword: item.oldPassword,
-      accessToken: userInfo.accessToken
+      accessToken: user?.accessToken
     }
     changePassword(dataParams).then(
       res => {
@@ -441,7 +444,7 @@ const PersonCenter = () => {
     identityCardUrlPositive: "", //身份证正面
     identityCardUrlReverse: "", //身份证反面
     userId: userInfo.recommendationCode,                //用户的推荐号
-    accessToken: userInfo.accessToken
+    accessToken: user?.accessToken
   }
 
   //实名认证
@@ -466,7 +469,7 @@ const PersonCenter = () => {
   //购买产品
   //查询产品
   let productParams = {
-    accessToken: userInfo?.accessToken,
+    accessToken: user?.accessToken,
     code: userInfo?.agent != 'ordinary' ? '' : userInfo?.superiorRecommendationCode,
     userId: userInfo?.id
   }
@@ -483,7 +486,7 @@ const PersonCenter = () => {
     productName: '',
     payType: '9',
     paymentVoucherUrl: '',
-    accessToken: userInfo.accessToken
+    accessToken: user?.accessToken
   }
 
   //选择产品后计算应付金额
@@ -495,7 +498,7 @@ const PersonCenter = () => {
     recommandCode: userInfo?.recommendationCode,
     userId: userInfo?.id,
     productUnqiueIdentification: '',
-    accessToken: userInfo.accessToken
+    accessToken: user?.accessToken
   }
 
   //应付金额
@@ -581,12 +584,12 @@ const PersonCenter = () => {
       usdLink: formAccout.getFieldValue('usdLink'),
       remark: formAccout.getFieldValue('remark') ? formAccout.getFieldValue('remark') : '',
       userId: userInfo?.id,
-      accessToken: userInfo?.accessToken
+      accessToken: user?.accessToken
     }
     const res = await getBlance(
       {
         userId: userInfo?.id,
-        accessToken: userInfo.accessToken
+        accessToken: user.accessToken
       }
     );
     if (res?.state) {
@@ -678,12 +681,25 @@ const PersonCenter = () => {
       params.iphoneNumber = formInfo.getFieldValue('infoName')
     }
 
-    const res = await infoUpdate(params, userInfo?.accessToken)
+    const res = await infoUpdate(params, user?.accessToken)
     if (res?.state) {
       message.success('success')
+      queryUserInfo()
       setIsModalInfoVisible(false)
     } else {
       message.error(res?.message)
+    }
+  }
+
+  //查询个人信息
+  const queryUserInfo = async () => {
+    let parsmUser = {
+      accessToken: user?.accessToken,
+      recommendationCode: userInfo?.recommendationCode
+    }
+    const res = await getUserInfo(parsmUser)
+    if (res?.state) {
+      setuUserInfo(res?.data)
     }
   }
 

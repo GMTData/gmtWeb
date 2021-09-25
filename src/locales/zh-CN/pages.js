@@ -1,7 +1,7 @@
 export default {
   'pages.layouts.userLayout.title': '欢迎登录GMT',
   'pages.layouts.forgetPassword.title': '忘记密码',
-  'pages.login.accountLogin.tab': '账户登录',
+  'pages.login.accountLogin.tab': '邮箱登录',
   'pages.login.accountLogin.errorMessage': '错误的用户名和密码',
   'pages.login.username.placeholder': '请输入用户名',
   'pages.login.username.required': '用户名是必填项！',

@@ -7,7 +7,10 @@ import { getAuthority } from '@/utils/authority';
 import { queryHotStock, queryHotNews, queryBanner, queryRicLists } from './service';
 import moment from 'moment';
 import { RightOutlined, UserOutlined } from '@ant-design/icons';
-import example from '../assets/image_mockup@2x.png';
+import image01 from '../assets/image01@2x.png';
+import image02 from '../assets/image02@2x.png';
+import image03 from '../assets/image03@2x.png';
+import image04 from '../assets/image04@2x.png';
 import ic_exchange from '../assets/ic_exchange_slices/ic_exchange.png';
 import ic_forward from '../assets/ic_forward_slices/ic_forward.png';
 import ic_futures from '../assets/ic_futures_slices/ic_futures.png';
@@ -17,7 +20,7 @@ import ic_news from '../assets/ic_news_slices/ic_news.png';
 import ic_phone from '../assets/ic_phone_slices/ic_phone.png';
 import ic_quotation from '../assets/ic_quotation_slices/ic_quotation.png';
 import ic_shares from '../assets/ic_shares_slices/ic_shares.png';
-import { gradeZN } from '@/utils/utils'
+import { gradeZN } from '@/utils/utils';
 
 
 const { Option } = AutoComplete;
@@ -37,6 +40,7 @@ const WelcomeHome = () => {
   const contentWdith = window.innerWidth - 40;//内容区域宽度
   //轮播图宽度
   const bannerWidth = eval(contentWdith / 100 * 75);
+  // const bannerWidth = 1024;
   //会员中心宽度
   const personWidth = eval(contentWdith - bannerWidth - 16);
   //头像居中的左右margin
@@ -63,12 +67,12 @@ const WelcomeHome = () => {
     queryHotStock(paramsHotStock).then(
       res => {
         setLoadingState(false);
-        if (res.state) {
-          if (res.data) {
+        if (res?.state) {
+          if (res?.data) {
             let stockList = []
-            Object.keys(res.data).forEach((key, index) => {
+            Object.keys(res?.data).forEach((key, index) => {
               if (index <= 14) {
-                let valueList = res.data[key] ? res.data[key].split('_') : [];
+                let valueList = res?.data[key] ? res?.data[key].split('_') : [];
                 if (valueList.length > 0) {
                   stockList.push({ code: key, name: valueList[0], price: valueList[1], applies: valueList[2] })
                 }
@@ -77,7 +81,7 @@ const WelcomeHome = () => {
             setStockState(stockList)
           }
         } else {
-          message.error(res.message);
+          message.error(res?.message);
         }
       }
     );
@@ -94,14 +98,14 @@ const WelcomeHome = () => {
     queryHotNews(paramsHotNews).then(
       res => {
         setLoadingState(false);
-        if (res.state) {
-          if (res.data) {
-            setNewsState(res.data?.RetrieveHeadlineML_Response_1?.HeadlineMLResponse?.HEADLINEML?.HL)
+        if (res?.state) {
+          if (res?.data) {
+            setNewsState(res?.data?.RetrieveHeadlineML_Response_1?.HeadlineMLResponse?.HEADLINEML?.HL)
           } else {
             setNewsState([])
           }
         } else {
-          message.error(res.message);
+          message.error(res?.message);
         }
       }
     );
@@ -117,12 +121,12 @@ const WelcomeHome = () => {
     queryBanner(paramsBanner).then(
       res => {
         setLoadingState(false);
-        if (res.state) {
-          if (res.data) {
+        if (res?.state) {
+          if (res?.data) {
 
           }
         } else {
-          message.error(res.message);
+          message.error(res?.message);
         }
       }
     );
@@ -159,12 +163,12 @@ const WelcomeHome = () => {
     ricParams.ric = e;
     queryRicLists(ricParams).then(
       res => {
-        if (res.state) {
-          if (res.data && res.data.result && res.data.result.length > 0) {
-            setRicList(res.data.result)
+        if (res?.state) {
+          if (res?.data && res?.data?.result && res?.data?.result.length > 0) {
+            setRicList(res?.data?.result)
           }
         } else {
-          message.error(res.message);
+          message.error(res?.message);
         }
       }
     );
@@ -182,14 +186,16 @@ const WelcomeHome = () => {
             <div>
               <Carousel autoplay>
                 <div>
-                  <img style={contentStyle} src='https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsucai.dabaoku.com%2Fshangwu%2Fgeguohuobi%2F073cu.jpg&refer=http%3A%2F%2Fsucai.dabaoku.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1632740157&t=b7b25c17bb944fbcbf3efe021ba3be0a' />
+                  <img style={contentStyle} src={image01} />
                 </div>
                 <div>
-                  <img style={contentStyle} src={example} />
+                  <img style={contentStyle} src={image02} />
                 </div>
                 <div>
+                  <img style={contentStyle} src={image03} />
                 </div>
                 <div>
+                  <img style={contentStyle} src={image04} />
                 </div>
               </Carousel>
             </div>

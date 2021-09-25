@@ -129,6 +129,14 @@ export async function getBlance(params, options) {
     });
 }
 
+//个人信息接口
+export async function getUserInfo(params, options) {
+    return request(`${PATH}/userInfo/getUserInfo/?recommandCode=${params.recommendationCode}`, {
+        method: 'GET',
+        headers: { 'accessToken': params.accessToken, },
+        ...(options || {}),
+    });
+}
 /**
  * 2.会员修改
  */
