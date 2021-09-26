@@ -208,22 +208,25 @@ const PersonCenter = () => {
   let user = getAuthority();//获取用户相关信息
 
   const [userInfo, setuUserInfo] = useState(user)
+  const [cutPage, setCutPage] = useState(1);
 
   //出金列表参数
   let params = {
     keyWord: userInfo.userName ? userInfo.userName : '',
-    pageSize: 20,
+    pageSize: 10,
     pageNumber: 1,
     accessToken: user?.accessToken
   }
 
   const [withdraw, setWithdraw] = useState([]);
+  const [withdrawData, setWithdrawData] = useState({})
   //查询出金记录列表
   const queryWithdrawList = () => {
     getWithdrawList(params).then(
       res => {
         if (res?.state) {
           setWithdraw(res?.data?.result)
+          setWithdrawData(res?.data)
         } else {
           message.error(res?.message);
         }
@@ -231,22 +234,40 @@ const PersonCenter = () => {
     );
   }
 
+  const onChangeWithdraw = (page, pageSize) => {
+    params.pageSize = pageSize ? pageSize : '10';
+    params.pageNumber = page ? page : '1';
+    setCutPage(page);
+    queryWithdrawList();
+  }
+
+  const onShowSizeChangeWithdraw = (current, size) => {
+    params.pageSize = size ? size : '10';
+    params.pageNumber = current ? current : '1';
+    setCutPage(current);
+    queryWithdrawList();
+  }
+
   //购买记录参数
   let paramsPurchase = {
     userId: userInfo.id ? userInfo.id : '',
-    pageSize: 20,
+    pageSize: 10,
     pageNumber: 1,
     recommand: '',
     accessToken: user?.accessToken
   }
 
   const [purchase, setPurchase] = useState([]);
+  const [purchaseData, setPurchaseData] = useState({})
+  const [cutPagePurchase, setCutPagePurchase] = useState(1);
+
   //查询购买记录列表
   const queryPurchaseRecord = () => {
     purchaseRecord(paramsPurchase).then(
       res => {
         if (res?.state) {
           setPurchase(res?.data?.result)
+          setPurchaseData(res?.data)
         } else {
           message.error(res?.message);
         }
@@ -254,21 +275,39 @@ const PersonCenter = () => {
     );
   }
 
+  const onChangePurchase = (page, pageSize) => {
+    paramsPurchase.pageSize = pageSize ? pageSize : '10';
+    paramsPurchase.pageNumber = page ? page : '1';
+    setCutPagePurchase(page);
+    queryPurchaseRecord();
+  }
+
+  const onShowSizeChangePurchase = (current, size) => {
+    paramsPurchase.pageSize = size ? size : '10';
+    paramsPurchase.pageNumber = current ? current : '1';
+    setCutPagePurchase(current);
+    queryPurchaseRecord();
+  }
+
   //佣金记录参数
   let paramsCommission = {
     id: userInfo.id ? userInfo.id : '',
-    pageSize: 20,
+    pageSize: 10,
     pageNumber: 1,
     accessToken: user.accessToken
   }
 
   const [commission, setCommission] = useState([]);
+  const [commissionData, setCommissionData] = useState({})
+  const [cutPageCommission, setCutPageCommission] = useState(1);
+
   //查询佣金记录列表
   const queryCommissionList = () => {
     commissionList(paramsCommission).then(
       res => {
         if (res?.state) {
           setCommission(res?.data?.result)
+          setCommissionData(res?.data)
         } else {
           message.error(res?.message);
         }
@@ -276,17 +315,21 @@ const PersonCenter = () => {
     );
   }
 
-  const [loadingState, setLoadingState] = useState(true);//loading
+  const onChangeCommission = (page, pageSize) => {
+    paramsCommission.pageSize = pageSize ? pageSize : '10';
+    paramsCommission.pageNumber = page ? page : '1';
+    setCutPageCommission(page);
+    queryCommissionList();
+  }
 
-  //查询公告列表参数
-  let paramsList = {
-    twoLevelNewsClassId: '', //国家分类 必填
-    stockTypes: [], //股票分类  非必填（只给二级分类的id 如果用户选择一级就把当前一级下的所有二级id传递进来）
-    pageSize: 20,
-    currentPage: 1,
-    accessToken: user?.accessToken,
-    language: "ZH"
-  };
+  const onShowSizeChangeCommission = (current, size) => {
+    paramsCommission.pageSize = size ? size : '10';
+    paramsCommission.pageNumber = current ? current : '1';
+    setCutPageCommission(current);
+    queryCommissionList();
+  }
+
+  const [loadingState, setLoadingState] = useState(true);//loading
 
   let pageTotal = '共';
   let pageItems = '条';
@@ -294,12 +337,10 @@ const PersonCenter = () => {
   useEffect(() => {
     if (intl.locale === "zh-CN") {
       params.language = 'ZH';
-      paramsList.language = 'ZH';
       pageTotal = '共';
       pageItems = '条';
     } else {
       params.language = 'EN';
-      paramsList.language = 'EN';
       pageTotal = 'Total';
       pageItems = 'items';
     }
@@ -844,20 +885,40 @@ const PersonCenter = () => {
             id: 'pages.personCenter.withdrawRecord',
             defaultMessage: '出金记录',
           })} key="3">
-            <Table columns={columnsWithdraw} dataSource={withdraw} />
-
+            <Table columns={columnsWithdraw} dataSource={withdraw} rowKey={(record) => record.id} pagination={false} />
+            <Pagination
+              style={{ marginTop: 10, float: 'right' }}
+              total={withdrawData ? withdrawData.total : 0}
+              showTotal={(total) => `${pageTotal} ${withdrawData?.total} ${pageItems} `}
+              current={cutPage ? cutPage : 1}
+              onChange={onChangeWithdraw}
+              showSizeChanger={onShowSizeChangeWithdraw} />
           </TabPane>
           <TabPane tab={intl.formatMessage({
             id: 'pages.personCenter.commissionRecord',
             defaultMessage: '佣金记录',
           })} key="4">
-            <Table columns={columnsCommission} dataSource={commission} />
+            <Table columns={columnsCommission} dataSource={commission} rowKey={(record) => record.id} pagination={false} />
+            <Pagination
+              style={{ marginTop: 10, float: 'right' }}
+              total={commissionData ? commissionData.total : 0}
+              showTotal={(total) => `${pageTotal} ${commissionData?.total} ${pageItems} `}
+              current={cutPageCommission ? cutPageCommission : 1}
+              onChange={onChangeCommission}
+              showSizeChanger={onShowSizeChangeCommission} />
           </TabPane>
           <TabPane tab={intl.formatMessage({
             id: 'pages.personCenter.purchaseRecords',
             defaultMessage: '购买记录',
           })} key="5">
-            <Table columns={columnsPurchase} dataSource={purchase} />
+            <Table columns={columnsPurchase} dataSource={purchase} rowKey={(record) => record.id} pagination={false} />
+            <Pagination
+              style={{ marginTop: 10, float: 'right' }}
+              total={purchaseData ? purchaseData.total : 0}
+              showTotal={(total) => `${pageTotal} ${purchaseData?.total} ${pageItems} `}
+              current={cutPagePurchase ? cutPagePurchase : 1}
+              onChange={onChangePurchase}
+              showSizeChanger={onShowSizeChangePurchase} />
           </TabPane>
           <TabPane tab={intl.formatMessage({
             id: 'pages.personCenter.accoutManage',

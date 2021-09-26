@@ -351,6 +351,8 @@ export const clientUp = new OSS.Wrapper({
 //会员级别匹配 中文
 export const gradeZN = (item) => {
   switch (item) {
+    case 'ordinary':
+      return '普通';
     case 'Primary':
       return '初级';
     case 'intermediate':

@@ -205,7 +205,7 @@ const WelcomeHome = () => {
               <div>
                 <Avatar size={72} icon={<UserOutlined />} style={avatorStyle} />
                 <span className={styles.useName}>{userInfo.userName ? userInfo.userName : userInfo.emailAdress ? userInfo.emailAdress : ''}</span>
-                <span style={{ marginTop: 8, textAlign: 'center', display: 'block' }}>ID：{userInfo?.recommendationCode}</span>
+                <span style={{ marginTop: 8, textAlign: 'center', display: 'block' }}>ID：GMT{userInfo?.recommendationCode}</span>
                 <div className={styles.useInfoSpace}></div>
                 <div className={styles.textLeft}><img src={ic_phone} className={styles.iconRight8} />联系方式：{userInfo.iphoneNumber ? userInfo.iphoneNumber : userInfo.emailAdress ? userInfo.emailAdress : ''}</div>
                 <div className={styles.textLeft}><img src={ic_level} className={styles.iconRight8} />会员等级：<img src={ic_member} />{intl.locale === "zh-CN" ? gradeZN(userInfo?.agent) : userInfo?.agent}</div>
