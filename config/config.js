@@ -46,7 +46,7 @@ export default defineConfig({
     // PATH: '/gmt'
   },
   esbuild: {},
-  // base: '/gmtweb',   //定义路由的基本路径
+  base: '/gmtweb',   //定义路由的基本路径
   publicPath: '/',  //定义资源的基本路径
   // publicPath: '/gmtweb/',  //定义资源的基本路径
   chunks: ['vendors', 'umi'],

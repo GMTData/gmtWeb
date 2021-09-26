@@ -74,29 +74,50 @@ const PersonCenter = () => {
       }
     },
     {
-      title: <span>{intl.locale === "zh-CN" ? '分佣金额' : 'Cent commission amount'}</span>,
+      title: <span>{intl.locale === "zh-CN" ? '姓名' : 'Name'}</span>,
+      dataIndex: 'receiveName',
+      key: 'receiveName',
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '账户' : 'account'}</span>,
+      dataIndex: 'receiveAccount',
+      key: 'receiveAccount',
+      render: (text, record, index) => {
+        return <span>{text ? 'GMT' + text : text}</span>
+      }
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '来自会员姓名' : 'From member`s name'}</span>,
+      dataIndex: 'purchaseName',
+      key: 'purchaseName',
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '来自订单' : 'From the order'}</span>,
+      dataIndex: 'orderNo',
+      key: 'orderNo',
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '金额' : 'The amount of'}</span>,
       dataIndex: 'commissionMoney',
       key: 'commissionMoney',
     },
     {
-      title: <span>{intl.locale === "zh-CN" ? '购买金额' : 'Purchase amount'}</span>,
-      dataIndex: 'payMoney',
-      key: 'payMoney',
-    },
-    {
-      title: <span>{intl.locale === "zh-CN" ? '产品名称' : 'The product name'}</span>,
-      dataIndex: 'productName',
-      key: 'productName',
-    },
-    {
-      title: <span>{intl.locale === "zh-CN" ? '接收人比列' : 'Recipient ratio column'}</span>,
+      title: <span>{intl.locale === "zh-CN" ? '返佣比列' : 'Commission than columns'}</span>,
       dataIndex: 'receiverRebate',
       key: 'receiverRebate',
     },
     {
-      title: <span>{intl.locale === "zh-CN" ? '购买人比例' : 'Proportion of buyers'}</span>,
-      dataIndex: 'superiorRebate',
-      key: 'superiorRebate',
+      title: <span>{intl.locale === "zh-CN" ? '备注' : 'remark'}</span>,
+      dataIndex: 'remark',
+      key: 'remark',
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '创建时间' : 'create Time'}</span>,
+      dataIndex: 'createTime',
+      key: 'createTime',
+      render: (text, record) => {
+        return <span>{text ? moment(text).format('YYYY-MM-DD HH:mm:ss') : ''}</span>
+      }
     },
   ]
 
@@ -117,23 +138,38 @@ const PersonCenter = () => {
       key: 'realName',
     },
     {
-      title: <span>{intl.locale === "zh-CN" ? '账号' : 'account'}</span>,
+      title: <span>{intl.locale === "zh-CN" ? '出金账户' : 'account'}</span>,
       dataIndex: 'account',
       key: 'account',
     },
-    {
-      title: <span>{intl.locale === "zh-CN" ? 'USDT钱包地址' : 'USDT wallet address'}</span>,
-      dataIndex: 'usdLink',
-      key: 'usdLink',
-    },
-
     {
       title: <span>{intl.locale === "zh-CN" ? '出金金额' : 'The amount of gold'}</span>,
       dataIndex: 'cashAmount',
       key: 'cashAmount',
     },
     {
-      title: <span>{intl.locale === "zh-CN" ? '出金备注' : 'Note the gold'}</span>,
+      title: <span>{intl.locale === "zh-CN" ? 'USDT钱包地址' : 'USDT wallet address'}</span>,
+      dataIndex: 'usdLink',
+      key: 'usdLink',
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '收款二维码' : 'Qr code of receipt'}</span>,
+      dataIndex: 'qrCode',
+      key: 'qrCode',
+      render: (text, record) => {
+        return <a target='_blank' href={text ? clientUp.signatureUrl(text) : ''}> 查看</a>
+      }
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '审核状态' : 'Review the status'}</span>,
+      dataIndex: 'status',
+      key: 'status',
+      render: (text, record) => {
+        return <span>{text == 0 ? '待审核' : text == 1 ? '通过' : text == 2 ? '不通过' : text}</span>
+      }
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '备注' : 'Note the gold'}</span>,
       dataIndex: 'remark',
       key: 'remark',
     },
@@ -168,19 +204,66 @@ const PersonCenter = () => {
       }
     },
     {
-      title: <FormattedMessage id="pages.personCenter.account" defaultMessage="账户" />,
-      dataIndex: 'account',
+      title: <span>{intl.locale === "zh-CN" ? '订单号' : 'The order number'}</span>,
+      dataIndex: 'orderNo',
+      key: 'orderNo',
     },
     {
-      title: <FormattedMessage id="pages.personCenter.uniqueIdentification" defaultMessage="产品唯一标识" />,
-      dataIndex: 'uniqueIdentification',
-      render: (val, record) => {
-        return <span>{intl.locale === "zh-CN" ? gradeZN(val) : val}</span>
+      title: <span>{intl.locale === "zh-CN" ? '所属会员' : 'Its member'}</span>,
+      dataIndex: 'userName',
+      key: 'userName'
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '充值账户' : 'Top-up account'}</span>,
+      dataIndex: 'recommandCode',
+      key: 'recommandCode',
+      render: (text, record, index) => {
+        return <span>{text ? 'GMT' + text : text}</span>
       }
     },
     {
-      title: <FormattedMessage id="pages.personCenter.productName" defaultMessage="产品名称" />,
-      dataIndex: 'productName',
+      title: <FormattedMessage id="pages.personCenter.purchaseType" defaultMessage="购买类型" />,
+      dataIndex: 'purchaseType',
+      key: 'purchaseType',
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '购买金额' : 'Purchase amount'}</span>,
+      dataIndex: 'money',
+      key: 'money',
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '购买等级' : 'Buy rating'}</span>,
+      dataIndex: 'uniqueIdentification',
+      key: 'uniqueIdentification',
+      render: (text, record) => {
+        return <span>{gradeZN(text)}</span>
+      }
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '支付凭证' : 'Payment voucher'}</span>,
+      dataIndex: 'paymentVoucherUrl',
+      key: 'paymentVoucherUrl',
+      render: (text, record) => {
+        return <a target='_blank' href={text ? clientUp.signatureUrl(text) : ''}> 查看</a>
+      }
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '上级推荐号' : 'Superior recommendation Number'}</span>,
+      dataIndex: 'superiorRecommandCode',
+      key: 'superiorRecommandCode',
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '审核状态' : 'Review the status'}</span>,
+      dataIndex: 'payStatus',
+      key: 'payStatus',
+      render: (text, record) => {
+        return <span>{text == 0 ? '待审核' : text == 1 ? '通过' : text == 2 ? '不通过' : text}</span>
+      }
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '审核备注' : 'Review the note'}</span>,
+      dataIndex: 'remark',
+      key: 'remark',
     },
     {
       title: <FormattedMessage id="pages.personCenter.payTime" defaultMessage="购买时间" />,
@@ -198,10 +281,6 @@ const PersonCenter = () => {
       render: (val, record) => {
         return <span>{val}</span>
       }
-    },
-    {
-      title: <FormattedMessage id="pages.personCenter.purchaseType" defaultMessage="购买类型" />,
-      dataIndex: 'purchaseType',
     },
   ];
 
@@ -619,7 +698,7 @@ const PersonCenter = () => {
     //出金提交参数
     balanceParams = {
       realName: userInfo?.realName,
-      account: userInfo.userName ? userInfo.userName : userInfo.iphoneNumber ? userInfo.iphoneNumber : userInfo.emailAdress ? userInfo.emailAdress : '',
+      account: userInfo.recommendationCode ? userInfo.recommendationCode : '',
       cashAmount: formAccout.getFieldValue('cashAmount'),
       qrCode: '1',
       usdLink: formAccout.getFieldValue('usdLink'),
@@ -808,7 +887,7 @@ const PersonCenter = () => {
                   </div>
                   <Radio.Group onChange={getGrade}>
                     {
-                      product.length > 0 ? product.map((p) => (
+                      product?.length > 0 ? product.map((p) => (
                         <Radio.Button key={p.id} value={p} disabled={p.unqiueIdentification == userInfo.agent}>{p.productName}<br />
                           {intl.locale === "zh-CN" ? twoStepZN : twoStepEN}:{intl.locale === "zh-CN" ? gradeZN(p.unqiueIdentification) : p.unqiueIdentification}<br />
                           {intl.locale === "zh-CN" ? threeStepZN : threeStepEN}:{p.productPrice}</Radio.Button>
@@ -940,7 +1019,7 @@ const PersonCenter = () => {
                 name="accountName"
               >
                 <span>
-                  ({userInfo.realName ? userInfo.realName : userInfo.iphoneNumber ? userInfo.iphoneNumber : userInfo.emailAdress ? userInfo.emailAdress : ''})
+                  ({userInfo.recommendationCode ? 'GMT' + userInfo.recommendationCode : ''})
                   {intl.locale === "zh-CN" ? '可提现金额:' : 'Withdrawal amount:'}{userInfo.balance ? userInfo.balance : 0}
                 </span>
               </Form.Item>
