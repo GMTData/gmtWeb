@@ -255,5 +255,7 @@ export default {
   'pages.personCenter.usdtpaymentcode': 'USDT collection qr code',
   'pages.personCenter.usdtAddress': 'USDT wallet address',
   'pages.personCenter.edit': 'Edit',
+  'pages.personCenter.personalData': 'personal data',
+  'pages.personCenter.realNameAuthentication': 'Real-name authentication',
 
 };

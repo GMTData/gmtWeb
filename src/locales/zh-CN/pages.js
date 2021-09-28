@@ -223,7 +223,7 @@ export default {
   'pages.newsNotice.newsHeadlines': '新闻标题',
   'pages.personCenter.accountInfo': '个人信息',
   'pages.personCenter.ID': 'ID',
-  'pages.personCenter.userName': '用户名',
+  'pages.personCenter.userName': '姓名',
   'pages.personCenter.userPassword': '用户密码',
   'pages.personCenter.emailAdress': '邮箱',
   'pages.personCenter.iphoneNumber': '手机号',
@@ -253,5 +253,7 @@ export default {
   'pages.personCenter.usdtpaymentcode': 'USDT收款二维码',
   'pages.personCenter.usdtAddress': 'USDT钱包地址',
   'pages.personCenter.edit': '修改',
+  'pages.personCenter.personalData': '个人资料',
+  'pages.personCenter.realNameAuthentication': '实名认证',
 
 };

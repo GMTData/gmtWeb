@@ -1,4 +1,4 @@
-import { Button, message, Steps, Input, InputNumber, Modal, Pagination, AutoComplete, Tabs, Descriptions, Form, Radio, Table } from 'antd';
+import { Button, message, Steps, Input, InputNumber, Modal, Pagination, AutoComplete, Tabs, Descriptions, Form, Radio, Table, Menu } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useIntl, FormattedMessage, Link } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -56,12 +56,87 @@ let balanceParams = {
 const { Option } = AutoComplete;
 const { TabPane } = Tabs;
 
+const { SubMenu } = Menu;
+
 const PersonCenter = () => {
   /** 国际化配置 */
   const intl = useIntl();
 
   const [form] = Form.useForm();
   const [formRealName] = Form.useForm();
+  const contentWdith = window.innerWidth - 260;//内容区域宽度
+
+
+  // submenu keys of first level
+  const rootSubmenuKeys = ['sub1', 'sub2', 'sub3', 'sub4'];
+
+  const [openKeys, setOpenKeys] = useState(['sub1', 'sub2', 'sub3', 'sub4']);
+  const [keyType, setKeyType] = useState('1')
+
+  const onOpenChange = keys => {
+    const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
+    if (rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
+      setOpenKeys(keys);
+    } else {
+      setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
+    }
+  };
+
+  //设置选中的栏目
+  const onSelectKey = ({ item, key }) => {
+    setKeyType(key)
+    if (key == 3 || key == 4) {
+      getProductList()
+    } else if (key == 7) {
+      queryWithdrawList()
+    } else if (key == 8) {
+      queryCommissionList()
+    } else if (key == 5) {
+      queryPurchaseRecord()
+    }
+
+  }
+
+  const columnsProduct = [
+    {
+      title: <span>{intl.locale === "zh-CN" ? '序号' : 'The serial number'}</span>,
+      dataIndex: 'index',
+      key: 'index',
+      render: (text, record, index) => {
+        return <span>{index + 1} </span>
+      }
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '产品名称' : 'Product name'}</span>,
+      dataIndex: 'productName',
+      key: 'productName',
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '产品价格' : 'Product price'}</span>,
+      dataIndex: 'productPrice',
+      key: 'productPrice',
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '产品等级' : 'Product level'}</span>,
+      dataIndex: 'unqiueIdentification',
+      key: 'unqiueIdentification',
+      render: (text, record) => {
+        return <span>{gradeZN(text)}</span>
+      }
+    },
+    {
+      title: <span>{intl.locale === "zh-CN" ? '是否购买' : 'Whether or not to buy'}</span>,
+      dataIndex: 'isPurchase',
+      key: 'isPurchase',
+      render: (text, record) => {
+        if (text == 1) {
+          return <span>{intl.locale === "zh-CN" ? '已购买' : 'Have to buy'}</span>
+        } else if (text == 2) {
+          return <span>{intl.locale === "zh-CN" ? '未购买' : 'Not to buy'}</span>
+        }
+      }
+    },
+  ];
 
   //佣金记录
   const columnsCommission = [
@@ -157,7 +232,7 @@ const PersonCenter = () => {
       dataIndex: 'qrCode',
       key: 'qrCode',
       render: (text, record) => {
-        return <a target='_blank' href={text ? clientUp.signatureUrl(text) : ''}> 查看</a>
+        return <a target='_blank' href={text ? clientUp.signatureUrl(text) : ''}> {intl.locale === "zh-CN" ? '查看' : 'To view'}</a>
       }
     },
     {
@@ -165,7 +240,13 @@ const PersonCenter = () => {
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => {
-        return <span>{text == 0 ? '待审核' : text == 1 ? '通过' : text == 2 ? '不通过' : text}</span>
+        if (text == 1) {
+          return <span>{intl.locale === "zh-CN" ? '通过' : 'Pass'}</span>
+        } else if (text == 2) {
+          return <span>{intl.locale === "zh-CN" ? '不通过' : 'Not Pass'}</span>
+        } else if (text == 0) {
+          return <span>{intl.locale === "zh-CN" ? '待审核' : 'To audit'}</span>
+        }
       }
     },
     {
@@ -244,7 +325,7 @@ const PersonCenter = () => {
       dataIndex: 'paymentVoucherUrl',
       key: 'paymentVoucherUrl',
       render: (text, record) => {
-        return <a target='_blank' href={text ? clientUp.signatureUrl(text) : ''}> 查看</a>
+        return <a target='_blank' href={text ? clientUp.signatureUrl(text) : ''}> {intl.locale === "zh-CN" ? '查看' : 'To view'}</a>
       }
     },
     {
@@ -257,7 +338,13 @@ const PersonCenter = () => {
       dataIndex: 'payStatus',
       key: 'payStatus',
       render: (text, record) => {
-        return <span>{text == 0 ? '待审核' : text == 1 ? '通过' : text == 2 ? '不通过' : text}</span>
+        if (text == 1) {
+          return <span>{intl.locale === "zh-CN" ? '通过' : 'Pass'}</span>
+        } else if (text == 2) {
+          return <span>{intl.locale === "zh-CN" ? '不通过' : 'Not Pass'}</span>
+        } else if (text == 0) {
+          return <span>{intl.locale === "zh-CN" ? '待审核' : 'To audit'}</span>
+        }
       }
     },
     {
@@ -841,12 +928,300 @@ const PersonCenter = () => {
     }
   }
 
-  console.log(userInfo)
-
   return (
     <PageContainer>
       <div className={styles.tabContent}>
-        <Tabs tabPosition='left' onTabClick={selectTab}>
+        <div>
+          <Menu mode="inline"
+            openKeys={openKeys}
+            defaultSelectedKeys={['1']}
+            onOpenChange={onOpenChange}
+            onSelect={onSelectKey}
+            style={{ display: 'inline-block', width: 200 }}>
+            <SubMenu key="sub1" title={intl.formatMessage({
+              id: 'pages.personCenter.accountInfo',
+              defaultMessage: '个人信息',
+            })}>
+              <Menu.Item key="1" title={intl.locale === "zh-CN" ? '个人资料' : 'personal data'}><FormattedMessage id="pages.personCenter.personalData" defaultMessage="个人资料" /></Menu.Item>
+              <Menu.Item key="2" title={intl.locale === "zh-CN" ? '实名认证' : 'Real-name authentication'}><FormattedMessage id="pages.personCenter.realNameAuthentication" defaultMessage="实名认证" /></Menu.Item>
+            </SubMenu>
+            <SubMenu key="sub2" title={intl.locale === "zh-CN" ? '产品管理' : 'Product management'}>
+              <Menu.Item key="3" title={intl.locale === "zh-CN" ? '产品列表' : 'Product list'}>{intl.locale === "zh-CN" ? '产品列表' : 'Product list'}</Menu.Item>
+              <Menu.Item key="4" title={intl.locale === "zh-CN" ? '产品认购' : 'Product subscription'}>{intl.locale === "zh-CN" ? '产品认购' : 'Product subscription'}</Menu.Item>
+            </SubMenu>
+            <SubMenu key="sub4" title={intl.locale === "zh-CN" ? '资金管理' : 'Money management'}>
+              <Menu.Item key="5" title={intl.locale === "zh-CN" ? '购买记录' : 'Purchase records'}>{intl.locale === "zh-CN" ? '购买记录' : 'Purchase records'}</Menu.Item>
+              <Menu.Item key="6" title={intl.locale === "zh-CN" ? '出金申请' : 'The gold application'}>{intl.locale === "zh-CN" ? '出金申请' : 'The gold application'}</Menu.Item>
+              <Menu.Item key="7" title={intl.locale === "zh-CN" ? '出金记录' : 'The gold record'}>{intl.locale === "zh-CN" ? '出金记录' : 'The gold record'}</Menu.Item>
+            </SubMenu>
+            <SubMenu key="sub4" title={intl.locale === "zh-CN" ? '收益管理' : 'Revenue management'}>
+              <Menu.Item key="8" title={intl.locale === "zh-CN" ? '佣金记录' : 'Commission record'}>{intl.locale === "zh-CN" ? '佣金记录' : 'Commission record'}</Menu.Item>
+            </SubMenu>
+          </Menu>
+          <div style={{ display: 'inline-block', position: 'absolute', width: contentWdith, marginLeft: 20, height: '100%', overflowY: 'scroll' }}>
+            {keyType == '1' ?
+              <div style={{ marginLeft: 200 }}>
+                <Descriptions column={1} title={intl.formatMessage({
+                  id: 'pages.personCenter.personalData',
+                  defaultMessage: '个人资料',
+                })}>
+                  <Descriptions.Item label={intl.formatMessage({
+                    id: 'pages.personCenter.ID',
+                    defaultMessage: '账户',
+                  })}>{userInfo.recommendationCode ? userInfo.recommendationCode : ''}</Descriptions.Item>
+                  <Descriptions.Item label={intl.formatMessage({
+                    id: 'pages.personCenter.userName',
+                    defaultMessage: '姓名',
+                  })}>{userInfo.realName ? userInfo.realName : intl.locale === "zh-CN" ? '未实名' : 'No real name'}</Descriptions.Item>
+                  <Descriptions.Item label={intl.formatMessage({
+                    id: 'pages.personCenter.emailAdress',
+                    defaultMessage: '邮箱',
+                  })}>{userInfo.emailAdress ? userInfo.emailAdress : ''}<a onClick={() => showModalInfo(1)}><EditOutlined /><FormattedMessage id="pages.personCenter.edit" defaultMessage='修改' /></a></Descriptions.Item>
+                  <Descriptions.Item label={intl.formatMessage({
+                    id: 'pages.personCenter.iphoneNumber',
+                    defaultMessage: '手机号',
+                  })}>{userInfo.iphoneNumber ? userInfo.iphoneNumber : ''}<a onClick={() => showModalInfo(2)}><EditOutlined /><FormattedMessage id="pages.personCenter.edit" defaultMessage='修改' /></a></Descriptions.Item>
+                  <Descriptions.Item label={intl.formatMessage({
+                    id: 'pages.personCenter.recommendationCode',
+                    defaultMessage: '我的邀请码',
+                  })}>{userInfo.recommendationCode ? userInfo.recommendationCode : ''}</Descriptions.Item>
+
+                </Descriptions>
+              </div>
+              : keyType == '2' ?
+                <div style={{ marginLeft: 200 }}>
+                  <Descriptions column={1} title={intl.formatMessage({
+                    id: 'pages.personCenter.realNameAuthentication',
+                    defaultMessage: '实名认证',
+                  })}>
+                    <Descriptions.Item label={intl.formatMessage({
+                      id: 'pages.personCenter.ID',
+                      defaultMessage: 'ID',
+                    })}>{userInfo.recommendationCode ? userInfo.recommendationCode : ''}</Descriptions.Item>
+                    <Descriptions.Item label={intl.formatMessage({
+                      id: 'pages.personCenter.userName',
+                      defaultMessage: '姓名',
+                    })}>{userInfo.userName ? userInfo.userName : ''}<a onClick={() => showModalInfo(0)}><EditOutlined /><FormattedMessage id="pages.personCenter.edit" defaultMessage='修改' /></a></Descriptions.Item>
+                    <Descriptions.Item label={intl.formatMessage({
+                      id: 'pages.personCenter.userPassword',
+                      defaultMessage: '用户密码',
+                    })}><a onClick={showModal}><EditOutlined /><FormattedMessage id="pages.personCenter.edit" defaultMessage='修改' /></a></Descriptions.Item>
+                    <Descriptions.Item label={intl.formatMessage({
+                      id: 'pages.personCenter.emailAdress',
+                      defaultMessage: '邮箱',
+                    })}>{userInfo.emailAdress ? userInfo.emailAdress : ''}<a onClick={() => showModalInfo(1)}><EditOutlined /><FormattedMessage id="pages.personCenter.edit" defaultMessage='修改' /></a></Descriptions.Item>
+                    <Descriptions.Item label={intl.formatMessage({
+                      id: 'pages.personCenter.iphoneNumber',
+                      defaultMessage: '手机号',
+                    })}>{userInfo.iphoneNumber ? userInfo.iphoneNumber : ''}<a onClick={() => showModalInfo(2)}><EditOutlined /><FormattedMessage id="pages.personCenter.edit" defaultMessage='修改' /></a></Descriptions.Item>
+                    <Descriptions.Item label={intl.formatMessage({
+                      id: 'pages.personCenter.recommendationCode',
+                      defaultMessage: '我的邀请码',
+                    })}>{userInfo.recommendationCode ? userInfo.recommendationCode : ''}</Descriptions.Item>
+                    <Descriptions.Item label={intl.formatMessage({
+                      id: 'pages.personCenter.superiorRecommendationCode',
+                      defaultMessage: '上级邀请码',
+                    })}>{userInfo.superiorRecommendationCode ? userInfo.superiorRecommendationCode : ''}</Descriptions.Item>
+                    <Descriptions.Item label={intl.formatMessage({
+                      id: 'pages.personCenter.realName',
+                      defaultMessage: '实名信息',
+                    })}>{userInfo.realName ? userInfo.realName : ''}{!isEmpty(userInfo.identityNumber) ? <span><CheckOutlined />{intl.locale === "zh-CN" ? '已认证' : 'certified'}</span> : <a onClick={showModalRealName}><EditOutlined />{intl.locale === "zh-CN" ? '去认证' : 'Go to the certification'}</a>}</Descriptions.Item>
+                    {
+                      userInfo.identityNumber ?
+                        <Descriptions.Item label={intl.locale === "zh-CN" ? '身份证' : 'Id card'}>
+                          {userInfo.identityNumber ? userInfo.identityNumber : ''}
+                          <br />
+                          <img src={clientUp.signatureUrl(userInfo?.identityCardUrlPositive)} style={{ width: 320 }} />
+                          <br />
+                          <img src={clientUp.signatureUrl(userInfo?.identityCardUrlReverse)} style={{ width: 320 }} />
+                        </Descriptions.Item>
+                        : ''
+                    }
+                    <Descriptions.Item label={intl.formatMessage({
+                      id: 'pages.personCenter.gatheringInfor',
+                      defaultMessage: '收款信息',
+                    })}>{!isEmpty(userInfo.identityNumber) ? <span><CheckOutlined />{intl.locale === "zh-CN" ? '已认证' : 'certified'}</span> : <a onClick={showModalRealName}><EditOutlined />{intl.locale === "zh-CN" ? '去认证' : 'Go to the certification'}</a>}</Descriptions.Item>
+                  </Descriptions>
+                </div>
+                : keyType == '3' ?
+                  <div>
+                    <Table columns={columnsProduct} dataSource={product} rowKey={(record) => record.id} />
+                  </div>
+                  : keyType == '4' ?
+                    <div style={{ marginLeft: 200 }}>
+                      {
+                        current == 0 ?
+                          <div>
+                            <div style={{ marginBottom: 20 }}>
+                              {intl.locale === "zh-CN" ? oneStepZN : oneStepEn}
+                            </div>
+                            <Radio.Group onChange={getGrade}>
+                              {
+                                product?.length > 0 ? product.map((p) => (
+                                  <Radio.Button key={p.id} value={p} disabled={p.isPurchase == 1}>{p.productName}<br />
+                                    {intl.locale === "zh-CN" ? twoStepZN : twoStepEN}:{intl.locale === "zh-CN" ? gradeZN(p.unqiueIdentification) : p.unqiueIdentification}<br />
+                                    {intl.locale === "zh-CN" ? threeStepZN : threeStepEN}:{p.productPrice}</Radio.Button>
+                                )) : ''
+                              }
+                            </Radio.Group>
+                            <div style={{ marginBottom: 20, marginTop: 20 }}>{intl.locale === "zh-CN" ? fourStepZN : fourStepEN}</div>
+                            <div>
+                              {intl.locale === "zh-CN" ? fiveStepZN : fiveStepEN}: {money}
+                            </div>
+                            <div>{intl.locale === "zh-CN" ? sixStepZN : sixStepEN}</div>
+                          </div> :
+                          current == 1 ?
+                            <div>
+                              <Descriptions column={1} title={intl.formatMessage({
+                                id: 'pages.personCenter.payInfo',
+                                defaultMessage: '收款信息',
+                              })}>
+                                <Descriptions.Item label={intl.formatMessage({
+                                  id: 'pages.personCenter.usdtpaymentcode',
+                                  defaultMessage: 'USDT收款二维码',
+                                })}> <img src={payment} width='50%' /></Descriptions.Item>
+                                <Descriptions.Item label={intl.formatMessage({
+                                  id: 'pages.personCenter.usdtAddress',
+                                  defaultMessage: 'USDT钱包地址',
+                                })}>0x36fd870bb2F70887819A5105828568E2C890f16E</Descriptions.Item>
+                              </Descriptions>
+                            </div>
+                            :
+                            current == 2 ?
+                              //第三步
+
+                              <div>
+                                <span className={styles.imgSpan}>
+                                  <FormattedMessage
+                                    id="pages.personCenter.payment"
+                                    defaultMessage='付款凭证'
+                                  />
+                                  <br />
+                                  <span>
+                                    {imgUrlPay ? <img src={imgUrlPay} /> : ''}
+                                  </span>
+                                </span>
+                                <label for="inputFilePay" class="button">
+                                  <span className={styles.uploadBtn}>
+                                    <FormattedMessage
+                                      id="pages.personCenter.chooseFile"
+                                      defaultMessage="选择文件"
+                                    />
+                                  </span>
+                                </label>
+                                <input type="file" id="inputFilePay" style={{ display: 'none' }} onChange={getFilePay} />
+                              </div> : ''
+                      }
+                      <div className="steps-action">
+                        {current < 3 - 1 && money != 0 && (
+                          <Button type="primary" onClick={() => next()}>
+                            {intl.locale === "zh-CN" ? '下一步' : 'The next step'}
+                          </Button>
+                        )}
+                        {current === 3 - 1 && (
+                          <Button type="primary" onClick={payMoneyOrder}>
+                            {intl.locale === "zh-CN" ? '生成订单' : ' To generate orders'}
+                          </Button>
+                        )}
+                        {current > 0 && (
+                          <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
+                            {intl.locale === "zh-CN" ? '上一步' : 'The previous step'}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    : keyType == '5' ?
+                      <div>
+                        <Table columns={columnsPurchase} dataSource={purchase} scroll={{ x: 1900 }} rowKey={(record) => record.id} pagination={false} />
+                        <Pagination
+                          style={{ marginTop: 10, float: 'right' }}
+                          total={purchaseData ? purchaseData.total : 0}
+                          showTotal={(total) => `${pageTotal} ${purchaseData?.total} ${pageItems} `}
+                          current={cutPagePurchase ? cutPagePurchase : 1}
+                          onChange={onChangePurchase}
+                          showSizeChanger={onShowSizeChangePurchase} />
+                      </div>
+                      : keyType == '6' ?
+                        <div style={{ marginLeft: 150 }}>
+                          <Form
+                            form={formAccout}
+                            name="accout"
+                            labelCol={{
+                              span: 6,
+                            }}
+                            wrapperCol={{
+                              span: 12,
+                            }}
+                            autoComplete="off"
+                          >
+                            <Form.Item
+                              label={intl.locale === "zh-CN" ? '出金账户' : 'The gold account'}
+                              name="accountName"
+                            >
+                              <span>
+                                ({userInfo.recommendationCode ? 'GMT' + userInfo.recommendationCode : ''})
+                                {intl.locale === "zh-CN" ? '可提现金额:' : 'Withdrawal amount:'}{userInfo.balance ? userInfo.balance : 0}
+                              </span>
+                            </Form.Item>
+                            <Form.Item
+                              name="cashAmount"
+                              label={intl.locale === "zh-CN" ? '提现金额' : 'Withdrawal amount'}
+                              rules={[
+                                {
+                                  required: true,
+                                }
+                              ]}
+                            >
+                              <InputNumber />
+                            </Form.Item>
+                            <Form.Item
+                              name="usdLink"
+                              label={intl.locale === "zh-CN" ? 'USDT钱包地址' : 'USDT wallet address'}
+                            >
+                              <Input disabled />
+                            </Form.Item>
+                            <Form.Item
+                              name="remark"
+                              label={intl.locale === "zh-CN" ? '备注' : 'remark'}
+                            >
+                              <Input />
+                            </Form.Item>
+                            <Form.Item
+                              name="operate"
+                              label=""
+                            >
+                              <Button style={{ marginLeft: '50%' }} onClick={balanceSubmitter}>{intl.locale === "zh-CN" ? '提交申请' : 'Submit an application'}</Button>
+                            </Form.Item>
+                          </Form>
+                        </div>
+                        : keyType == '7' ?
+                          <div>
+                            <Table columns={columnsWithdraw} dataSource={withdraw} rowKey={(record) => record.id} pagination={false} />
+                            <Pagination
+                              style={{ marginTop: 10, float: 'right' }}
+                              total={withdrawData ? withdrawData.total : 0}
+                              showTotal={(total) => `${pageTotal} ${withdrawData?.total} ${pageItems} `}
+                              current={cutPage ? cutPage : 1}
+                              onChange={onChangeWithdraw}
+                              showSizeChanger={onShowSizeChangeWithdraw} />
+                          </div>
+                          : keyType == '8' ?
+                            <div>
+                              <Table columns={columnsCommission} dataSource={commission} rowKey={(record) => record.id} pagination={false} />
+                              <Pagination
+                                style={{ marginTop: 10, float: 'right' }}
+                                total={commissionData ? commissionData.total : 0}
+                                showTotal={(total) => `${pageTotal} ${commissionData?.total} ${pageItems} `}
+                                current={cutPageCommission ? cutPageCommission : 1}
+                                onChange={onChangeCommission}
+                                showSizeChanger={onShowSizeChangeCommission} />
+                            </div>
+                            : ''}
+          </div>
+        </div>
+
+
+        {/* <Tabs tabPosition='left' onTabClick={selectTab}>
           <TabPane tab={intl.formatMessage({
             id: 'pages.personCenter.accountInfo',
             defaultMessage: '个人信息',
@@ -1085,7 +1460,7 @@ const PersonCenter = () => {
               </Form.Item>
             </Form>
           </TabPane>
-        </Tabs>
+        </Tabs> */}
 
         <Modal visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}
           title={
