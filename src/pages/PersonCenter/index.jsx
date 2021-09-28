@@ -446,18 +446,18 @@ const PersonCenter = () => {
   //修改密码
   const getChangePassWord = (item) => {
     if (isEmpty(item.newPassword) || isEmpty(item.oldPassword) || isEmpty(item.againNewPassword)) {
-      message.error('请填写完整')
+      message.error(intl.locale === "zh-CN" ? '请填写完整' : 'Please complete')
       return false
     }
     if (!isEmpty(item.newPassword) && !isEmpty(item.againNewPassword)) {
       if (item.newPassword !== item.againNewPassword) {
-        message.error('两次输入密码不一致')
+        message.error(intl.locale === "zh-CN" ? '两次输入密码不一致' : 'The two passwords are inconsistent')
         return false
       }
     }
 
     if (!passwordReg.test(item.newPassword) || !passwordReg.test(item.oldPassword) || !passwordReg.test(item.againNewPassword)) {
-      message.error('密码格式不合规')
+      message.error(intl.locale === "zh-CN" ? '密码格式不合规' : 'The password format is invalid')
       return false
     }
 
@@ -577,6 +577,19 @@ const PersonCenter = () => {
     paramsRealName.usdLink = formRealName.getFieldValue('uuidPay');
     paramsRealName.identityNumber = formRealName.getFieldValue('cardNo');
 
+    if (isEmpty(paramsRealName.realName) || isEmpty(paramsRealName.usdLink) || isEmpty(paramsRealName.identityNumber)) {
+      message.error(intl.locale === "zh-CN" ? '请填写完整' : 'Please complete')
+      return false
+    }
+    if (isEmpty(paramsRealName.identityCardUrlPositive) || isEmpty(paramsRealName.identityCardUrlReverse)) {
+      message.error(intl.locale === "zh-CN" ? '身份信息请上传完整' : 'Please upload complete identity information')
+      return false
+    }
+    if (isEmpty(paramsRealName.prCode)) {
+      message.error(intl.locale === "zh-CN" ? '收款码请上传' : 'Please upload the payment code')
+      return false
+    }
+
     const res = await insertDatum(paramsRealName)
     if (res?.state) {
       message.success('success')
@@ -671,6 +684,11 @@ const PersonCenter = () => {
     orderParasm.uniqueIdentification = productObj.uniqueIdentification;
     orderParasm.productName = productObj.productName;
     orderParasm.money = productObj.money;
+    if (isEmpty(orderParasm.paymentVoucherUrl)) {
+      message.error(intl.locale === "zh-CN" ? '付款凭证请上传' : ' Please upload the payment voucher')
+      return false
+    }
+
     const res = await generateOrder(orderParasm);
     if (res?.state) {
       message.success(res?.message)
@@ -823,6 +841,8 @@ const PersonCenter = () => {
     }
   }
 
+  console.log(userInfo)
+
   return (
     <PageContainer>
       <div className={styles.tabContent}>
@@ -868,6 +888,17 @@ const PersonCenter = () => {
                   id: 'pages.personCenter.realName',
                   defaultMessage: '实名信息',
                 })}>{userInfo.realName ? userInfo.realName : ''}{!isEmpty(userInfo.identityNumber) ? <span><CheckOutlined />{intl.locale === "zh-CN" ? '已认证' : 'certified'}</span> : <a onClick={showModalRealName}><EditOutlined />{intl.locale === "zh-CN" ? '去认证' : 'Go to the certification'}</a>}</Descriptions.Item>
+                {
+                  userInfo.identityNumber ?
+                    <Descriptions.Item label={intl.locale === "zh-CN" ? '身份证' : 'Id card'}>
+                      {userInfo.identityNumber ? userInfo.identityNumber : ''}
+                      <br />
+                      <img src={clientUp.signatureUrl(userInfo?.identityCardUrlPositive)} style={{ width: 320 }} />
+                      <br />
+                      <img src={clientUp.signatureUrl(userInfo?.identityCardUrlReverse)} style={{ width: 320 }} />
+                    </Descriptions.Item>
+                    : ''
+                }
                 <Descriptions.Item label={intl.formatMessage({
                   id: 'pages.personCenter.gatheringInfor',
                   defaultMessage: '收款信息',
@@ -888,7 +919,7 @@ const PersonCenter = () => {
                   <Radio.Group onChange={getGrade}>
                     {
                       product?.length > 0 ? product.map((p) => (
-                        <Radio.Button key={p.id} value={p} disabled={p.unqiueIdentification == userInfo.agent}>{p.productName}<br />
+                        <Radio.Button key={p.id} value={p} disabled={p.isPurchase == 1}>{p.productName}<br />
                           {intl.locale === "zh-CN" ? twoStepZN : twoStepEN}:{intl.locale === "zh-CN" ? gradeZN(p.unqiueIdentification) : p.unqiueIdentification}<br />
                           {intl.locale === "zh-CN" ? threeStepZN : threeStepEN}:{p.productPrice}</Radio.Button>
                       )) : ''
@@ -990,7 +1021,7 @@ const PersonCenter = () => {
             id: 'pages.personCenter.purchaseRecords',
             defaultMessage: '购买记录',
           })} key="5">
-            <Table columns={columnsPurchase} dataSource={purchase} rowKey={(record) => record.id} pagination={false} />
+            <Table columns={columnsPurchase} dataSource={purchase} scroll={{ x: 1900 }} rowKey={(record) => record.id} pagination={false} />
             <Pagination
               style={{ marginTop: 10, float: 'right' }}
               total={purchaseData ? purchaseData.total : 0}

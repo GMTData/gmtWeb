@@ -178,6 +178,11 @@ const WelcomeHome = () => {
     history.push(`/personCenter`)
   }
 
+  //to F10页面
+  const toF10Page = () => {
+    history.push(`/dataAnalysis`)
+  }
+
   return (
     <PageContainer loading={loadingState}>
       <div className={styles.homeContent} style={{ width: contentWdith }}>
@@ -207,10 +212,10 @@ const WelcomeHome = () => {
                 <span className={styles.useName}>{userInfo.userName ? userInfo.userName : userInfo.emailAdress ? userInfo.emailAdress : ''}</span>
                 <span style={{ marginTop: 8, textAlign: 'center', display: 'block' }}>ID：GMT{userInfo?.recommendationCode}</span>
                 <div className={styles.useInfoSpace}></div>
-                <div className={styles.textLeft}><img src={ic_phone} className={styles.iconRight8} />联系方式：{userInfo.iphoneNumber ? userInfo.iphoneNumber : userInfo.emailAdress ? userInfo.emailAdress : ''}</div>
-                <div className={styles.textLeft}><img src={ic_level} className={styles.iconRight8} />会员等级：<img src={ic_member} />{intl.locale === "zh-CN" ? gradeZN(userInfo?.agent) : userInfo?.agent}</div>
+                <div className={styles.textLeft}><img src={ic_phone} className={styles.iconRight8} />{intl.locale === "zh-CN" ? '联系方式：' : 'Contact information:'}{userInfo.iphoneNumber ? userInfo.iphoneNumber : userInfo.emailAdress ? userInfo.emailAdress : ''}</div>
+                <div className={styles.textLeft}><img src={ic_level} className={styles.iconRight8} />{intl.locale === "zh-CN" ? '会员等级：' : 'Membership level:'}<img src={ic_member} />{intl.locale === "zh-CN" ? gradeZN(userInfo?.agent) : userInfo?.agent}</div>
                 <div className={styles.vipBg} onClick={toCenter}>
-                  <span className={styles.forwardVip} ><img src={ic_member} className={styles.iconVip} />前往会员中心</span>
+                  <span className={styles.forwardVip} ><img src={ic_member} className={styles.iconVip} />{intl.locale === "zh-CN" ? '前往会员中心' : 'Go to the Member Centre'}</span>
                   <img src={ic_forward} className={styles.iconForward} />
                 </div>
               </div>
@@ -237,55 +242,58 @@ const WelcomeHome = () => {
             </div>
             <div style={{ width: '100%' }} className={styles.twoLevel}>
               <div className={styles.infoLine}>
-                <div><img src={ic_shares} className={styles.iconRight} />股票</div>
+                <div><img src={ic_shares} className={styles.iconRight} />{intl.locale === "zh-CN" ? '股票' : 'stock'}</div>
                 <div className={styles.infoLineTwo}>
-                  <span>深度资料</span>
-                  <span>自选股</span>
+                  <span onClick={toF10Page}>{intl.locale === "zh-CN" ? '深度资料' : 'The depth of the data'}</span>
+                  {intl.locale === "zh-CN" ? '' : <br />}
+                  <span onClick={toF10Page}>{intl.locale === "zh-CN" ? '自选股' : 'free'}</span>
                 </div>
               </div>
               <div className={styles.infoSpace}></div>
               <div className={styles.infoLine}>
-                <div><img src={ic_news} className={styles.iconRight} />资讯</div>
+                <div><img src={ic_news} className={styles.iconRight} />{intl.locale === "zh-CN" ? '资讯' : 'information'}</div>
                 <div className={styles.infoLineTwo}>
-                  <span>财经新闻</span>
-                  <span>公司公告</span>
+                  <span onClick={toF10Page}>{intl.locale === "zh-CN" ? '财经新闻' : 'Financial news'}</span>
+                  {intl.locale === "zh-CN" ? '' : <br />}
+                  <span onClick={toF10Page}>{intl.locale === "zh-CN" ? '公司公告' : 'The company announcement'}</span>
                 </div>
               </div>
               <div className={styles.infoSpace}></div>
               <div className={styles.infoLine}>
-                <div><img src={ic_quotation} className={styles.iconRight} />行情</div>
+                <div><img src={ic_quotation} className={styles.iconRight} />{intl.locale === "zh-CN" ? '行情' : 'The market'}</div>
                 <div className={styles.infoLineTwo}>
-                  <span>沪深市场</span>
-                  <span>全球市场</span>
+                  <span onClick={toF10Page}>{intl.locale === "zh-CN" ? '沪深市场' : 'Shanghai and shenzhen markets'}</span>
+                  {intl.locale === "zh-CN" ? '' : <br />}
+                  <span onClick={toF10Page}>{intl.locale === "zh-CN" ? '全球市场' : 'The global market'}</span>
                 </div>
               </div>
               <div className={styles.infoSpace}></div>
               <div className={styles.infoLine}>
-                <div><img src={ic_exchange} className={styles.iconRight} />外汇</div>
+                <div><img src={ic_exchange} className={styles.iconRight} />{intl.locale === "zh-CN" ? '外汇' : 'Foreign currency'}</div>
                 <div className={styles.infoLineTwo}>
-                  <span>外汇概括</span>
+                  <span onClick={toF10Page}>{intl.locale === "zh-CN" ? '外汇概括' : 'Foreign exchange summary'}</span>
                 </div>
               </div>
               <div className={styles.infoSpace}></div>
               <div className={styles.infoLine}>
-                <div><img src={ic_futures} className={styles.iconRight} />期货</div>
+                <div><img src={ic_futures} className={styles.iconRight} />{intl.locale === "zh-CN" ? '期货' : 'futures'}</div>
                 <div className={styles.infoLineTwo}>
-                  <span>期货概括</span>
+                  <span onClick={toF10Page}>{intl.locale === "zh-CN" ? '期货概括' : 'Futures generalization'}</span>
                 </div>
               </div>
             </div>
           </div>
           <div style={{ width: stockWidth, marginLeft: sixteen }} className={styles.twoLevel}>
             <div className={styles.titleLine}>
-              <span className={styles.titleTxt}>热门股票</span>
+              <span className={styles.titleTxt}>{intl.locale === "zh-CN" ? '热门股票' : 'Hot stocks'}</span>
               {/* <span className={styles.more}>更多<RightOutlined /></span> */}
             </div>
             <div>
               <Row className={styles.listLine}>
-                <Col span={6}>代码</Col>
-                <Col span={6}>简称</Col>
-                <Col span={6}>最新价</Col>
-                <Col span={6}>涨跌幅</Col>
+                <Col span={6}>{intl.locale === "zh-CN" ? '代码' : 'code'}</Col>
+                <Col span={6}>{intl.locale === "zh-CN" ? '简称' : 'Referred to as'}</Col>
+                <Col span={6}>{intl.locale === "zh-CN" ? '最新价' : 'The latest price'}</Col>
+                <Col span={6}>{intl.locale === "zh-CN" ? '涨跌幅' : 'applies'}</Col>
               </Row>
               {
                 stockState.length > 0 ? stockState.map((item) => (
@@ -302,7 +310,7 @@ const WelcomeHome = () => {
           </div>
           <div style={{ width: newsWidth, marginLeft: sixteen }} className={styles.twoLevel}>
             <div className={styles.titleLine}>
-              <span className={styles.titleTxt}>热门新闻</span>
+              <span className={styles.titleTxt}>{intl.locale === "zh-CN" ? '热门新闻' : 'Hot news'}</span>
               {/* <span className={styles.more}>更多<RightOutlined /></span> */}
             </div>
             <div>

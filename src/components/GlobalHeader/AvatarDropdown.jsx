@@ -40,7 +40,10 @@ class AvatarDropdown extends React.Component {
         {(
           <Menu.Item key="center">
             <UserOutlined />
-            个人中心
+            <FormattedMessage
+            id="menu.account.center"
+            defaultMessage="个人中心"
+          />
           </Menu.Item>
         )}
         {menu && (
