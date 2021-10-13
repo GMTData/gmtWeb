@@ -53,8 +53,8 @@ const ResearchReport = (props) => {
     //研究报告
     let params = {
         ric: '',
-        startTime: moment(timeSpan(7).startDate).format(dateFormat),
-        endTime: moment(timeSpan(7).endDate).format(dateFormat),
+        startTime: moment(timeSpan(90).startDate).format(dateFormat),
+        endTime: moment(timeSpan(90).endDate).format(dateFormat),
         accessToken: userInfo.accessToken
     }
 
@@ -134,7 +134,7 @@ const ResearchReport = (props) => {
                     <FormattedMessage id="pages.tradingValuation.timeRange" defaultMessage="时间范围:" />
                     <RangePicker name='timeRange'
                         className={styles.timeContentLeft}
-                        defaultValue={[moment(timeSpan(7).startDate, dateFormat), moment(timeSpan(7).endDate, dateFormat)]}
+                        defaultValue={[moment(timeSpan(90).startDate, dateFormat), moment(timeSpan(90).endDate, dateFormat)]}
                         onChange={(e) => setTimeData(e)} />
                 </div>
                 <div>

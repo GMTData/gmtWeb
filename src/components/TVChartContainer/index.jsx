@@ -90,10 +90,18 @@ export class TVChartContainer extends React.PureComponent {
 		let widgetOptions = {
 
 		};
+
+		if (ric && ric.indexOf('.') != -1) {
+			ric = ric.split('.')[0]
+		}
 		//判断是否有权限
 		if (this.state.dataFlag) {
 			if (this.props.symbol == 'AAPL.O') {
 				this.props.symbol = 'AAPl'
+			} else {
+				if ((this.props.symbol).indexOf('.') != -1) {
+					this.props.symbol = (this.props.symbol).split('.')[0]
+				}
 			}
 			widgetOptions = {
 				theme: 'Dark',

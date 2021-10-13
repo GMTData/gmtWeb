@@ -114,8 +114,8 @@ const SignificantEvent = (props) => {
     let eventParams = {
         ric: "",  //可以为空
         topics: [],  //股票的分类 跟公告接口传参一样。
-        startTime: moment(timeSpan(7).startDate).format(dateFormat),
-        endTime: moment(timeSpan(7).endDate).format(dateFormat),
+        startTime: moment(timeSpan(90).startDate).format(dateFormat),
+        endTime: moment(timeSpan(90).endDate).format(dateFormat),
         maxNumberOfItems: 100,
         accessToken: userInfo.accessToken
     }
@@ -123,8 +123,8 @@ const SignificantEvent = (props) => {
     //股利参数
     let dividendsParams = {
         ric: "",  //可以为空
-        startTime: moment(timeSpan(107).startDate).format(dateFormat),
-        endTime: moment(timeSpan(107).endDate).format(dateFormat),
+        startTime: moment(timeSpan(90).startDate).format(dateFormat),
+        endTime: moment(timeSpan(90).endDate).format(dateFormat),
         accessToken: userInfo.accessToken,
         pageNumber: 1,
         recordsPerPage: 10
@@ -297,7 +297,7 @@ const SignificantEvent = (props) => {
                             <FormattedMessage id="pages.tradingValuation.timeRange" defaultMessage="时间范围:" />
                             <RangePicker name='timeRange'
                                 className={styles.timeContentLeft}
-                                defaultValue={[moment(timeSpan(7).startDate, dateFormat), moment(timeSpan(7).endDate, dateFormat)]}
+                                defaultValue={[moment(timeSpan(90).startDate, dateFormat), moment(timeSpan(90).endDate, dateFormat)]}
                                 onChange={(e) => setTimeData(e)} />
                             {(keyType == 701 || keyType == 0) ?
                                 <span style={{ marginLeft: '32px' }}>

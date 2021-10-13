@@ -86,13 +86,13 @@ const Executives = (props) => {
                 return <span>{record.NameAndTitle.PersonalInfo.Info[6].Value ? new Date().getFullYear() - parseInt(record.NameAndTitle.PersonalInfo.Info[6].Value) : ''}</span>
             }
         },
-        {
-            title: <FormattedMessage id="pages.Executives.introduction" defaultMessage="简介" />,
-            dataIndex: 'introduction',
-            render: (val, record) => {
-                return <span>{rowKeys.length > 0 ? <DownCircleOutlined onClick={() => open(record)} /> : <RightCircleOutlined onClick={() => open(record)} />}</span>
-            }
-        },
+        // {
+        //     title: <FormattedMessage id="pages.Executives.introduction" defaultMessage="简介" />,
+        //     dataIndex: 'introduction',
+        //     render: (val, record) => {
+        //         return <span>{rowKeys.length > 0 ? <DownCircleOutlined onClick={() => open(record)} /> : <RightCircleOutlined onClick={() => open(record)} />}</span>
+        //     }
+        // },
     ];
 
     return (

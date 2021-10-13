@@ -166,28 +166,28 @@ const PeerComparison = (props) => {
                                     res.data.financialStatements[fs][v].map((y) => {
                                         y.lineItemObject.map((l) => {
                                             if (l.coaCode == 'SCOR') {
-                                                SCOR = l.Value;
+                                                SCOR = Number(l.Value);
                                             }
                                             if (l.coaCode == 'RTLR') {
-                                                RTLR = l.Value;
+                                                RTLR = Number(l.Value);
                                             }
                                             if (l.coaCode == 'LTLL') {
-                                                LTLL = l.Value;
+                                                LTLL = Number(l.Value);
                                             }
                                             if (l.coaCode == 'LMIN') {
-                                                LMIN = l.Value;
+                                                LMIN = Number(l.Value);
                                             }
                                             if (l.coaCode == 'QTLE') {
-                                                QTLE = l.Value;
+                                                QTLE = Number(l.Value);
                                             }
                                             if (l.coaCode == 'CIAC') {
-                                                CIAC = l.Value;
+                                                CIAC = Number(l.Value);
                                             }
                                             if (l.coaCode == 'ATOT') {
-                                                ATOT = l.Value;
+                                                ATOT = Number(l.Value);
                                             }
                                             if (l.coaCode == 'SOPI') {
-                                                SOPI = l.Value;
+                                                SOPI = Number(l.Value);
                                             }
                                         })
 
@@ -463,7 +463,7 @@ const PeerComparison = (props) => {
                         <div className={styles.titilePeer}>
                             <Row>
                                 <Col span={4}>{intl.locale === "zh-CN" ? '代码' : 'code'}</Col>
-                                <Col span={4}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as"'}</Col>
+                                <Col span={4}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as'}</Col>
                                 <Col span={16}>
                                     <span className={styles.spanPeer}>
                                         <div>{titleTypeRatio}</div>
@@ -595,7 +595,7 @@ const PeerComparison = (props) => {
                             <div className={styles.titilePeer}>
                                 <Row>
                                     <Col span={4}>{intl.locale === "zh-CN" ? '代码' : 'code'}</Col>
-                                    <Col span={4}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as"'}</Col>
+                                    <Col span={4}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as'}</Col>
                                     <Col span={16}>
                                         <span className={styles.spanPeer}>
                                             <div>{titleType}</div>
@@ -712,7 +712,7 @@ const PeerComparison = (props) => {
                                 <div className={styles.titilePeer}>
                                     <Row>
                                         <Col span={3}>{intl.locale === "zh-CN" ? '代码' : 'code'}</Col>
-                                        <Col span={6}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as"'}</Col>
+                                        <Col span={6}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as'}</Col>
                                         <Col span={3}>{intl.locale === "zh-CN" ? '季度收盘价' : 'Quarterly closing price'}</Col>
                                         {/* <Col span={3}>{intl.locale === "zh-CN" ? '每股现金流' : 'Cash flow per share'}</Col> */}
                                         <Col span={12}>
@@ -753,8 +753,8 @@ const PeerComparison = (props) => {
                                 <div>
                                     <div className={styles.titilePeer}>
                                         <Row>
-                                            <Col span={4}>{intl.locale === "zh-CN" ? '代码' : 'code'}</Col>
-                                            <Col span={4}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as"'}</Col>
+                                            <Col span={3}>{intl.locale === "zh-CN" ? '代码' : 'code'}</Col>
+                                            <Col span={3}>{intl.locale === "zh-CN" ? '证券简称' : 'The securities referred to as'}</Col>
                                             <Col span={3}>{intl.locale === "zh-CN" ? '52周最高(前复权)' : '52 weeks maximum (previous recovery)'}</Col>
                                             <Col span={3}>{intl.locale === "zh-CN" ? '52周最低(前复权)' : '52 weeks minimum (previous recovery)'}</Col>
                                             <Col span={12} className={styles.spanPeer}>

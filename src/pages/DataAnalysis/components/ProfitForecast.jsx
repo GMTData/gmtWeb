@@ -17,18 +17,21 @@ const balType = 'Balance Sheet';
 const { RangePicker } = DatePicker;
 let dateFormat = 'YYYY';
 
+let forecastParams = {
+    ric: '',
+    startYear: '',
+    endYear: '',
+    accessToken: ''
+}
+
 const ProfitForecast = (props) => {
     const { keyType, ric, allData } = props;
     const userInfo = getAuthority();//获取用户相关信息
     const [oneInfoTitle, setOneInfoTitle] = useState('');//一级名称
     //资产负债表、损益表、现金流量预测数据    
-    let forecastParams = {
-        ric: allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol?.Value,
-        // ric: 'AAPL.O',
-        startYear: yearScope(5).startYear,
-        endYear: yearScope(5).endYear,
-        accessToken: userInfo.accessToken
-    }
+    forecastParams.ric = allData?.GetShareholdersReport_Response_1?.SymbolReport?.Symbol?.Value;
+    forecastParams.accessToken = userInfo.accessToken
+
     /** 国际化配置 */
     const intl = useIntl();
 
@@ -59,7 +62,7 @@ const ProfitForecast = (props) => {
 
     useEffect(() => {
         //查询预测数据
-        getForecastData();
+        getForecastData(yearScope(5).startYear, yearScope(5).endYear);
     }, [allData]);
 
     const [casState, setCasState] = useState({});//现金流量表
@@ -81,7 +84,9 @@ const ProfitForecast = (props) => {
     const [nameState, setNameState] = useState({})   //中英文
     let nameMap = {}
     //预测数据
-    const getForecastData = () => {
+    const getForecastData = (t1, t2) => {
+        forecastParams.startYear = t1 ? t1 : yearScope(5).startYear;
+        forecastParams.endYear = t2 ? t2 : yearScope(5).endYear;
         queryForecast(forecastParams).then(
             res => {
                 if (res.state) {
@@ -209,9 +214,7 @@ const ProfitForecast = (props) => {
 
     //设置时间值
     const setTimeData = (e) => {
-        forecastParams.startTime = e[0]._d.getFullYear();
-        forecastParams.endTime = e[1]._d.getFullYear();
-        getForecastData();
+        getForecastData(e[0]._d.getFullYear(), e[1]._d.getFullYear());
     }
 
     return (

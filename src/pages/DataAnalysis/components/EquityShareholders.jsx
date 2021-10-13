@@ -408,7 +408,7 @@ const EquityShareholders = (props) => {
                         <div>
                             {keyType == 301 ?
                                 <Table loading={loadingPageState}
-                                    scroll={{ x: 2500 }}
+                                    scroll={{ x: 2000 }}
                                     rowKey={(record) => record.InvestorPermId}
                                     columns={columnsConsolidated}
                                     dataSource={pageList}
@@ -416,7 +416,7 @@ const EquityShareholders = (props) => {
                                 :
                                 keyType == 302 ?
                                     <Table loading={loadingPageState}
-                                        scroll={{ x: 2500 }}
+                                        scroll={{ x: 2000 }}
                                         rowKey={(record) => record.InvestorPermId}
                                         columns={columnsFund}
                                         dataSource={pageList}

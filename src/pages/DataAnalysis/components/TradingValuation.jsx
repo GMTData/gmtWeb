@@ -55,23 +55,23 @@ const TradingValuation = (props) => {
     //每日行情
     let params = {
         ric: '',
-        startTime: moment(timeSpan(7).startDate).format(dateFormat),
-        endTime: moment(timeSpan(7).endDate).format(dateFormat),
+        startTime: moment(timeSpan(90).startDate).format(dateFormat),
+        endTime: moment(timeSpan(90).endDate).format(dateFormat),
         period: 'DAILY',
         accessToken: userInfo.accessToken
     }
     //估值分析
     let paramsValuation = {
         ric: '',
-        startTime: timeSpan(7).startDate.getTime(),
-        endTime: timeSpan(7).endDate.getTime(),
+        startTime: timeSpan(90).startDate.getTime(),
+        endTime: timeSpan(90).endDate.getTime(),
         accessToken: userInfo.accessToken
     }
     //估值分析折线图
     let paramsLine = {
         ric: '',
-        startTime: timeSpan(7).startDate.getTime(),
-        endTime: timeSpan(7).endDate.getTime(),
+        startTime: timeSpan(90).startDate.getTime(),
+        endTime: timeSpan(90).endDate.getTime(),
         period: 'DAILY',
         dimension: 'CLOSE',
         accessToken: userInfo.accessToken
@@ -251,7 +251,7 @@ const TradingValuation = (props) => {
                     <FormattedMessage id="pages.tradingValuation.timeRange" defaultMessage="时间范围:" />
                     <RangePicker name='timeRange'
                         className={styles.timeContentLeft}
-                        defaultValue={[moment(timeSpan(7).startDate, dateFormat), moment(timeSpan(7).endDate, dateFormat)]}
+                        defaultValue={[moment(timeSpan(90).startDate, dateFormat), moment(timeSpan(90).endDate, dateFormat)]}
                         onChange={(e) => setTimeData(e)} />
                 </div>
                 {keyType == 501 ?

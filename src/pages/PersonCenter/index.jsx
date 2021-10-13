@@ -1,4 +1,4 @@
-import { Button, message, Steps, Input, InputNumber, Modal, Pagination, AutoComplete, Tabs, Descriptions, Form, Radio, Table, Menu } from 'antd';
+import { Button, message, Steps, Input, InputNumber, Modal, Pagination, AutoComplete, Tabs, Descriptions, Form, Radio, Table, Menu, Space } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useIntl, FormattedMessage, Link } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -10,6 +10,10 @@ import moment from 'moment';
 import { fileSizeTransform, isEmpty, passwordReg, clientUp, gradeZN, UUIDGMT, eamilReg } from '@/utils/utils';
 import payment from '../../assets/payment.png'
 import { useForm } from 'antd/lib/form/Form';
+import ic_account from '../../assets/ic_account.svg';
+import ic_income from '../../assets/ic_income.svg';
+import ic_product from '../../assets/ic_product.svg';
+import ic_sell from '../../assets/ic_sell.svg';
 
 const { Step } = Steps;
 const oneStepZN = '第一步:请选择产品';
@@ -592,8 +596,10 @@ const PersonCenter = () => {
 
   //实名信息认证   
   const [isModalRealNameVisible, setIsModalRealNameVisible] = useState(false);
+  const [approve, setApprove] = useState(0)
 
-  const showModalRealName = () => {
+  const showModalRealName = (type) => {
+    setApprove(type)
     setIsModalRealNameVisible(true);
   };
 
@@ -660,21 +666,29 @@ const PersonCenter = () => {
     paramsRealName.identityCardUrlPositive = paramsRealNameObj.identityCardUrlPositive;
     paramsRealName.identityCardUrlReverse = paramsRealNameObj.identityCardUrlReverse;
     paramsRealName.prCode = paramsRealNameObj.prCode;
-    paramsRealName.realName = formRealName.getFieldValue('realName');
-    paramsRealName.usdLink = formRealName.getFieldValue('uuidPay');
-    paramsRealName.identityNumber = formRealName.getFieldValue('cardNo');
+    paramsRealName.realName = formRealName.getFieldValue('realName') ? formRealName.getFieldValue('realName') : '';
+    paramsRealName.usdLink = formRealName.getFieldValue('uuidPay') ? formRealName.getFieldValue('uuidPay') : '';
+    paramsRealName.identityNumber = formRealName.getFieldValue('cardNo') ? formRealName.getFieldValue('cardNo') : '';
 
-    if (isEmpty(paramsRealName.realName) || isEmpty(paramsRealName.usdLink) || isEmpty(paramsRealName.identityNumber)) {
-      message.error(intl.locale === "zh-CN" ? '请填写完整' : 'Please complete')
-      return false
+    if (approve == 0) {
+      if (isEmpty(paramsRealName.realName) || isEmpty(paramsRealName.identityNumber)) {
+        message.error(intl.locale === "zh-CN" ? '请填写完整' : 'Please complete')
+        return false
+      }
+      if (isEmpty(paramsRealName.identityCardUrlPositive) || isEmpty(paramsRealName.identityCardUrlReverse)) {
+        message.error(intl.locale === "zh-CN" ? '身份信息请上传完整' : 'Please upload complete identity information')
+        return false
+      }
     }
-    if (isEmpty(paramsRealName.identityCardUrlPositive) || isEmpty(paramsRealName.identityCardUrlReverse)) {
-      message.error(intl.locale === "zh-CN" ? '身份信息请上传完整' : 'Please upload complete identity information')
-      return false
-    }
-    if (isEmpty(paramsRealName.prCode)) {
-      message.error(intl.locale === "zh-CN" ? '收款码请上传' : 'Please upload the payment code')
-      return false
+    if (approve == 1) {
+      if (isEmpty(paramsRealName.usdLink)) {
+        message.error(intl.locale === "zh-CN" ? '请填写完整' : 'Please complete')
+        return false
+      }
+      if (isEmpty(paramsRealName.prCode)) {
+        message.error(intl.locale === "zh-CN" ? '收款码请上传' : 'Please upload the payment code')
+        return false
+      }
     }
 
     const res = await insertDatum(paramsRealName)
@@ -928,6 +942,12 @@ const PersonCenter = () => {
     }
   }
 
+  const [wayState, setWayState] = useState('1')
+  //选择出金方式
+  const onChangeWay = (e) => {
+    setWayState(e.target.value)
+  }
+
   return (
     <PageContainer>
       <div className={styles.tabContent}>
@@ -938,23 +958,23 @@ const PersonCenter = () => {
             onOpenChange={onOpenChange}
             onSelect={onSelectKey}
             style={{ display: 'inline-block', width: 200 }}>
-            <SubMenu key="sub1" title={intl.formatMessage({
+            <SubMenu key="sub1" icon={<img src={ic_account} style={{ marginRight: 5 }} />} title={intl.formatMessage({
               id: 'pages.personCenter.accountInfo',
               defaultMessage: '个人信息',
             })}>
               <Menu.Item key="1" title={intl.locale === "zh-CN" ? '个人资料' : 'personal data'}><FormattedMessage id="pages.personCenter.personalData" defaultMessage="个人资料" /></Menu.Item>
               <Menu.Item key="2" title={intl.locale === "zh-CN" ? '实名认证' : 'Real-name authentication'}><FormattedMessage id="pages.personCenter.realNameAuthentication" defaultMessage="实名认证" /></Menu.Item>
             </SubMenu>
-            <SubMenu key="sub2" title={intl.locale === "zh-CN" ? '产品管理' : 'Product management'}>
+            <SubMenu key="sub2" icon={<img src={ic_product} style={{ marginRight: 5 }} />} title={intl.locale === "zh-CN" ? '产品管理' : 'Product management'}>
               <Menu.Item key="3" title={intl.locale === "zh-CN" ? '产品列表' : 'Product list'}>{intl.locale === "zh-CN" ? '产品列表' : 'Product list'}</Menu.Item>
               <Menu.Item key="4" title={intl.locale === "zh-CN" ? '产品认购' : 'Product subscription'}>{intl.locale === "zh-CN" ? '产品认购' : 'Product subscription'}</Menu.Item>
             </SubMenu>
-            <SubMenu key="sub4" title={intl.locale === "zh-CN" ? '资金管理' : 'Money management'}>
+            <SubMenu key="sub3" icon={<img src={ic_sell} style={{ marginRight: 5 }} />} title={intl.locale === "zh-CN" ? '资金管理' : 'Money management'}>
               <Menu.Item key="5" title={intl.locale === "zh-CN" ? '购买记录' : 'Purchase records'}>{intl.locale === "zh-CN" ? '购买记录' : 'Purchase records'}</Menu.Item>
               <Menu.Item key="6" title={intl.locale === "zh-CN" ? '出金申请' : 'The gold application'}>{intl.locale === "zh-CN" ? '出金申请' : 'The gold application'}</Menu.Item>
               <Menu.Item key="7" title={intl.locale === "zh-CN" ? '出金记录' : 'The gold record'}>{intl.locale === "zh-CN" ? '出金记录' : 'The gold record'}</Menu.Item>
             </SubMenu>
-            <SubMenu key="sub4" title={intl.locale === "zh-CN" ? '收益管理' : 'Revenue management'}>
+            <SubMenu key="sub4" icon={<img src={ic_income} style={{ marginRight: 5 }} />} title={intl.locale === "zh-CN" ? '收益管理' : 'Revenue management'}>
               <Menu.Item key="8" title={intl.locale === "zh-CN" ? '佣金记录' : 'Commission record'}>{intl.locale === "zh-CN" ? '佣金记录' : 'Commission record'}</Menu.Item>
             </SubMenu>
           </Menu>
@@ -969,6 +989,8 @@ const PersonCenter = () => {
                     id: 'pages.personCenter.ID',
                     defaultMessage: '账户',
                   })}>{userInfo.recommendationCode ? userInfo.recommendationCode : ''}</Descriptions.Item>
+                  <Descriptions.Item label={intl.locale === "zh-CN" ? '会员等级：' : 'Membership level:'}>
+                    {intl.locale === "zh-CN" ? gradeZN(userInfo?.agent) : userInfo?.agent}</Descriptions.Item>
                   <Descriptions.Item label={intl.formatMessage({
                     id: 'pages.personCenter.userName',
                     defaultMessage: '姓名',
@@ -976,11 +998,11 @@ const PersonCenter = () => {
                   <Descriptions.Item label={intl.formatMessage({
                     id: 'pages.personCenter.emailAdress',
                     defaultMessage: '邮箱',
-                  })}>{userInfo.emailAdress ? userInfo.emailAdress : ''}<a onClick={() => showModalInfo(1)}><EditOutlined /><FormattedMessage id="pages.personCenter.edit" defaultMessage='修改' /></a></Descriptions.Item>
+                  })}>{userInfo.emailAdress ? userInfo.emailAdress : ''}</Descriptions.Item>
                   <Descriptions.Item label={intl.formatMessage({
                     id: 'pages.personCenter.iphoneNumber',
                     defaultMessage: '手机号',
-                  })}>{userInfo.iphoneNumber ? userInfo.iphoneNumber : ''}<a onClick={() => showModalInfo(2)}><EditOutlined /><FormattedMessage id="pages.personCenter.edit" defaultMessage='修改' /></a></Descriptions.Item>
+                  })}>{userInfo.iphoneNumber ? userInfo.iphoneNumber : ''}</Descriptions.Item>
                   <Descriptions.Item label={intl.formatMessage({
                     id: 'pages.personCenter.recommendationCode',
                     defaultMessage: '我的邀请码',
@@ -1025,7 +1047,7 @@ const PersonCenter = () => {
                     <Descriptions.Item label={intl.formatMessage({
                       id: 'pages.personCenter.realName',
                       defaultMessage: '实名信息',
-                    })}>{userInfo.realName ? userInfo.realName : ''}{!isEmpty(userInfo.identityNumber) ? <span><CheckOutlined />{intl.locale === "zh-CN" ? '已认证' : 'certified'}</span> : <a onClick={showModalRealName}><EditOutlined />{intl.locale === "zh-CN" ? '去认证' : 'Go to the certification'}</a>}</Descriptions.Item>
+                    })}>{userInfo.realName ? userInfo.realName : ''}{!isEmpty(userInfo.identityNumber) ? <span><CheckOutlined />{intl.locale === "zh-CN" ? '已认证' : 'certified'}</span> : <a onClick={() => showModalRealName(0)}><EditOutlined />{intl.locale === "zh-CN" ? '去认证' : 'Go to the certification'}</a>}</Descriptions.Item>
                     {
                       userInfo.identityNumber ?
                         <Descriptions.Item label={intl.locale === "zh-CN" ? '身份证' : 'Id card'}>
@@ -1040,7 +1062,7 @@ const PersonCenter = () => {
                     <Descriptions.Item label={intl.formatMessage({
                       id: 'pages.personCenter.gatheringInfor',
                       defaultMessage: '收款信息',
-                    })}>{!isEmpty(userInfo.identityNumber) ? <span><CheckOutlined />{intl.locale === "zh-CN" ? '已认证' : 'certified'}</span> : <a onClick={showModalRealName}><EditOutlined />{intl.locale === "zh-CN" ? '去认证' : 'Go to the certification'}</a>}</Descriptions.Item>
+                    })}>{!isEmpty(userInfo?.usdLink) ? <span><CheckOutlined />{intl.locale === "zh-CN" ? '已认证' : 'certified'}</span> : <a onClick={() => showModalRealName(1)}><EditOutlined />{intl.locale === "zh-CN" ? '去认证' : 'Go to the certification'}</a>}</Descriptions.Item>
                   </Descriptions>
                 </div>
                 : keyType == '3' ?
@@ -1152,6 +1174,7 @@ const PersonCenter = () => {
                             wrapperCol={{
                               span: 12,
                             }}
+                            layout='vertical'
                             autoComplete="off"
                           >
                             <Form.Item
@@ -1172,25 +1195,64 @@ const PersonCenter = () => {
                                 }
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber style={{ width: '100%' }} />
                             </Form.Item>
                             <Form.Item
-                              name="usdLink"
-                              label={intl.locale === "zh-CN" ? 'USDT钱包地址' : 'USDT wallet address'}
+                              name="goldWay"
+                              label={intl.locale === "zh-CN" ? '选择出金方式' : 'Choose the gold way'}
                             >
-                              <Input disabled />
+                              <Radio.Group onChange={onChangeWay} defaultValue={1}>
+                                <Space direction="vertical">
+                                  <Radio value={0}>{intl.locale === "zh-CN" ? '银行卡出金' : 'Bank card payment'}</Radio>
+                                  <Radio value={1}>{intl.locale === "zh-CN" ? 'USDT出金' : 'USDT out gold'}</Radio>
+                                </Space>
+                              </Radio.Group>
                             </Form.Item>
+                            {
+                              wayState == 0 ?
+                                <Form.Item
+                                  name="bankCard"
+                                  label={intl.locale === "zh-CN" ? '银行卡号' : 'Bank card number'}
+                                >
+                                  <Input disabled />
+                                </Form.Item>
+                                : wayState == 1 ?
+                                  <Form.Item
+                                    name="usdLink"
+                                    label={intl.locale === "zh-CN" ? 'USDT钱包地址' : 'USDT wallet address'}
+                                  >
+                                    <Input disabled />
+                                  </Form.Item>
+                                  : ''
+                            }
+
                             <Form.Item
                               name="remark"
                               label={intl.locale === "zh-CN" ? '备注' : 'remark'}
                             >
                               <Input />
                             </Form.Item>
+                            <Tabs defaultActiveKey="1" style={{ marginRight: '50%', marginBottom: 10 }}>
+                              <TabPane tab={intl.locale === "zh-CN" ? '手机验证' : 'Phone verification'} key="1">
+                                <Input />
+                                <span className={styles.verification}>
+                                  <span>|</span>
+                                  <span className={styles.verificationText}>{intl.locale === "zh-CN" ? '发送验证码' : 'Verification code'}</span>
+                                </span>
+                              </TabPane>
+                              <TabPane tab={intl.locale === "zh-CN" ? '邮箱验证' : 'Email address verification'} key="2">
+                                <Input />
+                                <span className={styles.verification}>
+                                  <span>|</span>
+                                  <span className={styles.verificationText}>{intl.locale === "zh-CN" ? '发送验证码' : 'Verification code'}</span>
+                                </span>
+                              </TabPane>
+                            </Tabs>
                             <Form.Item
                               name="operate"
                               label=""
                             >
-                              <Button style={{ marginLeft: '50%' }} onClick={balanceSubmitter}>{intl.locale === "zh-CN" ? '提交申请' : 'Submit an application'}</Button>
+                              <Button onClick={balanceSubmitter}>{intl.locale === "zh-CN" ? '提交申请' : 'Submit an application'}</Button>
                             </Form.Item>
                           </Form>
                         </div>
@@ -1573,110 +1635,117 @@ const PersonCenter = () => {
             }}
             autoComplete="off"
           >
-            <Form.Item
-              label={intl.locale === "zh-CN" ? '所属会员' : 'Its member'}
-              name="vipName"
-            >
-              <span>{userInfo.recommendationCode}({userInfo.userName ? userInfo.userName : userInfo.iphoneNumber ? userInfo.iphoneNumber : userInfo.emailAdress ? userInfo.emailAdress : ''})</span>
-            </Form.Item>
-            <Form.Item
-              name="realName"
-              label={intl.locale === "zh-CN" ? '姓名' : 'The name'}
-              rules={[
-                {
-                  required: true,
-                }
-              ]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="cardNo"
-              label={intl.locale === "zh-CN" ? '身份证号' : 'Id number'}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="uuidPay"
-              label={intl.locale === "zh-CN" ? 'USDT钱包地址' : 'USDT wallet address'}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-            <div className={styles.upContent}>
+            {approve == 0 ?
               <div>
-                <span className={styles.imgSpan}>
-                  <FormattedMessage
-                    id="pages.personCenter.cardFront"
-                    defaultMessage="身份证正面"
-                  />
-                  <br />
-                  <span>
-                    {imgUrl ? <img src={imgUrl} /> : ''}
-                  </span>
-                </span>
-                <label for="inputFile" class="button">
-                  <span className={styles.uploadBtn}>
-                    <FormattedMessage
-                      id="pages.personCenter.chooseFile"
-                      defaultMessage="选择文件"
-                    />
-                  </span>
-                </label>
-                <input type="file" id="inputFile" style={{ display: 'none' }} onChange={getFile}></input>
-              </div>
-              <div>
-                <span className={styles.imgSpan}>
-                  <FormattedMessage
-                    id="pages.personCenter.cardReverse"
-                    defaultMessage="身份证反面"
-                  />
-                  <br />
-                  <span>
-                    {imgUrlOther ? <img src={imgUrlOther} /> : ""}
-                  </span>
-                </span>
-                <label for="inputFile1" class="button">
-                  <span className={styles.uploadBtn}>
-                    <FormattedMessage
-                      id="pages.personCenter.chooseFile"
-                      defaultMessage="选择文件"
-                    />
-                  </span>
-                </label>
-                <input type="file" id="inputFile1" style={{ display: 'none' }} onChange={getFileOther}></input>
-              </div>
-            </div>
-            <div className={styles.payCode}>
-              <span className={styles.imgSpan}>
-                <FormattedMessage
-                  id="pages.personCenter.payCode"
-                  defaultMessage="付款码"
-                />
-                <br />
-                <span>
-                  {imgUrlPayment ? <img src={imgUrlPayment} /> : ''}
-                </span>
-              </span>
-              <label for="inputFilePayment" class="button">
-                <span className={styles.uploadBtn}>
-                  <FormattedMessage
-                    id="pages.personCenter.chooseFile"
-                    defaultMessage="选择文件"
-                  />
-                </span>
-              </label>
-              <input type="file" id="inputFilePayment" style={{ display: 'none' }} onChange={getFilePayment}></input>
-            </div>
+                <Form.Item
+                  label={intl.locale === "zh-CN" ? '所属会员' : 'Its member'}
+                  name="vipName"
+                >
+                  <span>{userInfo.recommendationCode}({userInfo.userName ? userInfo.userName : userInfo.iphoneNumber ? userInfo.iphoneNumber : userInfo.emailAdress ? userInfo.emailAdress : ''})</span>
+                </Form.Item>
+                <Form.Item
+                  name="realName"
+                  label={intl.locale === "zh-CN" ? '姓名' : 'The name'}
+                  rules={[
+                    {
+                      required: true,
+                    }
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  name="cardNo"
+                  label={intl.locale === "zh-CN" ? '身份证号' : 'Id number'}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+
+                <div className={styles.upContent}>
+                  <div>
+                    <span className={styles.imgSpan}>
+                      <FormattedMessage
+                        id="pages.personCenter.cardFront"
+                        defaultMessage="身份证正面"
+                      />
+                      <br />
+                      <span>
+                        {imgUrl ? <img src={imgUrl} /> : ''}
+                      </span>
+                    </span>
+                    <label for="inputFile" class="button">
+                      <span className={styles.uploadBtn}>
+                        <FormattedMessage
+                          id="pages.personCenter.chooseFile"
+                          defaultMessage="选择文件"
+                        />
+                      </span>
+                    </label>
+                    <input type="file" id="inputFile" style={{ display: 'none' }} onChange={getFile}></input>
+                  </div>
+                  <div>
+                    <span className={styles.imgSpan}>
+                      <FormattedMessage
+                        id="pages.personCenter.cardReverse"
+                        defaultMessage="身份证反面"
+                      />
+                      <br />
+                      <span>
+                        {imgUrlOther ? <img src={imgUrlOther} /> : ""}
+                      </span>
+                    </span>
+                    <label for="inputFile1" class="button">
+                      <span className={styles.uploadBtn}>
+                        <FormattedMessage
+                          id="pages.personCenter.chooseFile"
+                          defaultMessage="选择文件"
+                        />
+                      </span>
+                    </label>
+                    <input type="file" id="inputFile1" style={{ display: 'none' }} onChange={getFileOther}></input>
+                  </div>
+                </div>
+              </div> :
+              approve == 1 ?
+                <div>
+                  <Form.Item
+                    name="uuidPay"
+                    label={intl.locale === "zh-CN" ? 'USDT钱包地址' : 'USDT wallet address'}
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                  >
+                    <Input />
+                  </Form.Item>
+                  <div className={styles.payCode}>
+                    <span className={styles.imgSpan}>
+                      <FormattedMessage
+                        id="pages.personCenter.payCode"
+                        defaultMessage="付款码"
+                      />
+                      <br />
+                      <span>
+                        {imgUrlPayment ? <img src={imgUrlPayment} /> : ''}
+                      </span>
+                    </span>
+                    <label for="inputFilePayment" class="button">
+                      <span className={styles.uploadBtn}>
+                        <FormattedMessage
+                          id="pages.personCenter.chooseFile"
+                          defaultMessage="选择文件"
+                        />
+                      </span>
+                    </label>
+                    <input type="file" id="inputFilePayment" style={{ display: 'none' }} onChange={getFilePayment}></input>
+                  </div>
+                </div> : ''}
           </Form>
         </Modal>
 

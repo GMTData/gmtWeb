@@ -212,7 +212,7 @@ const FinancialData = (props) => {
                                     code.coaItem == cas.coaCode ?
                                         <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                             <span>
-                                                {code.coaValueEn}
+                                                {intl.locale === "zh-CN" ? code.coaValueZh : code.coaValueEn}
                                             </span>
                                             {(dataType === '0' || dataType === '1') && casState.year.length > 0 ? casState.year.map((yearItem) => (
                                                 <span>
@@ -258,7 +258,7 @@ const FinancialData = (props) => {
                                         code.coaItem == cas.coaCode ?
                                             <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                                 <span>
-                                                    {code.coaValueEn}
+                                                    {intl.locale === "zh-CN" ? code.coaValueZh : code.coaValueEn}
                                                 </span>
                                                 {(dataType === '0' || dataType === '1') && incState.year.length > 0 ? incState.year.map((yearItem) => (
                                                     <span>
@@ -303,7 +303,7 @@ const FinancialData = (props) => {
                                             code.coaItem == cas.coaCode ?
                                                 <div className={[styles.dataContent, index % 2 == 0 ? styles.oddBack : ''].join(' ')}>
                                                     <span>
-                                                        {code.coaValueEn}
+                                                        {intl.locale === "zh-CN" ? code.coaValueZh : code.coaValueEn}
                                                     </span>
                                                     {(dataType === '0' || dataType === '1') && balState.year.length > 0 ? balState.year.map((yearItem) => (
                                                         <span>
@@ -318,7 +318,7 @@ const FinancialData = (props) => {
                                                                 <span>{code.coaItem == item.coaCode ? item.Value ? parseInt(item.Value) : '' : ''}</span>
                                                             )) : ''}
                                                         </span>
-                                                    )) : ''}˝
+                                                    )) : ''}
                                                 </div> : ''
                                         )) : ''
                                     )) : ''
@@ -460,7 +460,7 @@ const FinancialData = (props) => {
                                                                             : '' : '' : '' : '' : '')) : ''
                                                 }
                                             </div> :
-                                            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false}  />}
+                                            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />}
         </div>
     )
 };

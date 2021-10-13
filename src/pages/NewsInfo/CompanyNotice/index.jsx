@@ -5,7 +5,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { queryClassList, queryNoticeClass, queryNoticeList, downloadkNotice, queryRicLists, queryNoticeListByRic } from './service';
 import styles from './index.less';
 import { getAuthority } from '@/utils/authority';
-import { CarryOutOutlined } from '@ant-design/icons';
+import { CarryOutOutlined, DownloadOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { fileSizeTransform, isEmpty, mimeType } from '@/utils/utils';
 
@@ -77,7 +77,8 @@ const CompanyNotice = () => {
       title: <FormattedMessage id="pages.companyNotice.operate" defaultMessage="操作" />,
       dataIndex: 'operate',
       render: (val, record) => {
-        return <a className={styles.checkInfo} onClick={() => getNoticeFile(record, 'down')}>下载</a>
+        return <a className={styles.checkInfo}><DownloadOutlined onClick={() => getFileSrc(record)} /></a>
+        // return <a className={styles.checkInfo} onClick={() => getNoticeFile(record, 'down')}><DownloadOutlined /></a>
       }
     },
   ];
@@ -364,14 +365,24 @@ const CompanyNotice = () => {
           aElement.click();
           window.URL.revokeObjectURL(blobUrl);
         } else {
-          var link = document.createElement('a');
-          link.href = window.URL.createObjectURL(blob);
-          link.target = "_blank";
-          link.click();
+          // var link = document.createElement('a');
+          // link.href = window.URL.createObjectURL(blob);
+          // link.target = "_blank";
+          // link.click();
+          // window.open(blobUrl)
         }
 
       }
     )
+  }
+  //文件下载a标签的src
+  const getFileSrc = (item) => {
+    let { fileType, DCN, originalFileName, size } = item.submissionInfo[0];
+    const oa = document.createElement('a');
+    oa.href = `${PATH}/news/downloadkNotice?dcn=${DCN}&size=${size}&fileName=${originalFileName}&fileType=${fileType}`;
+    oa.setAttribute('target', '_blank');
+    document.body.appendChild(oa);
+    oa.click();
   }
   //关闭弹框
   const handleCancel = () => {

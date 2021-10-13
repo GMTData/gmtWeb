@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useIntl, FormattedMessage, Link, history } from 'umi';
 import styles from './Welcome.less';
-import { Row, Col, message, Spin, Carousel, Avatar, AutoComplete } from 'antd';
+import { Row, Col, message, Spin, Carousel, Avatar, AutoComplete,Empty } from 'antd';
 import { getAuthority } from '@/utils/authority';
 import { queryHotStock, queryHotNews, queryBanner, queryRicLists } from './service';
 import moment from 'moment';
@@ -146,6 +146,7 @@ const WelcomeHome = () => {
     lineHeight: '320px',
     textAlign: 'center',
     background: '#364d79',
+    width: '100%'
   };
 
 
@@ -304,7 +305,7 @@ const WelcomeHome = () => {
                     <Col span={6} className={item.applies ? item.applies < 0 ? styles.shareRed : styles.shareGreen : ''}>{item.applies ? item.applies > 0 ? '+' + parseFloat(item.applies).toFixed(2) + '%' : parseFloat(item.applies).toFixed(2) + '%' : ''}</Col>
                   </Row>
                 ))
-                  : <Spin className={styles.spinLoading} />
+                  : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />
               }
             </div>
           </div>
