@@ -22,8 +22,28 @@ export async function queryNewsList(params) {
 }
 //新闻详情接口
 export async function queryNewsInfo(params) {
-  return request(`${PATH}/news/details?newsId=${params.newsId}`,{
+  return request(`${PATH}/news/details?newsId=${params.newsId}`, {
     method: 'get',
     headers: { 'accessToken': params.accessToken },
+  });
+}
+
+//收藏新增接口
+export async function collectionAdd(params) {
+  let formData = new FormData();
+  formData.append('ric', params.ric);
+  formData.append('id', params.id);
+  formData.append('dcn', params.dcn);
+  formData.append('size', params.size);
+  formData.append('fileName', params.fileName);
+  formData.append('fileType', params.fileType);
+  formData.append('publicDate', params.publicDate);
+  formData.append('noticeDate', params.noticeDate);
+  formData.append('userId', params.userId);
+  formData.append('type', params.type);
+  return request(`${PATH}/collection/insert`, {
+    method: 'post',
+    headers: { 'accessToken': params.accessToken, "Content-Type": "application/json" },
+    data: JSON.stringify(params)
   });
 }

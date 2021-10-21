@@ -1,4 +1,5 @@
 import { parse } from 'querystring';
+import { message } from 'antd';
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -376,4 +377,43 @@ export const UUIDGMT = () => {
   s[8] = s[13] = s[18] = s[23];
   var uuid = s.join("");
   return uuid;
+}
+
+//预览的请求
+export const previewXHR = (url, callback) => {
+  let xhr = new XMLHttpRequest()
+  xhr.open('GET', url, true)
+  xhr.responseType = 'blob'
+  xhr.onload = function () {
+    callback(this)
+  }
+  xhr.send()
+}
+
+//复制到粘贴板
+export const copyDomTxt = (text) => {
+  const inputDom = document.createElement('input');
+  document.body.appendChild(inputDom);
+  inputDom.setAttribute('value', text);
+  inputDom.select();
+  document.execCommand("Copy"); // 执行浏览器复制命令
+  if (localStorage.umi_locale === "zh-CN") {
+    message.success("复制成功");
+  } else {
+    message.success('Copy successful!')
+  }
+}
+
+//转换支付类型
+export const changePayType = (type) => {
+  switch (type) {
+    case '0':
+      return '银联';
+    case '1':
+      return '数字货币支付';
+    case '2':
+      return '支付宝';
+    case '3':
+      return '微信';
+  }
 }

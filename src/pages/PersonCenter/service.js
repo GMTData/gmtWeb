@@ -91,6 +91,7 @@ export async function insertDatum(params, options) {
         identityCardUrlPositive: params.identityCardUrlPositive,
         identityCardUrlReverse: params.identityCardUrlReverse,
         userId: params.userId,
+        country: params.country,
         identityNumber: params.identityNumber
     }
     return request(`${PATH}/v2/adminor/insertDatum`, {
@@ -111,6 +112,7 @@ export async function insertWithdraw(params, options) {
         remark: params.remark,
         qrCode: params.qrCode,
         userId: params.userId,
+        payType: params.payType
     }
     return request(`${PATH}/v2/adminor/insertWithdraw`, {
         method: 'POST',

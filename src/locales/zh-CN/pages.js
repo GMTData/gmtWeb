@@ -255,5 +255,7 @@ export default {
   'pages.personCenter.edit': '修改',
   'pages.personCenter.personalData': '个人资料',
   'pages.personCenter.realNameAuthentication': '实名认证',
+  'pages.personCenter.realNameInfo': '实名信息认证',
+  'pages.personCenter.country': '国家',
 
 };

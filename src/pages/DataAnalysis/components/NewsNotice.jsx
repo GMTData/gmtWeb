@@ -4,8 +4,10 @@ import { useIntl, FormattedMessage, Link } from 'umi';
 import { queryNoticeByRic, downloadkNotice, querytNewsByRic } from '../service';
 import styles from './index.less';
 import { getAuthority } from '@/utils/authority';
-import { fileSizeTransform, mimeType, subGroupArray } from '@/utils/utils';
+import { fileSizeTransform, mimeType, subGroupArray, previewXHR } from '@/utils/utils';
 import moment from 'moment';
+import { DownloadOutlined } from '@ant-design/icons';
+
 
 const NewsNotice = (props) => {
     let pageTotal = '共';
@@ -75,7 +77,7 @@ const NewsNotice = (props) => {
             dataIndex: 'documentTitle',
             width: 300,
             render: (val, record) => {
-                return <span className={styles.checkInfo} onClick={() => getNoticeFile(record, 'view')}>{record.submissionInfo[0].documentTitle ? record.submissionInfo[0].documentTitle : 'No Title'}</span>
+                return <span className={styles.checkInfo} onClick={() => previewNotice(record)}>{record.submissionInfo[0].documentTitle ? record.submissionInfo[0].documentTitle : 'No Title'}</span>
             }
         },
         {
@@ -92,14 +94,21 @@ const NewsNotice = (props) => {
                 multiple: 2,
             },
             render: (val, record) => {
-                return <span>{moment(record.submissionInfo[0].releaseDate).format("HH:mm")}</span>
+                return <span>{moment(record?.submissionInfo[0]?.releaseDate).format("HH:mm")}</span>
             }
         },
         {
             title: <FormattedMessage id="pages.companyNotice.fileSize" defaultMessage="大小" />,
             dataIndex: 'size',
             render: (val, record) => {
-                return <span>{fileSizeTransform(record.submissionInfo[0].size)}</span>
+                return <span>{fileSizeTransform(record?.submissionInfo[0]?.size)}</span>
+            }
+        },
+        {
+            title: <FormattedMessage id="pages.companyNotice.operate" defaultMessage="操作" />,
+            dataIndex: 'operate',
+            render: (val, record) => {
+                return <a className={styles.checkInfo}><DownloadOutlined onClick={() => getFileSrc(record)} /></a>
             }
         },
     ];
@@ -183,8 +192,8 @@ const NewsNotice = (props) => {
                 if (res.state) {
                     setLoadingState(false);
                     if (res.data) {
-                        setNewsNoticeData(res.data.SearchSubmissions_Response_1 ? res.data.SearchSubmissions_Response_1 : []);
-                        setNewsNoticePage(res.data.SearchSubmissions_Response_1 ? res.data.SearchSubmissions_Response_1 ? res.data.SearchSubmissions_Response_1.submissionStatusAndInfo : [] : []);
+                        setNewsNoticeData(res?.data?.SearchSubmissions_Response_1 ? res?.data?.SearchSubmissions_Response_1 : []);
+                        setNewsNoticePage(res?.data?.SearchSubmissions_Response_1?.submissionStatusAndInfo);
                     }
                 } else {
                     setLoadingState(false);
@@ -228,7 +237,7 @@ const NewsNotice = (props) => {
     }
     const getNoticeFile = (item, type) => {
         setLoadingState(true);
-        let { fileType, DCN, originalFileName, size } = item.submissionInfo[0];
+        let { fileType, DCN, originalFileName, size } = item?.submissionInfo[0];
         fileParams.fileType = fileType;
         fileParams.dcn = DCN;
         fileParams.originalFileName = DCN;
@@ -255,6 +264,32 @@ const NewsNotice = (props) => {
 
             }
         )
+    }
+
+    //公告预览
+    const previewNotice = (item) => {
+        let { fileType, DCN, originalFileName, size } = item?.submissionInfo[0];
+        const xhrUrl = `${PATH}/news/downloadkNotice?dcn=${DCN}&size=${size}&fileName=${originalFileName}&fileType=${fileType}`;
+        setLoadingState(true);
+        previewXHR(xhrUrl, function (data) {
+            if (data.status == 200) {
+                setLoadingState(false);
+                let documentType = mimeType(fileType);
+                let blob = new Blob([data.response], { type: documentType + ';chartset=UTF-8' });
+                let fileURL = URL.createObjectURL(blob)
+                window.open(fileURL)
+            }
+        })
+    }
+
+    //文件下载a标签的src
+    const getFileSrc = (item) => {
+        let { fileType, DCN, size } = item?.submissionInfo[0];
+        const oa = document.createElement('a');
+        oa.href = `${PATH}/news/downloadkNotice?dcn=${DCN}&size=${size}&fileName=${DCN}&fileType=${fileType}`;
+        oa.setAttribute('target', '_blank');
+        document.body.appendChild(oa);
+        oa.click();
     }
 
     return (

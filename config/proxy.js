@@ -8,7 +8,7 @@
 export default {
   dev: {
     '/gmt': {
-      target:'https://Gmtdata.technology',
+      target:'https://Gmtdata.technology:8443',
       changeOrigin: true,
       pathRewrite: {
         '^': '',
@@ -17,7 +17,7 @@ export default {
   },
   test: {
     '/gmt/': {
-      target:'https://Gmtdata.technology',
+      target:'https://Gmtdata.technology:8443',
       changeOrigin: true,
       pathRewrite: {
         '^': '',
@@ -26,7 +26,7 @@ export default {
   },
   pre: {
     '/gmt/': {
-      target:'https://Gmtdata.technology',
+      target:'https://Gmtdata.technology:8443',
       changeOrigin: true,
       pathRewrite: {
         '^': '',

@@ -42,43 +42,43 @@ export default defineConfig({
     basePath: '/gmtweb/',
   },
   define: {
-    PATH: 'https://Gmtdata.technology/gmt',
+    PATH: 'https://Gmtdata.technology:8443/gmt',
     // PATH: '/gmt'
   },
   esbuild: {},
   publicPath: '/',  //定义资源的基本路径
   // publicPath: '/gmtweb/',  //定义资源的基本路径
-  chunks: ['vendors', 'umi'],
-  chainWebpack(config) {
-    config.merge({
-      optimization: {
-        minimize: true,
-        splitChunks: {
-          chunks: 'async',
-          minSize: 30000,
-          minChunks: 2,
-          automaticNameDelimiter: '.',
-          cacheGroups: {
-            vendor: {
-              name: 'vendors',
-              test: /^.*node_modules[\\/](?!ag-grid-|lodash|rc-select|rc-time-picker|antd-mobile).*$/,
-              chunks: "all",
-              priority: -10,
-            },
-            default: {
-              minChunks: 1,
-              priority: -20,
-              reuseExistingChunk: true
-            }
-          }
-        }
-      }
-    });
-    //过滤掉momnet的那些不使用的国际化文件
-    config.plugin("replace").use(require("webpack").ContextReplacementPlugin).tap(() => {
-      return [/moment[/\\]locale$/, /zh-cn|en-us/];
-    });
-  },
+  // chunks: ['vendors', 'umi'],
+  // chainWebpack(config) {
+  //   config.merge({
+  //     optimization: {
+  //       minimize: true,
+  //       splitChunks: {
+  //         chunks: 'async',
+  //         minSize: 30000,
+  //         minChunks: 2,
+  //         automaticNameDelimiter: '.',
+  //         cacheGroups: {
+  //           vendor: {
+  //             name: 'vendors',
+  //             test: /^.*node_modules[\\/](?!ag-grid-|lodash|rc-select|rc-time-picker|antd-mobile).*$/,
+  //             chunks: "all",
+  //             priority: -10,
+  //           },
+  //           default: {
+  //             minChunks: 1,
+  //             priority: -20,
+  //             reuseExistingChunk: true
+  //           }
+  //         }
+  //       }
+  //     }
+  //   });
+  //   //过滤掉momnet的那些不使用的国际化文件
+  //   config.plugin("replace").use(require("webpack").ContextReplacementPlugin).tap(() => {
+  //     return [/moment[/\\]locale$/, /zh-cn|en-us/];
+  //   });
+  // },
   externals: {
     "bizcharts": "BizCharts",
     // 以下配置为BizCharts依赖的第三方库，需要同时提供

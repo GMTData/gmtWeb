@@ -2,10 +2,11 @@ import { message } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useIntl, FormattedMessage, connect } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
-import { queryNewsInfo } from '../FinancialNews/service';
+import { queryNewsInfo, collectionAdd } from '../FinancialNews/service';
 import { getAuthority } from '@/utils/authority';
 import styles from './index.less';
 import moment from 'moment';
+import { StarOutlined } from '@ant-design/icons';
 
 const NewsDetails = (props) => {
   const userInfo = getAuthority();//获取用户相关信息
@@ -27,13 +28,13 @@ const NewsDetails = (props) => {
     queryNewsInfo(params).then(
       res => {
         setLoadingState(false);
-        if (res.state) {
-          if (res.data && res.data?.RetrieveStoryML_Response_1?.StoryMLResponse?.STORYML?.HL.length > 0) {
-            setNewsInfo(res.data?.RetrieveStoryML_Response_1?.StoryMLResponse?.STORYML?.HL[0]);
+        if (res?.state) {
+          if (res.data?.RetrieveStoryML_Response_1?.StoryMLResponse?.STORYML?.HL.length > 0) {
+            setNewsInfo(res?.data?.RetrieveStoryML_Response_1?.StoryMLResponse?.STORYML?.HL[0]);
           }
         } else {
           setLoadingState(false);
-          message.error(res.message);
+          message.error(res?.message);
         }
       }
     );
@@ -44,7 +45,11 @@ const NewsDetails = (props) => {
       <div >
         <div className={styles.infoTime}>{moment(newsInfo.CT).format("yyyy-MM-DD HH:mm:ss")}</div>
         <div className={styles.infoTitle}>{newsInfo.HT}</div>
-        <div className={styles.infoTxtTitle}></div>
+        <div className={styles.infoTxtTitle}>
+          <a>
+            <StarOutlined className={styles.starNews} />
+          </a>
+        </div>
         <div className={styles.infoTxt}>
           <div dangerouslySetInnerHTML={{ __html: newsInfo.TE }}></div>
         </div>

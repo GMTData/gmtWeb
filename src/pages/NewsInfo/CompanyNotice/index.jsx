@@ -2,12 +2,12 @@ import { Button, message, Table, Input, Tree, Modal, Pagination, AutoComplete } 
 import React, { useState, useEffect } from 'react';
 import { useIntl, FormattedMessage, Link } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
-import { queryClassList, queryNoticeClass, queryNoticeList, downloadkNotice, queryRicLists, queryNoticeListByRic } from './service';
+import { queryClassList, queryNoticeClass, queryNoticeList, preview, downloadkNotice, queryRicLists, queryNoticeListByRic, collectionAdd } from './service';
 import styles from './index.less';
 import { getAuthority } from '@/utils/authority';
-import { CarryOutOutlined, DownloadOutlined } from '@ant-design/icons';
+import { CarryOutOutlined, DownloadOutlined, StarOutlined } from '@ant-design/icons';
 import moment from 'moment';
-import { fileSizeTransform, isEmpty, mimeType } from '@/utils/utils';
+import { fileSizeTransform, isEmpty, mimeType, previewXHR } from '@/utils/utils';
 
 let classId = '';
 let treeCHeckId = [];
@@ -46,7 +46,7 @@ const CompanyNotice = () => {
       dataIndex: 'documentTitle',
       width: 300,
       render: (val, record) => {
-        return <span className={styles.checkInfo} onClick={() => getNoticeFile(record, 'view')}>{record.submissionInfo[0].documentTitle ? record.submissionInfo[0].documentTitle : 'No Title'}</span>
+        return <span className={styles.checkInfo} onClick={() => previewNotice(record)}>{record.submissionInfo[0].documentTitle ? record.submissionInfo[0].documentTitle : 'No Title'}</span>
       }
     },
     {
@@ -77,8 +77,10 @@ const CompanyNotice = () => {
       title: <FormattedMessage id="pages.companyNotice.operate" defaultMessage="操作" />,
       dataIndex: 'operate',
       render: (val, record) => {
-        return <a className={styles.checkInfo}><DownloadOutlined onClick={() => getFileSrc(record)} /></a>
-        // return <a className={styles.checkInfo} onClick={() => getNoticeFile(record, 'down')}><DownloadOutlined /></a>
+        return <a className={styles.checkInfo}>
+          <DownloadOutlined onClick={() => getFileSrc(record)} style={{ marginRight: 20 }} />
+          <StarOutlined onClick={() => collectionNotice(record)} />
+        </a>
       }
     },
   ];
@@ -173,7 +175,7 @@ const CompanyNotice = () => {
   const queryNoticeClassList = () => {
     queryNoticeClass(params).then(
       res => {
-        if (res.state) {
+        if (res?.state) {
           //处理后台数据成树形菜单格式
           if (res.data.length > 0) {
             let treeOneList = [];
@@ -256,7 +258,11 @@ const CompanyNotice = () => {
         classId = item.subClass[0].id;
       }
     }
-    queryNoticeLists();
+    if (codeValue) {
+      queryNoticeListByRicInput(checkedKeys)
+    } else {
+      queryNoticeLists(checkedKeys);
+    }
   }
 
   const [showLine, setShowLine] = useState(true);
@@ -294,14 +300,29 @@ const CompanyNotice = () => {
     });
   };
 
+  const [checkedKeys, setCheckedKeys] = useState([]);
+
+  const onCheck = (checkedKeysValue) => {
+    setCheckedKeys(checkedKeysValue);
+    if (codeValue) {
+      queryNoticeListByRicInput(checkedKeysValue)
+    } else {
+      queryNoticeLists(checkedKeysValue);
+    }
+  };
+
   const [noticeList, setNoticeList] = useState([]);//公告列表数据
   const [ricData, setRicData] = useState({});//RIC码集合
 
   //查询公告列表数据
-  const queryNoticeLists = () => {
+  const queryNoticeLists = (checkList) => {
     paramsList.accessToken = userInfo.accessToken;
     paramsList.twoLevelNewsClassId = classId ? classId : '';
-    paramsList.stockTypes = treeCHeckId ? treeCHeckId : '';
+    if (checkList) {
+      paramsList.stockTypes = checkList;
+    } else {
+      paramsList.stockTypes = treeCHeckId ? treeCHeckId : '';
+    }
     if (isEmpty(classId)) {
       setLoadingListState(false);
       return false;
@@ -312,9 +333,9 @@ const CompanyNotice = () => {
           if (res.state) {
             setLoadingListState(false);
             if (res.data) {
-              setNoticeList(res.data.SearchSubmissions_Response_1.submissionStatusAndInfo);
-              setPageList(res.data.SearchSubmissions_Response_1);
-              setRicData(res.data.ricMap);
+              setNoticeList(res?.data?.SearchSubmissions_Response_1?.submissionStatusAndInfo);
+              setPageList(res?.data?.SearchSubmissions_Response_1);
+              setRicData(res?.data?.ricMap);
             } else {
               setNoticeList([]);
               setPageList([]);
@@ -334,7 +355,6 @@ const CompanyNotice = () => {
   const tableWdith = window.innerWidth - 470;//表格区域宽度
 
   const [modelState, setModelState] = useState(false);
-  const [viewUrl, setViewUrl] = useState({});
 
   //文件下载参数
   let fileParams = {
@@ -346,12 +366,12 @@ const CompanyNotice = () => {
   }
   const getNoticeFile = (item, type) => {
     setLoadingListState(true);
-    let { fileType, DCN, originalFileName, size } = item.submissionInfo[0];
+    let { fileType, DCN, originalFileName, size } = item?.submissionInfo[0];
     fileParams.fileType = fileType;
     fileParams.dcn = DCN;
     fileParams.originalFileName = DCN;
     fileParams.size = size;
-    downloadkNotice(fileParams).then(
+    preview(fileParams).then(
       res => {
         setLoadingListState(false);
         let documentType = mimeType(fileType);
@@ -365,19 +385,34 @@ const CompanyNotice = () => {
           aElement.click();
           window.URL.revokeObjectURL(blobUrl);
         } else {
-          // var link = document.createElement('a');
-          // link.href = window.URL.createObjectURL(blob);
-          // link.target = "_blank";
-          // link.click();
-          // window.open(blobUrl)
+          var link = document.createElement('a');
+          link.href = blobUrl;
+          link.target = "_blank";
+          link.click();
         }
 
       }
     )
   }
+
+  //公告预览
+  const previewNotice = (item) => {
+    let { fileType, DCN, originalFileName, size } = item?.submissionInfo[0];
+    const xhrUrl = `${PATH}/news/downloadkNotice?dcn=${DCN}&size=${size}&fileName=${originalFileName}&fileType=${fileType}`;
+    setLoadingListState(true);
+    previewXHR(xhrUrl, function (data) {
+      if (data.status == 200) {
+        setLoadingListState(false);
+        let documentType = mimeType(fileType);
+        let blob = new Blob([data.response], { type: documentType + ';chartset=UTF-8' });
+        let fileURL = URL.createObjectURL(blob)
+        window.open(fileURL)
+      }
+    })
+  }
   //文件下载a标签的src
   const getFileSrc = (item) => {
-    let { fileType, DCN, originalFileName, size } = item.submissionInfo[0];
+    let { fileType, DCN, originalFileName, size } = item?.submissionInfo[0];
     const oa = document.createElement('a');
     oa.href = `${PATH}/news/downloadkNotice?dcn=${DCN}&size=${size}&fileName=${originalFileName}&fileType=${fileType}`;
     oa.setAttribute('target', '_blank');
@@ -426,7 +461,7 @@ const CompanyNotice = () => {
     queryRicLists(ricParams).then(
       res => {
         if (res.state) {
-          if (res.data && res.data.result && res.data.result.length > 0) {
+          if (res?.data?.result?.length > 0) {
             setRicList(res.data.result)
           }
         } else {
@@ -446,9 +481,13 @@ const CompanyNotice = () => {
     language: "ZH"
   };
 
-  const queryNoticeListByRicInput = () => {
+  const queryNoticeListByRicInput = (checkList) => {
     paramsRicList.ric = codeValue ? codeValue : '';
-    paramsRicList.stockTypes = treeCHeckId ? treeCHeckId : '';
+    if (checkList) {
+      paramsRicList.stockTypes = checkList;
+    } else {
+      paramsRicList.stockTypes = treeCHeckId ? treeCHeckId : '';
+    }
     setLoadingListState(true);
     queryNoticeListByRic(paramsRicList).then(
       res => {
@@ -470,6 +509,36 @@ const CompanyNotice = () => {
         }
       }
     );
+  }
+
+  //收藏公告
+  const collectionNotice = (item) => {
+    console.log(item)
+    let paramsCollection = {
+      ric: ricData[item?.submissionInfo[0]?.companyInfo[0]?.mxid],
+      id: item?.commonID,
+      dcn: item?.submissionInfo[0]?.DCN,
+      size: item?.submissionInfo[0]?.size,
+      fileName: item?.submissionInfo[0]?.originalFileName ? item?.submissionInfo[0]?.originalFileName : item?.submissionInfo[0]?.formName,
+      fileType: item?.submissionInfo[0]?.fileType,
+      publicDate: item?.submissionInfo[0]?.arriveDate,
+      noticeDate: item?.submissionInfo[0]?.releaseDate,
+      type: 'notice',
+      userId: userInfo?.id,
+      accessToken: userInfo?.accessToken,
+    }
+    setLoadingListState(true);
+    collectionAdd(paramsCollection).then(
+      res => {
+        if (res?.state) {
+          message.success(intl.locale === "zh-CN" ? '收藏成功' : 'collection successful');
+          setLoadingListState(false);
+        } else {
+          message.error(res?.message)
+        }
+      }
+    )
+
   }
 
 
@@ -504,6 +573,9 @@ const CompanyNotice = () => {
             defaultSelectedKeys={[noticeCheckedKey]}
             treeData={treeNotice}
             onSelect={onSelect}
+            checkable={true}
+            checkedKeys={checkedKeys}
+            onCheck={onCheck}
           />
         </div>
         <div className={styles.tableNotice}>
@@ -522,7 +594,7 @@ const CompanyNotice = () => {
               </Option>
             ))}
           </AutoComplete>
-          <Button onClick={queryNoticeListByRicInput}>
+          <Button onClick={() => queryNoticeListByRicInput()}>
             <FormattedMessage id="pages.companyNotice.search" defaultMessage="搜索" />
           </Button>
           <Table loading={loadingListState}
@@ -549,7 +621,6 @@ const CompanyNotice = () => {
           onCancel={handleCancel}
           visible={modelState}
         >
-
         </Modal>
       </div>
     </PageContainer>

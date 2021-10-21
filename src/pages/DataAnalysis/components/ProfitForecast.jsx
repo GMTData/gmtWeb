@@ -217,8 +217,25 @@ const ProfitForecast = (props) => {
         getForecastData(e[0]._d.getFullYear(), e[1]._d.getFullYear());
     }
 
+    const labelY = {
+        offset: 50,
+        style: { // 绘图属性配置
+            fontSize: 15,
+            textAlign: 'center',
+            fontWeight: 'bold',
+        }
+    }
+
+    const labelX = {
+        style: { // 绘图属性配置
+            fontSize: 15,
+            textAlign: 'center',
+            fontWeight: 'bold',
+        }
+    }
+
     return (
-        <div className={styles.companyInfo}>
+        <div className={styles.companyInfo} >
             <div className={styles.infoTitle}>
                 <span className={styles.titleTxt}>{oneInfoTitle}</span> <span className={styles.levelTitleExt}>（单位：美元，USD）</span>
             </div>
@@ -271,13 +288,23 @@ const ProfitForecast = (props) => {
                                 <div>
                                     {casState.length > 0 ?
                                         <Chart padding={[30, 100, 60, 100]} autoFit height={300} data={casState} interactions={['element-active']}>
-                                            <Axis name="value" tickLine line grid={null} />
+                                            <Axis label={labelY} name="value" tickLine line grid={null} />
+                                            <Axis label={labelX} name="year" />
                                             <Point position="year*value" color="type" shape='circle' />
-                                            <Line shape="smooth" position="year*value" color="type" label="value" />
+                                            <Line position="year*value" color="type"
+                                                label={["value", (xValue) => {
+                                                    return {
+                                                        content: xValue,
+                                                        style: {
+                                                            fill: 'white',
+                                                            fontSize: 15
+                                                        }
+                                                    };
+                                                }]}
+                                            />
                                             <Tooltip shared showCrosshairs />
                                             <Legend name='type'
                                                 filter={type => {
-                                                    // return type.indexOf('cp') !== -1
                                                     return type === c
                                                 }}
                                                 visible={false}
@@ -318,9 +345,19 @@ const ProfitForecast = (props) => {
                                     <div>
                                         {balState.length > 0 ?
                                             <Chart padding={[30, 100, 60, 100]} autoFit height={300} data={balState} interactions={['element-active']}>
-                                                <Axis name="value" tickLine line grid={null} />
+                                                <Axis name="value" label={labelY} tickLine line grid={null} />
+                                                <Axis name="year" label={labelX}/>
                                                 <Point position="year*value" color="type" shape='circle' />
-                                                <Line shape="smooth" position="year*value" color="type" label="value" />
+                                                <Line position="year*value" color="type"
+                                                    label={["value", (xValue) => {
+                                                        return {
+                                                            content: xValue,
+                                                            style: {
+                                                                fill: 'white',
+                                                                fontSize: 15
+                                                            }
+                                                        };
+                                                    }]} />
                                                 <Tooltip shared showCrosshairs />
                                                 <Legend name='type'
                                                     filter={type => {
@@ -363,9 +400,19 @@ const ProfitForecast = (props) => {
                                         <div>
                                             {incState.length > 0 ?
                                                 <Chart padding={[30, 100, 60, 100]} autoFit height={300} data={incState} interactions={['element-active']}>
-                                                    <Axis name="value" tickLine line grid={null} />
+                                                    <Axis name="value" label={labelY} tickLine line grid={null} />
+                                                    <Axis name="year" label={labelX}/>
                                                     <Point position="year*value" color="type" shape='circle' />
-                                                    <Line shape="smooth" position="year*value" color="type" label="value" />
+                                                    <Line position="year*value" color="type"
+                                                        label={["value", (xValue) => {
+                                                            return {
+                                                                content: xValue,
+                                                                style: {
+                                                                    fill: 'white',
+                                                                    fontSize: 15
+                                                                }
+                                                            };
+                                                        }]} />
                                                     <Tooltip shared showCrosshairs />
                                                     <Legend name='type'
                                                         filter={type => {
@@ -408,9 +455,19 @@ const ProfitForecast = (props) => {
                                             <div>
                                                 {valState.length > 0 ?
                                                     <Chart padding={[30, 100, 60, 100]} autoFit height={300} data={valState} interactions={['element-active']}>
-                                                        <Axis name="value" tickLine line grid={null} />
+                                                        <Axis name="value" label={labelY} tickLine line grid={null} />
+                                                        <Axis name="year" label={labelX}/>
                                                         <Point position="year*value" color="type" shape='circle' />
-                                                        <Line shape="smooth" position="year*value" color="type" label="value" />
+                                                        <Line position="year*value" color="type"
+                                                            label={["value", (xValue) => {
+                                                                return {
+                                                                    content: xValue,
+                                                                    style: {
+                                                                        fill: 'white',
+                                                                        fontSize: 15
+                                                                    }
+                                                                };
+                                                            }]} />
                                                         <Tooltip shared showCrosshairs />
                                                         <Legend name='type'
                                                             filter={type => {
@@ -423,8 +480,9 @@ const ProfitForecast = (props) => {
                                     )) : '' : ''
                     }
                 </div>
-                : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />}
-        </div>
+                : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />
+            }
+        </div >
     )
 };
 

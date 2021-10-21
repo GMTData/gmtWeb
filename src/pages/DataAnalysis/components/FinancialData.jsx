@@ -193,7 +193,7 @@ const FinancialData = (props) => {
                             <span>{intl.locale === "zh-CN" ? '报告期' : 'During the reporting period'}</span>
                             {
                                 (dataType === '0' || dataType === '1') && casState ? casState.year.map((item) => (
-                                    <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item.reportYearTime ? item.reportYearTime : ''}</span>
+                                    <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item.fiscaYear ? item.fiscaYear : ''}</span>
                                 )) : ''
                             }
                             {
@@ -239,7 +239,7 @@ const FinancialData = (props) => {
                                 <span>{intl.locale === "zh-CN" ? '报告期' : 'During the reporting period'}</span>
                                 {
                                     (dataType === '0' || dataType === '1') && incState ? incState.year.map((item) => (
-                                        <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item.reportYearTime ? item.reportYearTime : ''}</span>
+                                        <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item.fiscaYear ? item.fiscaYear : ''}</span>
                                     )) : ''
                                 }
                                 {
@@ -285,7 +285,7 @@ const FinancialData = (props) => {
                                     <span>{intl.locale === "zh-CN" ? '报告期' : 'During the reporting period'}</span>
                                     {
                                         (dataType === '0' || dataType === '1') && balState ? balState.year.map((item) => (
-                                            <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item.reportYearTime ? item.reportYearTime : ''}</span>
+                                            <span>{intl.locale === "zh-CN" ? titleYearCn : titleYearEn}{item.fiscaYear ? item.fiscaYear : ''}</span>
                                         )) : ''
                                     } {
                                         (dataType === '0' || dataType === '2') && balState ? balState.interim.map((item) => (

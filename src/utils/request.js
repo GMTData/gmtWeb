@@ -51,11 +51,21 @@ const request = extend({
 
 // request响应拦截器, 统一处理错误信息
 request.interceptors.response.use(async (response, options) => {
-  const data = await response.clone().json();
-  if (!data.state && data.message == "accessToken invalid!") {
+  const res = await response.clone().json();
+  let { state, data, message } = res;
+  // 如果是分页的 字段调整为records
+  if (!state) {
+    if (message == "accessToken invalid!" || message == "登录失效!") {
+      if (localStorage.umi_locale === "zh-CN") {
+        message = '登录失效!';
+      }
+    }
+  }
+  if (!state && (message == "accessToken invalid!" || message == "登录失效!")) {
     // 界面报错处理,token失效统一跳转登录
     history.push(`/user/login`);
   }
-  return response;
+  return { data, state, message };
+  // return response;
 });
 export default request;

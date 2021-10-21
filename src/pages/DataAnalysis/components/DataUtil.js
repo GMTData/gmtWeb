@@ -29,8 +29,8 @@ export const menuList = [
     },
     {
         id: 2,
-        name: '新闻公告&研究报告',
-        nameEn: 'Press Announcements & Research Reports',
+        name: '新闻&公告',
+        nameEn: 'Press & Announcements',
         subMenu: [
             {
                 id: 201,
@@ -69,14 +69,14 @@ export const menuList = [
         nameEn: 'Earnings Forecasts & Research Reports',
         subMenu: [
             {
-                id: 401,
-                name: '现金流量表',
-                nameEn: 'Cash flow statement',
-            },
-            {
                 id: 402,
                 name: '资产负债表预测',
                 nameEn: 'Balance sheet forecast',
+            },
+            {
+                id: 401,
+                name: '现金流量表',
+                nameEn: 'Cash flow statement',
             },
             {
                 id: 403,
@@ -117,10 +117,11 @@ export const menuList = [
         name: '财务数据',
         nameEn: 'Financial data',
         subMenu: [
+
             {
-                id: 601,
-                name: '成长能力',
-                nameEn: 'Growth ability',
+                id: 604,
+                name: '资产负债表',
+                nameEn: 'Balance sheet',
             },
             {
                 id: 602,
@@ -133,14 +134,9 @@ export const menuList = [
                 nameEn: 'The income statement',
             },
             {
-                id: 604,
-                name: '资产负债表',
-                nameEn: 'Balance sheet',
-            },
-            {
-                id: 605,
-                name: '盈利能力与收益质量',
-                nameEn: 'Profitability and earnings quality',
+                id: 601,
+                name: '成长能力',
+                nameEn: 'Growth ability',
             },
             {
                 id: 606,
@@ -155,6 +151,11 @@ export const menuList = [
                 id: 608,
                 name: '资本结构与偿债能力',
                 nameEn: 'Capital structure and solvency',
+            },
+            {
+                id: 605,
+                name: '盈利能力与收益质量',
+                nameEn: 'Profitability and earnings quality',
             },
         ]
     },

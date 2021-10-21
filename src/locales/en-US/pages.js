@@ -257,5 +257,8 @@ export default {
   'pages.personCenter.edit': 'Edit',
   'pages.personCenter.personalData': 'personal data',
   'pages.personCenter.realNameAuthentication': 'Real-name authentication',
+  'pages.personCenter.realNameInfo': 'Real-name information authentication',
+  'pages.personCenter.country': 'country',
+
 
 };

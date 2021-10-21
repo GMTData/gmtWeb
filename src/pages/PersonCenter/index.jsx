@@ -5,15 +5,16 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { changePassword, getWithdrawList, commissionList, purchaseRecord, productList, calPayMoney, generateOrder, insertDatum, insertWithdraw, getBlance, infoUpdate, getUserInfo } from './service';
 import styles from './index.less';
 import { getAuthority, setAuthority } from '@/utils/authority';
-import { EditOutlined, CheckOutlined } from '@ant-design/icons';
+import { EditOutlined, CheckOutlined, CopyOutlined } from '@ant-design/icons';
 import moment from 'moment';
-import { fileSizeTransform, isEmpty, passwordReg, clientUp, gradeZN, UUIDGMT, eamilReg } from '@/utils/utils';
+import { fileSizeTransform, isEmpty, passwordReg, clientUp, gradeZN, UUIDGMT, eamilReg, copyDomTxt, changePayType } from '@/utils/utils';
 import payment from '../../assets/payment.png'
 import { useForm } from 'antd/lib/form/Form';
 import ic_account from '../../assets/ic_account.svg';
 import ic_income from '../../assets/ic_income.svg';
 import ic_product from '../../assets/ic_product.svg';
 import ic_sell from '../../assets/ic_sell.svg';
+import ic_share from '../../assets/ic_share.svg';
 
 const { Step } = Steps;
 const oneStepZN = '第一步:请选择产品';
@@ -55,6 +56,7 @@ let balanceParams = {
   usdLink: '',
   remark: '',
   userId: '',
+  payType: '1'
 }
 
 const { Option } = AutoComplete;
@@ -72,9 +74,9 @@ const PersonCenter = () => {
 
 
   // submenu keys of first level
-  const rootSubmenuKeys = ['sub1', 'sub2', 'sub3', 'sub4'];
+  const rootSubmenuKeys = ['sub1', 'sub2', 'sub3', 'sub4', 'sub5'];
 
-  const [openKeys, setOpenKeys] = useState(['sub1', 'sub2', 'sub3', 'sub4']);
+  const [openKeys, setOpenKeys] = useState(['sub1', 'sub2', 'sub3', 'sub4', 'sub5']);
   const [keyType, setKeyType] = useState('1')
 
   const onOpenChange = keys => {
@@ -377,7 +379,7 @@ const PersonCenter = () => {
 
   let user = getAuthority();//获取用户相关信息
 
-  const [userInfo, setuUserInfo] = useState(user)
+  const [userInfo, setUserInfo] = useState(user)
   const [cutPage, setCutPage] = useState(1);
 
   //出金列表参数
@@ -601,6 +603,11 @@ const PersonCenter = () => {
   const showModalRealName = (type) => {
     setApprove(type)
     setIsModalRealNameVisible(true);
+    setTimeout(() => {
+      $("#country").countrySelect({
+        defaultCountry: "cn",
+      });
+    }, 20);
   };
 
   const handleOkRealName = () => {
@@ -662,6 +669,8 @@ const PersonCenter = () => {
 
   //实名认证
   const realNameInfo = async () => {
+    console.log($("#country").countrySelect("getSelectedCountryData").iso2);
+    console.log($("#country").countrySelect("getSelectedCountryData").name);
     //实名认证信息参数
     paramsRealName.identityCardUrlPositive = paramsRealNameObj.identityCardUrlPositive;
     paramsRealName.identityCardUrlReverse = paramsRealNameObj.identityCardUrlReverse;
@@ -669,6 +678,7 @@ const PersonCenter = () => {
     paramsRealName.realName = formRealName.getFieldValue('realName') ? formRealName.getFieldValue('realName') : '';
     paramsRealName.usdLink = formRealName.getFieldValue('uuidPay') ? formRealName.getFieldValue('uuidPay') : '';
     paramsRealName.identityNumber = formRealName.getFieldValue('cardNo') ? formRealName.getFieldValue('cardNo') : '';
+    paramsRealName.country = $("#country").countrySelect("getSelectedCountryData").iso2;
 
     if (approve == 0) {
       if (isEmpty(paramsRealName.realName) || isEmpty(paramsRealName.identityNumber)) {
@@ -822,9 +832,11 @@ const PersonCenter = () => {
       qrCode: '1',
       usdLink: formAccout.getFieldValue('usdLink'),
       remark: formAccout.getFieldValue('remark') ? formAccout.getFieldValue('remark') : '',
+      payType: formAccout.getFieldValue('payType') ? formAccout.getFieldValue('payType') : '1',
       userId: userInfo?.id,
       accessToken: user?.accessToken
     }
+    balanceParams.payType = changePayType(balanceParams.payType);//处理支付方式的转换
     const res = await getBlance(
       {
         userId: userInfo?.id,
@@ -938,7 +950,7 @@ const PersonCenter = () => {
     }
     const res = await getUserInfo(parsmUser)
     if (res?.state) {
-      setuUserInfo(res?.data)
+      setUserInfo(res?.data)
     }
   }
 
@@ -947,6 +959,22 @@ const PersonCenter = () => {
   const onChangeWay = (e) => {
     setWayState(e.target.value)
   }
+
+  //复制到粘贴板
+  const copyDomContent = (id) => {
+    copyDomTxt(id);
+  }
+
+  //个人推广链接地址
+  const personToPromote = `https://www.gmtdata.technology/gmtweb/#/user/register?recommendationCode=` + userInfo?.recommendationCode;
+
+  //生成推广二维码
+  useEffect(() => {
+    let personToPromoteQrcode = document.getElementById("personToPromoteQrcode");
+    if (personToPromoteQrcode) {
+      new QRCode(personToPromoteQrcode, personToPromote);
+    }
+  }, [keyType])
 
   return (
     <PageContainer>
@@ -976,6 +1004,9 @@ const PersonCenter = () => {
             </SubMenu>
             <SubMenu key="sub4" icon={<img src={ic_income} style={{ marginRight: 5 }} />} title={intl.locale === "zh-CN" ? '收益管理' : 'Revenue management'}>
               <Menu.Item key="8" title={intl.locale === "zh-CN" ? '佣金记录' : 'Commission record'}>{intl.locale === "zh-CN" ? '佣金记录' : 'Commission record'}</Menu.Item>
+            </SubMenu>
+            <SubMenu key="sub5" icon={<img src={ic_share} style={{ marginRight: 5 }} />} title={intl.locale === "zh-CN" ? '邀请管理' : 'Invitation management'}>
+              <Menu.Item key="9" title={intl.locale === "zh-CN" ? '推广链接' : 'To promote links'}>{intl.locale === "zh-CN" ? '推广链接' : 'To promote links'}</Menu.Item>
             </SubMenu>
           </Menu>
           <div style={{ display: 'inline-block', position: 'absolute', width: contentWdith, marginLeft: 20, height: '100%', overflowY: 'scroll' }}>
@@ -1045,9 +1076,13 @@ const PersonCenter = () => {
                       defaultMessage: '上级邀请码',
                     })}>{userInfo.superiorRecommendationCode ? userInfo.superiorRecommendationCode : ''}</Descriptions.Item>
                     <Descriptions.Item label={intl.formatMessage({
+                      id: 'pages.personCenter.country',
+                      defaultMessage: '国家',
+                    })}>{intl.locale === "zh-CN" ? userInfo?.countryZh : userInfo?.countryEn}</Descriptions.Item>
+                    <Descriptions.Item label={intl.formatMessage({
                       id: 'pages.personCenter.realName',
                       defaultMessage: '实名信息',
-                    })}>{userInfo.realName ? userInfo.realName : ''}{!isEmpty(userInfo.identityNumber) ? <span><CheckOutlined />{intl.locale === "zh-CN" ? '已认证' : 'certified'}</span> : <a onClick={() => showModalRealName(0)}><EditOutlined />{intl.locale === "zh-CN" ? '去认证' : 'Go to the certification'}</a>}</Descriptions.Item>
+                    })}>{userInfo.realName ? userInfo.realName : ''}{isEmpty(userInfo.identityNumber) ? <span><CheckOutlined />{intl.locale === "zh-CN" ? '已认证' : 'certified'}</span> : <a onClick={() => showModalRealName(0)}><EditOutlined />{intl.locale === "zh-CN" ? '去认证' : 'Go to the certification'}</a>}</Descriptions.Item>
                     {
                       userInfo.identityNumber ?
                         <Descriptions.Item label={intl.locale === "zh-CN" ? '身份证' : 'Id card'}>
@@ -1198,20 +1233,22 @@ const PersonCenter = () => {
                               <InputNumber style={{ width: '100%' }} />
                             </Form.Item>
                             <Form.Item
-                              name="goldWay"
-                              label={intl.locale === "zh-CN" ? '选择出金方式' : 'Choose the gold way'}
+                              name="payType"
+                              label={intl.locale === "zh-CN" ? '支付方式' : 'Method of payment'}
                             >
                               <Radio.Group onChange={onChangeWay} defaultValue={1}>
                                 <Space direction="vertical">
                                   <Radio value={0}>{intl.locale === "zh-CN" ? '银行卡出金' : 'Bank card payment'}</Radio>
                                   <Radio value={1}>{intl.locale === "zh-CN" ? 'USDT出金' : 'USDT out gold'}</Radio>
+                                  <Radio value={2}>{intl.locale === "zh-CN" ? '支付宝' : 'Alipay'}</Radio>
+                                  <Radio value={3}>{intl.locale === "zh-CN" ? '微信' : 'WeChat'}</Radio>
                                 </Space>
                               </Radio.Group>
                             </Form.Item>
                             {
                               wayState == 0 ?
                                 <Form.Item
-                                  name="bankCard"
+                                  name="usdLink"
                                   label={intl.locale === "zh-CN" ? '银行卡号' : 'Bank card number'}
                                 >
                                   <Input disabled />
@@ -1223,7 +1260,21 @@ const PersonCenter = () => {
                                   >
                                     <Input disabled />
                                   </Form.Item>
-                                  : ''
+                                  : wayState == 2 ?
+                                    <Form.Item
+                                      name="usdLink"
+                                      label={intl.locale === "zh-CN" ? '支付宝账号' : 'Alipay Account'}
+                                    >
+                                      <Input />
+                                    </Form.Item>
+                                    : wayState == 3 ?
+                                      <Form.Item
+                                        name="usdLink"
+                                        label={intl.locale === "zh-CN" ? '微信账号' : 'WeChat account'}
+                                      >
+                                        <Input />
+                                      </Form.Item>
+                                      : ''
                             }
 
                             <Form.Item
@@ -1278,7 +1329,23 @@ const PersonCenter = () => {
                                 onChange={onChangeCommission}
                                 showSizeChanger={onShowSizeChangeCommission} />
                             </div>
-                            : ''}
+                            : keyType == '9' ?
+                              <div style={{ marginLeft: 150 }}>
+                                <Descriptions column={1} title={intl.locale === "zh-CN" ? '推广链接' : 'To promote links'}>
+                                  <Descriptions.Item label={intl.locale === "zh-CN" ? '代理推广邀请码' : 'Agent promotion invitation code'}>
+                                    <span id="code">{userInfo.recommendationCode ? userInfo.recommendationCode : ''}</span>
+                                    <CopyOutlined style={{ marginLeft: 20 }} onClick={() => copyDomContent(userInfo?.recommendationCode)} />
+                                  </Descriptions.Item>
+                                  <Descriptions.Item label={intl.locale === "zh-CN" ? '代理推广链接' : 'Agent promotion link'}>
+                                    {personToPromote}
+                                    <CopyOutlined style={{ marginLeft: 20 }} onClick={() => copyDomContent(personToPromote)} />
+                                  </Descriptions.Item>
+                                  <Descriptions.Item label={intl.locale === "zh-CN" ? '推广二维码' : 'Promote QR code'}>
+                                    <div id="personToPromoteQrcode"></div>
+                                  </Descriptions.Item>
+                                </Descriptions>
+                              </div>
+                              : ''}
           </div>
         </div>
 
@@ -1665,7 +1732,17 @@ const PersonCenter = () => {
                 >
                   <Input />
                 </Form.Item>
-
+                <Form.Item
+                  name="country"
+                  label={intl.locale === "zh-CN" ? '国家' : 'country'}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <input type="text" class='ant-input' id="country" />
+                </Form.Item>
                 <div className={styles.upContent}>
                   <div>
                     <span className={styles.imgSpan}>
@@ -1771,7 +1848,7 @@ const PersonCenter = () => {
           </Form>
         </Modal>
       </div>
-    </PageContainer>
+    </PageContainer >
   )
 };
 

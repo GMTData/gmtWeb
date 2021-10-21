@@ -82,6 +82,10 @@ const Register = (props) => {
 
   useEffect(() => {
     setPhoneL();
+    //地址栏有推广码自动填充
+    form.setFieldsValue({
+      recommendationCode: props?.history?.location?.query?.recommendationCode
+    })
   }, [])
 
   //设置电话号码
