@@ -101,6 +101,14 @@ export async function insertDatum(params, options) {
         ...(options || {}),
     });
 }
+//获取国际码
+export async function countryCode(params, options) {
+    return request(`${PATH}/countryCode/query?language=${params.language}`, {
+        method: 'GET',
+        headers: { 'accessToken': params.accessToken, },
+        ...(options || {}),
+    });
+}
 
 /**.提交 出金申请*/
 export async function insertWithdraw(params, options) {

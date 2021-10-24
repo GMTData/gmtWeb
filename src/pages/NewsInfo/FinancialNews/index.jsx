@@ -1,8 +1,8 @@
-import { message, Timeline, Spin, Empty, Checkbox, Pagination } from 'antd';
+import { message, Timeline, Spin, Empty, Checkbox, Pagination, Tabs } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useIntl, FormattedMessage, Link } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
-import { queryClassList, queryByParentId, queryNewsList } from './service';
+import { queryClassList, queryByParentId, queryNewsList, queryCollectionByUserId } from './service';
 import styles from './index.less';
 import { getAuthority } from '@/utils/authority';
 import { weeksCN, weeksEN, subGroupArray } from '../../../utils/utils'
@@ -14,6 +14,7 @@ const localTIme = new Date();
 let isRefresh = true;
 let pageTotal = '共';
 let pageItems = '条';
+const { TabPane } = Tabs;
 
 const FinancialNews = () => {
   const userInfo = getAuthority();//获取用户相关信息
@@ -184,79 +185,149 @@ const FinancialNews = () => {
     setNewsPageList(subGroupArray(newsList, size)[current - 1]);
   }
 
+  //查询收藏
+  let paramsCollectionQuery = {
+    userId: userInfo?.id,
+    type: 'news',
+    accessToken: userInfo.accessToken,
+  };
+
+  const [newsMyList, setNewsMyList] = useState([])
+  const [newsMyPageList, setNewsMyPageList] = useState([])
+
+  const getCollectionList = () => {
+    queryCollectionByUserId(paramsCollectionQuery).then(
+      res => {
+        if (res?.state) {
+          setNewsMyList(res?.data)
+          setNewsMyPageList(subGroupArray(res?.data, 20)[0]);
+          setLoadingListState(false);
+        } else {
+          message.error(res?.message)
+          setLoadingListState(false);
+        }
+      }
+    )
+  }
+
+  const [cutPageMy, setCutPageMy] = useState(1);
+  const onChangeMy = (page, pageSize) => {
+    setCutPageMy(page);
+    setNewsMyPageList(subGroupArray(newsMyList, pageSize)[page - 1]);
+  }
+
+  const onShowSizeChangeMy = (current, size) => {
+    setCutPageMy(current);
+    setNewsMyPageList(subGroupArray(newsMyList, size)[current - 1]);
+  }
+  //切换页面选项卡
+  const callback = (key) => {
+    if (key == '2') {
+      getCollectionList()
+    }
+  }
+
   return (
     <PageContainer loading={loadingState} className={styles.newContent}>
-      <div className={styles.oneLevelTitle}>
-        {oneLevel ? oneLevel.map((item, index) => (
-          <span key={index} value={item.className}
-            onClick={() => getNewsList(item)}
-            className={[styles.oneLevel, item.id === levelState ? styles.oneLevelActive : ''].join(' ')}>
-            {item.className}
-          </span>
-        )) : ''
-        }
-      </div>
+      <Tabs defaultActiveKey="1" onChange={callback} style={{ margin: '0px 20px' }}>
+        <TabPane tab={intl.locale === "zh-CN" ? '财经新闻' : 'Financial news'} key="1">
+          <div className={styles.oneLevelTitle}>
+            {oneLevel ? oneLevel.map((item, index) => (
+              <span key={index} value={item.className}
+                onClick={() => getNewsList(item)}
+                className={[styles.oneLevel, item.id === levelState ? styles.oneLevelActive : ''].join(' ')}>
+                {item.className}
+              </span>
+            )) : ''
+            }
+          </div>
 
-      <div className={[styles.oneLevelTitle, twoLevel.length > 0 ? styles.twoLevelTitle : ''].join(' ')}>
-        {twoLevel ? twoLevel.map((item, index) => (
-          <span key={index} value={item.className}
-            onClick={() => getNewsList(item)}
-            className={[styles.twoLevel, item.id === levelTwoState ? styles.twoLevelActive : ''].join(' ')}>
-            {item.className}
-          </span>
-        )) : ''
-        }
-      </div>
-      <div className={[styles.oneLevelTitle, twoLevel.length > 0 ? styles.threeLevelTitle : ''].join(' ')}>
-        {threeLevel ? threeLevel.map((item, index) => (
-          <span key={index} value={item.className}
-            onClick={() => getNewsList(item)}
-            className={[styles.threeLevel, item.id === levelThreeState ? styles.threeLevelActive : styles.txtCoWh].join(' ')}>
-            {item.className}
-          </span>
-        )) : ''
-        }
-      </div>
-      <div>
-        <span className={styles.dayTtile}>{moment(new Date()).format('YYYY-MM-DD')},{new Date().toTimeString()}</span>
-        {/* <span className={styles.dayTtile}>
+          <div className={[styles.oneLevelTitle, twoLevel.length > 0 ? styles.twoLevelTitle : ''].join(' ')}>
+            {twoLevel ? twoLevel.map((item, index) => (
+              <span key={index} value={item.className}
+                onClick={() => getNewsList(item)}
+                className={[styles.twoLevel, item.id === levelTwoState ? styles.twoLevelActive : ''].join(' ')}>
+                {item.className}
+              </span>
+            )) : ''
+            }
+          </div>
+          <div className={[styles.oneLevelTitle, twoLevel.length > 0 ? styles.threeLevelTitle : ''].join(' ')}>
+            {threeLevel ? threeLevel.map((item, index) => (
+              <span key={index} value={item.className}
+                onClick={() => getNewsList(item)}
+                className={[styles.threeLevel, item.id === levelThreeState ? styles.threeLevelActive : styles.txtCoWh].join(' ')}>
+                {item.className}
+              </span>
+            )) : ''
+            }
+          </div>
+          <div>
+            <span className={styles.dayTtile}>{moment(new Date()).format('YYYY-MM-DD')},{new Date().toTimeString()}</span>
+            {/* <span className={styles.dayTtile}>
           {moment(new Date()).format('YYYY-MM-DD')},{intl.locale === "zh-CN" ? weeksCN(moment().format('d')) : weeksEN(moment().format('d'))}</span> */}
-        <span>
-          <span style={{ 'marginLeft': '400px' }}>
-            <Checkbox className={styles.checkInfo} defaultChecked={checkState} onChange={(e) => onChangeCheck(e)} />
-            <span>{timeCount}</span>
-            <FormattedMessage id="pages.financialNews.seconds" defaultMessage="秒" />
-            <FormattedMessage id="pages.financialNews.refresh" defaultMessage="后刷新" />
-          </span>
-          <ReloadOutlined onClick={() => getNewsList()} className={styles.refresh} />
-        </span>
-      </div>
-      {loadingListState ? <Spin className={styles.loadingSpin} size='large' /> :
-        <div className={styles.timelineTop}>
-          <Timeline mode={'left'}>
-            {newsPageList && newsPageList.length > 0 ? newsPageList.map((item, index) => (
-              <Timeline.Item label={moment(item.LT).format("HH:mm")} key={item.ID}>
-                <Link target="_blank" to={{
-                  pathname: `/news/details/${item.ID}`
+            <span>
+              <span style={{ 'marginLeft': '400px' }}>
+                <Checkbox className={styles.checkInfo} defaultChecked={checkState} onChange={(e) => onChangeCheck(e)} />
+                <span>{timeCount}</span>
+                <FormattedMessage id="pages.financialNews.seconds" defaultMessage="秒" />
+                <FormattedMessage id="pages.financialNews.refresh" defaultMessage="后刷新" />
+              </span>
+              <ReloadOutlined onClick={() => getNewsList()} className={styles.refresh} />
+            </span>
+          </div>
+          {loadingListState ? <Spin className={styles.loadingSpin} size='large' /> :
+            <div className={styles.timelineTop}>
+              <Timeline mode={'left'}>
+                {newsPageList && newsPageList.length > 0 ? newsPageList.map((item, index) => (
+                  <Timeline.Item label={moment(item.LT).format("HH:mm")} key={item.ID}>
+                    <Link target="_blank" to={{
+                      pathname: `/news/details/${item.ID}`
 
-                }}>
-                  <span className={styles.checkInfo}>{item.HT}</span>
-                </Link>
-              </Timeline.Item>
-            )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='No result' />}
-          </Timeline>
-        </div>
-      }
-      <Pagination
-        total={newsList ? newsList.length : 0}
-        showTotal={(total) => `${pageTotal} ${newsList ? newsList.length : 0} ${pageItems} `}
-        defaultPageSize={20}
-        current={cutPage ? cutPage : 1}
-        onChange={onChange}
-        onShowSizeChange={onShowSizeChange}
-      />
+                    }}>
+                      <span className={styles.checkInfo}>{item.HT}</span>
+                    </Link>
+                  </Timeline.Item>
+                )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='No result' />}
+              </Timeline>
+            </div>
+          }
+          <Pagination
+            total={newsList ? newsList.length : 0}
+            showTotal={(total) => `${pageTotal} ${newsList ? newsList.length : 0} ${pageItems} `}
+            defaultPageSize={20}
+            current={cutPage ? cutPage : 1}
+            onChange={onChange}
+            onShowSizeChange={onShowSizeChange}
+          />
+        </TabPane>
+        <TabPane tab={intl.locale === "zh-CN" ? '我的收藏' : 'My collection'} key="2">
+          {loadingListState ? <Spin className={styles.loadingSpin} size='large' /> :
+            <div className={styles.timelineTop}>
+              <Timeline mode={'left'}>
+                {newsMyPageList && newsMyPageList.length > 0 ? newsMyPageList.map((item, index) => (
+                  <Timeline.Item label={moment(item.publicDate).format("HH:mm")} key={item.dcn}>
+                    <Link target="_blank" to={{
+                      pathname: `/news/details/${item.dcn}`
 
-
+                    }}>
+                      <span className={styles.checkInfo}>{item.fileName}</span>
+                    </Link>
+                  </Timeline.Item>
+                )) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='No result' />}
+              </Timeline>
+            </div>
+          }
+          <Pagination
+            total={newsMyList ? newsMyList.length : 0}
+            showTotal={(total) => `${pageTotal} ${newsMyList ? newsMyList.length : 0} ${pageItems} `}
+            defaultPageSize={20}
+            current={cutPageMy ? cutPageMy : 1}
+            onChange={onChangeMy}
+            onShowSizeChange={onShowSizeChangeMy}
+          />
+        </TabPane>
+      </Tabs>
     </PageContainer>
   )
 };

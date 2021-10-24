@@ -40,18 +40,45 @@ const NewsDetails = (props) => {
     );
   }, []);
 
+  //收藏新闻
+  const collectionNotice = (item) => {
+    let paramsCollection = {
+      ric: 'story',
+      id: '',
+      dcn: item?.ID,
+      size: item?.TN,
+      fileName: item?.HT,
+      fileType: item?.TY,
+      publicDate: item?.LT ? moment(item?.CT).format("yyyy-MM-DD HH:mm:ss") : '',
+      noticeDate: item?.RT ? moment(item?.RT).format("yyyy-MM-DD HH:mm:ss") : '',
+      type: 'news',
+      userId: userInfo?.id,
+      accessToken: userInfo?.accessToken,
+    }
+    collectionAdd(paramsCollection).then(
+      res => {
+        if (res?.state) {
+          message.success(intl.locale === "zh-CN" ? '收藏成功' : 'collection successful');
+        } else {
+          message.error(res?.message)
+        }
+      }
+    )
+
+  }
+
   return (
     <PageContainer loading={loadingState}>
       <div >
-        <div className={styles.infoTime}>{moment(newsInfo.CT).format("yyyy-MM-DD HH:mm:ss")}</div>
-        <div className={styles.infoTitle}>{newsInfo.HT}</div>
+        <div className={styles.infoTime}>{moment(newsInfo?.CT).format("yyyy-MM-DD HH:mm:ss")}</div>
+        <div className={styles.infoTitle}>{newsInfo?.HT}</div>
         <div className={styles.infoTxtTitle}>
           <a>
-            <StarOutlined className={styles.starNews} />
+            <StarOutlined className={styles.starNews} onClick={() => collectionNotice(newsInfo)} />
           </a>
         </div>
         <div className={styles.infoTxt}>
-          <div dangerouslySetInnerHTML={{ __html: newsInfo.TE }}></div>
+          <div dangerouslySetInnerHTML={{ __html: newsInfo?.TE }}></div>
         </div>
       </div>
     </PageContainer>

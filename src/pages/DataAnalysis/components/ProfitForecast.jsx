@@ -237,7 +237,7 @@ const ProfitForecast = (props) => {
     return (
         <div className={styles.companyInfo} >
             <div className={styles.infoTitle}>
-                <span className={styles.titleTxt}>{oneInfoTitle}</span> <span className={styles.levelTitleExt}>（单位：美元，USD）</span>
+                <span className={styles.titleTxt}>{oneInfoTitle}</span> <span className={styles.levelTitleExt}></span>
             </div>
             <div className={styles.timeRange}>
                 <FormattedMessage id="pages.tradingValuation.timeRange" defaultMessage="时间范围:" />

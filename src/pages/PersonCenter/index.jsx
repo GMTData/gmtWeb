@@ -1,8 +1,8 @@
-import { Button, message, Steps, Input, InputNumber, Modal, Pagination, AutoComplete, Tabs, Descriptions, Form, Radio, Table, Menu, Space } from 'antd';
+import { Button, message, Steps, Input, InputNumber, Modal, Pagination, Select, Tabs, Descriptions, Form, Radio, Table, Menu, Space } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useIntl, FormattedMessage, Link } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
-import { changePassword, getWithdrawList, commissionList, purchaseRecord, productList, calPayMoney, generateOrder, insertDatum, insertWithdraw, getBlance, infoUpdate, getUserInfo } from './service';
+import { changePassword, getWithdrawList, commissionList, purchaseRecord, productList, calPayMoney, generateOrder, insertDatum, insertWithdraw, getBlance, infoUpdate, getUserInfo, countryCode } from './service';
 import styles from './index.less';
 import { getAuthority, setAuthority } from '@/utils/authority';
 import { EditOutlined, CheckOutlined, CopyOutlined } from '@ant-design/icons';
@@ -41,6 +41,7 @@ let productObj = {
 //实名认证信息参数
 let paramsRealNameObj = {
   realName: "",
+  country: '',
   usdLink: "", //usd链接
   prCode: "", //二维码图片地址
   identityCardUrlPositive: "", //身份证正面
@@ -59,7 +60,7 @@ let balanceParams = {
   payType: '1'
 }
 
-const { Option } = AutoComplete;
+const { Option } = Select;
 const { TabPane } = Tabs;
 
 const { SubMenu } = Menu;
@@ -603,12 +604,36 @@ const PersonCenter = () => {
   const showModalRealName = (type) => {
     setApprove(type)
     setIsModalRealNameVisible(true);
-    setTimeout(() => {
-      $("#country").countrySelect({
-        defaultCountry: "cn",
-      });
-    }, 20);
+    // setTimeout(() => {
+    //   $("#country").countrySelect({
+    //     defaultCountry: "cn",
+    //   });
+    // }, 20);
+    getCountryCode()
   };
+
+  //获取国际码
+  let paramsCode = {
+    language: intl.locale === "zh-CN" ? 'CH' : 'US',
+    accessToken: user?.accessToken
+  }
+
+  const [countryState, setCountryState] = useState([]);
+  const getCountryCode = () => {
+    countryCode(paramsCode).then(
+      res => {
+        if (res?.state) {
+          setCountryState(res?.data)
+        } else {
+          message.error(res?.message);
+        }
+      }
+    )
+  }
+
+  const setCountryId = (e, option) => {
+    paramsRealNameObj.country = option?.id;
+  }
 
   const handleOkRealName = () => {
     realNameInfo()
@@ -669,16 +694,14 @@ const PersonCenter = () => {
 
   //实名认证
   const realNameInfo = async () => {
-    console.log($("#country").countrySelect("getSelectedCountryData").iso2);
-    console.log($("#country").countrySelect("getSelectedCountryData").name);
     //实名认证信息参数
     paramsRealName.identityCardUrlPositive = paramsRealNameObj.identityCardUrlPositive;
     paramsRealName.identityCardUrlReverse = paramsRealNameObj.identityCardUrlReverse;
-    paramsRealName.prCode = paramsRealNameObj.prCode;
+    paramsRealName.prCode = paramsRealNameObj.prCode ? paramsRealNameObj.prCode : '';
     paramsRealName.realName = formRealName.getFieldValue('realName') ? formRealName.getFieldValue('realName') : '';
     paramsRealName.usdLink = formRealName.getFieldValue('uuidPay') ? formRealName.getFieldValue('uuidPay') : '';
     paramsRealName.identityNumber = formRealName.getFieldValue('cardNo') ? formRealName.getFieldValue('cardNo') : '';
-    paramsRealName.country = $("#country").countrySelect("getSelectedCountryData").iso2;
+    paramsRealName.country = paramsRealNameObj.country;
 
     if (approve == 0) {
       if (isEmpty(paramsRealName.realName) || isEmpty(paramsRealName.identityNumber)) {
@@ -1082,7 +1105,7 @@ const PersonCenter = () => {
                     <Descriptions.Item label={intl.formatMessage({
                       id: 'pages.personCenter.realName',
                       defaultMessage: '实名信息',
-                    })}>{userInfo.realName ? userInfo.realName : ''}{isEmpty(userInfo.identityNumber) ? <span><CheckOutlined />{intl.locale === "zh-CN" ? '已认证' : 'certified'}</span> : <a onClick={() => showModalRealName(0)}><EditOutlined />{intl.locale === "zh-CN" ? '去认证' : 'Go to the certification'}</a>}</Descriptions.Item>
+                    })}>{userInfo.realName ? userInfo.realName : ''}{!isEmpty(userInfo.identityNumber) ? <span><CheckOutlined />{intl.locale === "zh-CN" ? '已认证' : 'certified'}</span> : <a onClick={() => showModalRealName(0)}><EditOutlined />{intl.locale === "zh-CN" ? '去认证' : 'Go to the certification'}</a>}</Descriptions.Item>
                     {
                       userInfo.identityNumber ?
                         <Descriptions.Item label={intl.locale === "zh-CN" ? '身份证' : 'Id card'}>
@@ -1741,7 +1764,16 @@ const PersonCenter = () => {
                     },
                   ]}
                 >
-                  <input type="text" class='ant-input' id="country" />
+                  <Select
+                    showSearch
+                    onSelect={setCountryId}
+                    placeholder={intl.locale === "zh-CN" ? '输入国家' : 'input country'}>
+                    {countryState.length > 0 ? countryState.map((code, index) => (
+                      <Option key={index} id={code.id} value={intl.locale === "zh-CN" ? code.countryChinese : code.countryEnglish}>
+                        {intl.locale === "zh-CN" ? code.countryChinese : code.countryEnglish}
+                      </Option>
+                    )) : ''}
+                  </Select>
                 </Form.Item>
                 <div className={styles.upContent}>
                   <div>

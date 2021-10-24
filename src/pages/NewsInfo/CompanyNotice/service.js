@@ -85,3 +85,10 @@ export async function collectionAdd(params) {
     data: JSON.stringify(params)
   });
 }
+//查询收藏公告
+export async function queryCollectionByUserId(params) {
+  return request(`${PATH}/collection/queryByUserId?userId=${params.userId}&type=${params.type}`, {
+    method: 'get',
+    headers: { 'accessToken': params.accessToken },
+  });
+}

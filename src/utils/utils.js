@@ -397,6 +397,7 @@ export const copyDomTxt = (text) => {
   inputDom.setAttribute('value', text);
   inputDom.select();
   document.execCommand("Copy"); // 执行浏览器复制命令
+  document.body.removeChild(inputDom);
   if (localStorage.umi_locale === "zh-CN") {
     message.success("复制成功");
   } else {
