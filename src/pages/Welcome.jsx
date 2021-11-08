@@ -197,9 +197,9 @@ const WelcomeHome = () => {
                 <div>
                   <img style={contentStyle} src={image02} />
                 </div>
-                <div>
+                {/* <div>
                   <img style={contentStyle} src={image03} />
-                </div>
+                </div> */}
                 <div>
                   <img style={contentStyle} src={image04} />
                 </div>

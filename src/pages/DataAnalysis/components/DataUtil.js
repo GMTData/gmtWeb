@@ -30,17 +30,17 @@ export const menuList = [
     {
         id: 2,
         name: '新闻&公告',
-        nameEn: 'Press & Announcements',
+        nameEn: 'News & Announcements',
         subMenu: [
             {
                 id: 201,
-                name: '新闻公告',
-                nameEn: 'Press Announcements',
+                name: '公司新闻',
+                nameEn: 'Company news',
             },
             {
                 id: 202,
-                name: '研究报告',
-                nameEn: 'Research Reports',
+                name: '公司公告',
+                nameEn: 'Company announcement',
             },
         ]
     },

@@ -143,9 +143,9 @@ const NewsNotice = (props) => {
             pageTotal = '共';
             pageItems = '条';
             if ((keyType && keyType == 201) || keyType == 0) {
-                setOneInfoTitle('新闻公告');
+                setOneInfoTitle('公司新闻');
             } else if (keyType && keyType == 202) {
-                setOneInfoTitle('研究报告');
+                setOneInfoTitle('公司公告');
                 queryNewsNoticeLists(ric);
             }
         } else {
@@ -153,9 +153,9 @@ const NewsNotice = (props) => {
             pageTotal = 'Total';
             pageItems = 'items';
             if ((keyType && keyType == 201) || keyType == 0) {
-                setOneInfoTitle('Press Announcements');
+                setOneInfoTitle('Company news');
             } else if (keyType && keyType == 202) {
-                setOneInfoTitle('Research Reports');
+                setOneInfoTitle('Company announcement');
                 queryNewsNoticeLists(ric);
             }
         }
@@ -302,15 +302,15 @@ const NewsNotice = (props) => {
                     <div>
                         <Table loading={loadingState}
                             scroll={{ x: '100%' }}
-                            rowKey={(record) => record.ID}
+                            rowKey={(record) => record?.ID}
                             columns={columnsNews}
                             rowClassName={getRowClassName}
                             dataSource={newsPage}
                             pagination={false} />
                         <div className={styles.pageBox}>
                             <Pagination
-                                total={newsList.length}
-                                showTotal={(total) => `${pageTotal} ${newsList.length} ${pageItems} `}
+                                total={newsList?.length}
+                                showTotal={(total) => `${pageTotal} ${newsList?.length} ${pageItems} `}
                                 defaultPageSize={20}
                                 current={cutPage ? cutPage : 1}
                                 onChange={onChange}
@@ -322,7 +322,7 @@ const NewsNotice = (props) => {
                         <div>
                             <Table loading={loadingState}
                                 scroll={{ x: '100%' }}
-                                rowKey={(record) => record.commonID}
+                                rowKey={(record) => record?.commonID}
                                 columns={columns}
                                 rowClassName={getRowClassName}
                                 dataSource={newsNoticePage}
@@ -330,7 +330,7 @@ const NewsNotice = (props) => {
                             <div className={styles.pageBox}>
                                 <Pagination
                                     total={newsNoticeData.totalHit}
-                                    showTotal={(total) => `${pageTotal} ${newsNoticeData.totalHit ? newsNoticeData.totalHit : 0} ${pageItems} `}
+                                    showTotal={(total) => `${pageTotal} ${newsNoticeData?.totalHit ? newsNoticeData?.totalHit : 0} ${pageItems} `}
                                     defaultPageSize={20}
                                     current={cutPage ? cutPage : 1}
                                     onChange={onChange}

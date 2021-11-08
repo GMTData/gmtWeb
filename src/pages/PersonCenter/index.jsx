@@ -1077,7 +1077,9 @@ const PersonCenter = () => {
                     <Descriptions.Item label={intl.formatMessage({
                       id: 'pages.personCenter.userName',
                       defaultMessage: '姓名',
-                    })}>{userInfo.userName ? userInfo.userName : ''}<a onClick={() => showModalInfo(0)}><EditOutlined /><FormattedMessage id="pages.personCenter.edit" defaultMessage='修改' /></a></Descriptions.Item>
+                    })}>{userInfo.userName ? userInfo.userName : ''}
+                    {/* <a onClick={() => showModalInfo(0)}><EditOutlined /><FormattedMessage id="pages.personCenter.edit" defaultMessage='修改' /></a> */}
+                    </Descriptions.Item>
                     <Descriptions.Item label={intl.formatMessage({
                       id: 'pages.personCenter.userPassword',
                       defaultMessage: '用户密码',

@@ -204,7 +204,7 @@ const FinancialData = (props) => {
                         </div>
                         <div>
                             <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '现金流量' : 'The cash flow'}</span>
-                            <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：百万元，' + currencyCode + '）' : '(Unit: Million Yuan, ' + currencyCode + ')'}</span>
+                            <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：'+currencyCode+',百万）' : '(Unit:'+currencyCode+' ,Million)'}</span>
                         </div>
                         {
                             casState.year.length > 0 ? casState.year[0].lineitem.map((cas, index) => (
@@ -250,7 +250,7 @@ const FinancialData = (props) => {
                             </div>
                             <div>
                                 <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '营业总收入' : 'Gross revenue'}</span>
-                                <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：百万元，' + currencyCode + '）' : '(Unit: Million Yuan, ' + currencyCode + ')'}</span>
+                                <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：'+currencyCode+',百万）' : '(Unit:'+currencyCode+' ,Million)'}</span>
                             </div>
                             {
                                 incState.year.length > 0 ? incState.year[0].lineitem.map((cas, index) => (
@@ -295,7 +295,7 @@ const FinancialData = (props) => {
                                 </div>
                                 <div>
                                     <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '资产' : 'assets'}</span>
-                                    <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：百万元，' + currencyCode + '）' : '(Unit: Million Yuan, ' + currencyCode + ')'}</span>
+                                    <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：'+currencyCode+',百万）' : '(Unit:'+currencyCode+' ,Million)'}</span>
                                 </div>
                                 {
                                     balState.year.length > 0 ? balState.year[0].lineitem.map((cas, index) => (
@@ -336,7 +336,7 @@ const FinancialData = (props) => {
                                     </div>
                                     <div>
                                         <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '现金流量' : 'The cash flow'}</span>
-                                        <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：百万元，' + currencyCode + '）' : '(Unit: Million Yuan, ' + currencyCode + ')'}</span>
+                                        <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：'+currencyCode+',百万）' : '(Unit:'+currencyCode+' ,Million)'}</span>
                                     </div>
                                     {
                                         financial ? Object.keys(financial).map((item, index) => (
@@ -370,7 +370,7 @@ const FinancialData = (props) => {
                                         </div>
                                         <div>
                                             <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '现金流量' : 'The cash flow'}</span>
-                                            <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：百万元，' + currencyCode + '）' : '(Unit: Million Yuan, ' + currencyCode + ')'}</span>
+                                            <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：'+currencyCode+',百万）' : '(Unit:'+currencyCode+' ,Million)'}</span>
                                         </div>
                                         {
                                             financial ? Object.keys(financial).map((item, index) => (
@@ -404,7 +404,7 @@ const FinancialData = (props) => {
                                             </div>
                                             <div>
                                                 <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '现金流量' : 'The cash flow'}</span>
-                                                <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：百万元，' + currencyCode + '）' : '(Unit: Million Yuan, ' + currencyCode + ')'}</span>
+                                                <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：'+currencyCode+',百万）' : '(Unit:'+currencyCode+' ,Million)'}</span>
                                             </div>
                                             {
                                                 financial ? Object.keys(financial).map((item, index) => (
@@ -438,7 +438,7 @@ const FinancialData = (props) => {
                                                 </div>
                                                 <div>
                                                     <span className={styles.levelTitle}>{intl.locale === "zh-CN" ? '现金流量' : 'The cash flow'}</span>
-                                                    <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：百万元，' + currencyCode + '）' : '(Unit: Million Yuan, ' + currencyCode + ')'}</span>
+                                                    <span className={styles.levelTitleExt}>{intl.locale === "zh-CN" ? '（单位：'+currencyCode+',百万）' : '(Unit:'+currencyCode+' ,Million)'}</span>
                                                 </div>
                                                 {
                                                     financial ? Object.keys(financial).map((item, index) => (
